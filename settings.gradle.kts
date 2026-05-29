@@ -21,3 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "MusicWall"
 include(":app")
+include(":tools:collage-debug")

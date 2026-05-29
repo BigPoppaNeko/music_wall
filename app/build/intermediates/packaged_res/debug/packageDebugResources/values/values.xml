@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="image_kind_entries">
+        <item>Álbumes</item>
+        <item>Artistas</item>
+        <item>Canciones</item>
+        <item>Favoritas</item>
+        <item>Esta semana</item>
+    </string-array>
+    <string-array name="image_kind_values">
+        <item>ALBUMS</item>
+        <item>ARTISTS</item>
+        <item>TRACKS</item>
+        <item>LOVED</item>
+        <item>WEEKLY_ALBUMS</item>
+    </string-array>
+    <string-array name="limit_entries">
+        <item>10 imágenes</item>
+        <item>25 imágenes</item>
+        <item>50 imágenes</item>
+    </string-array>
+    <string-array name="limit_values">
+        <item>10</item>
+        <item>25</item>
+        <item>50</item>
+    </string-array>
+    <string-array name="period_entries">
+        <item>Última semana</item>
+        <item>Último mes</item>
+        <item>3 meses</item>
+        <item>6 meses</item>
+        <item>12 meses</item>
+        <item>General</item>
+    </string-array>
+    <string-array name="period_values">
+        <item>7day</item>
+        <item>1month</item>
+        <item>3month</item>
+        <item>6month</item>
+        <item>12month</item>
+        <item>overall</item>
+    </string-array>
+    <color name="ic_launcher_background">#191414</color>
+    <string name="app_name">Music Wall</string>
+    <string name="btn_connect">Verificar y conectar</string>
+    <string name="change_account">Cambiar cuenta</string>
+    <string name="connect_subtitle">Tu historial musical, convertido en arte</string>
+    <string name="connected_as">Conectado como</string>
+    <string name="create_account">¿No tienes cuenta? Regístrate en last.fm →</string>
+    <string name="error_empty_username">Escribe tu usuario de Last.fm</string>
+    <string name="error_generic">Error al verificar. Inténtalo de nuevo</string>
+    <string name="error_network">Sin conexión. Comprueba tu red</string>
+    <string name="error_user_not_found">Usuario no encontrado en Last.fm</string>
+    <string name="hint_username">Usuario de Last.fm</string>
+    <string name="settings_title">Configuración</string>
+    <string name="verifying">Verificando usuario…</string>
+    <style name="Theme.MusicWall" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">#D51007</item>
+        <item name="colorPrimaryContainer">#4A0501</item>
+        <item name="colorOnPrimaryContainer">#FFBAB6</item>
+        <item name="colorSecondary">#D51007</item>
+        <item name="colorSurface">#1E1E1E</item>
+        <item name="colorSurfaceVariant">#2A2A2A</item>
+        <item name="android:colorBackground">#191414</item>
+        <item name="colorOnSurface">#FFFFFF</item>
+        <item name="colorOnSurfaceVariant">#CCCCCC</item>
+        <item name="android:windowBackground">#191414</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+</resources>

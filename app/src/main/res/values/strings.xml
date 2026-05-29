@@ -2,4 +2,17 @@
 <resources>
     <string name="app_name">Music Wall</string>
     <string name="settings_title">Configuración</string>
+
+    <!-- Connect screen -->
+    <string name="connect_subtitle">Tu historial musical, convertido en arte</string>
+    <string name="hint_username">Usuario de Last.fm</string>
+    <string name="btn_connect">Verificar y conectar</string>
+    <string name="create_account">¿No tienes cuenta? Regístrate en last.fm →</string>
+    <string name="verifying">Verificando usuario…</string>
+    <string name="error_empty_username">Escribe tu usuario de Last.fm</string>
+    <string name="error_user_not_found">Usuario no encontrado en Last.fm</string>
+    <string name="error_network">Sin conexión. Comprueba tu red</string>
+    <string name="error_generic">Error al verificar. Inténtalo de nuevo</string>
+    <string name="connected_as">Conectado como</string>
+    <string name="change_account">Cambiar cuenta</string>
 </resources>

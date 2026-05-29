@@ -1,8 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.MusicWall" parent="Theme.AppCompat.DayNight.DarkActionBar">
+    <style name="Theme.MusicWall" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="colorPrimary">#D51007</item>
-        <item name="colorPrimaryDark">#B00E06</item>
-        <item name="colorAccent">#D51007</item>
+        <item name="colorPrimaryContainer">#4A0501</item>
+        <item name="colorOnPrimaryContainer">#FFBAB6</item>
+        <item name="colorSecondary">#D51007</item>
+        <item name="colorSurface">#1E1E1E</item>
+        <item name="colorSurfaceVariant">#2A2A2A</item>
+        <item name="android:colorBackground">#191414</item>
+        <item name="colorOnSurface">#FFFFFF</item>
+        <item name="colorOnSurfaceVariant">#CCCCCC</item>
+        <item name="android:windowBackground">#191414</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">false</item>
     </style>
 </resources>

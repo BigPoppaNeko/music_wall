@@ -2,6 +2,8 @@ package com.jfcardenas.musicwall.api
 
 import com.google.gson.annotations.SerializedName
 
+// ── Albums ────────────────────────────────────────────────────────────────────
+
 data class TopAlbumsResponse(
     @SerializedName("topalbums") val topAlbums: TopAlbums
 )
@@ -13,8 +15,13 @@ data class TopAlbums(
 data class Album(
     val name: String,
     val artist: ArtistRef,
-    @SerializedName("image") val images: List<LastFmImage>
+    @SerializedName("image") val images: List<LastFmImage>,
+    val playcount: String?,
+    val mbid: String?,
+    val url: String?
 )
+
+// ── Artists ───────────────────────────────────────────────────────────────────
 
 data class TopArtistsResponse(
     @SerializedName("topartists") val topArtists: TopArtists
@@ -24,12 +31,157 @@ data class TopArtists(
     @SerializedName("artist") val artists: List<ArtistItem>
 )
 
-data class ArtistRef(val name: String)
+data class ArtistRef(
+    val name: String,
+    val mbid: String? = null,
+    val url: String? = null
+)
 
 data class ArtistItem(
     val name: String,
+    @SerializedName("image") val images: List<LastFmImage>?,
+    val playcount: String?,
+    val mbid: String?,
+    val url: String?
+)
+
+// ── Top Tracks ────────────────────────────────────────────────────────────────
+
+data class TopTracksResponse(
+    @SerializedName("toptracks") val topTracks: TopTracks
+)
+
+data class TopTracks(
+    @SerializedName("track") val tracks: List<TopTrackItem>
+)
+
+data class TopTrackItem(
+    val name: String,
+    val mbid: String?,
+    val url: String?,
+    val playcount: String?,
+    val artist: ArtistRef,
+    @SerializedName("image") val images: List<LastFmImage>,
+    @SerializedName("@attr") val attr: TrackRankAttr?
+)
+
+data class TrackRankAttr(val rank: String?)
+
+// ── Loved Tracks ──────────────────────────────────────────────────────────────
+
+data class LovedTracksResponse(
+    @SerializedName("lovedtracks") val lovedTracks: LovedTracks
+)
+
+data class LovedTracks(
+    @SerializedName("track") val tracks: List<LovedTrackItem>
+)
+
+data class LovedTrackItem(
+    val name: String,
+    val mbid: String?,
+    val url: String?,
+    val artist: ArtistRef,
+    @SerializedName("image") val images: List<LastFmImage>,
+    val date: TrackDate?
+)
+
+data class TrackDate(
+    val uts: String?,
+    @SerializedName("#text") val text: String?
+)
+
+// ── Recent Tracks ─────────────────────────────────────────────────────────────
+
+data class RecentTracksResponse(
+    @SerializedName("recenttracks") val recentTracks: RecentTracks
+)
+
+data class RecentTracks(
+    @SerializedName("track") val tracks: List<Track>
+)
+
+data class Track(
+    val name: String,
+    val artist: ArtistRef,
+    val album: AlbumRef,
+    @SerializedName("image") val images: List<LastFmImage>,
+    @SerializedName("@attr") val attr: TrackAttr?,
+    val url: String?,
+    val date: TrackDate?
+)
+
+data class AlbumRef(
+    @SerializedName("#text") val name: String,
+    val mbid: String? = null
+)
+
+data class TrackAttr(
+    val nowplaying: String?
+) {
+    fun isNowPlaying() = nowplaying == "true"
+}
+
+// ── Weekly Charts ─────────────────────────────────────────────────────────────
+
+data class WeeklyAlbumChartResponse(
+    @SerializedName("weeklyalbumchart") val chart: WeeklyAlbumChart
+)
+
+data class WeeklyAlbumChart(
+    @SerializedName("album") val albums: List<WeeklyAlbum>
+)
+
+data class WeeklyAlbum(
+    val name: String,
+    val mbid: String?,
+    val url: String?,
+    val playcount: String?,
+    val artist: ArtistRef,
     @SerializedName("image") val images: List<LastFmImage>?
 )
+
+data class WeeklyArtistChartResponse(
+    @SerializedName("weeklyartistchart") val chart: WeeklyArtistChart
+)
+
+data class WeeklyArtistChart(
+    @SerializedName("artist") val artists: List<WeeklyArtist>
+)
+
+data class WeeklyArtist(
+    val name: String,
+    val mbid: String?,
+    val url: String?,
+    val playcount: String?,
+    @SerializedName("image") val images: List<LastFmImage>?
+)
+
+// ── User Info ─────────────────────────────────────────────────────────────────
+
+data class UserInfoResponse(
+    @SerializedName("user") val user: LastFmUser
+)
+
+data class LastFmUser(
+    val name: String,
+    val realname: String,
+    val playcount: String,
+    val country: String?,
+    val subscriber: String?,
+    @SerializedName("track_count") val trackCount: String?,
+    @SerializedName("artist_count") val artistCount: String?,
+    @SerializedName("album_count") val albumCount: String?,
+    val registered: RegisteredInfo?,
+    @SerializedName("image") val images: List<LastFmImage>?
+)
+
+data class RegisteredInfo(
+    val unixtime: String?,
+    @SerializedName("#text") val text: Long?
+)
+
+// ── Images ────────────────────────────────────────────────────────────────────
 
 data class LastFmImage(
     @SerializedName("#text") val url: String,
@@ -37,5 +189,6 @@ data class LastFmImage(
 )
 
 fun List<LastFmImage>.getExtraLargeUrl(): String? =
-    firstOrNull { it.size == "extralarge" }?.url?.takeIf { it.isNotEmpty() }
+    firstOrNull { it.size == "mega" }?.url?.takeIf { it.isNotEmpty() }
+        ?: firstOrNull { it.size == "extralarge" }?.url?.takeIf { it.isNotEmpty() }
         ?: firstOrNull { it.size == "large" }?.url?.takeIf { it.isNotEmpty() }

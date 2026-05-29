@@ -3,10 +3,16 @@
     <string-array name="image_kind_entries">
         <item>Álbumes</item>
         <item>Artistas</item>
+        <item>Canciones</item>
+        <item>Favoritas</item>
+        <item>Esta semana</item>
     </string-array>
     <string-array name="image_kind_values">
         <item>ALBUMS</item>
         <item>ARTISTS</item>
+        <item>TRACKS</item>
+        <item>LOVED</item>
+        <item>WEEKLY_ALBUMS</item>
     </string-array>
 
     <string-array name="period_entries">
