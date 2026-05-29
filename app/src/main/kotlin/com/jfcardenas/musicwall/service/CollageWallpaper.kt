@@ -197,7 +197,6 @@ class CollageWallpaper : WallpaperService() {
                     val path = withContext(Dispatchers.IO) { saveBitmap(collageBitmap) }
                     bitmap = collageBitmap
                     drawFrame()
-                    drawFrame()
                     prefs.edit().putString(PREF_COLLAGE_PATH, path).apply()
                     toast("¡Collage listo!")
                 }

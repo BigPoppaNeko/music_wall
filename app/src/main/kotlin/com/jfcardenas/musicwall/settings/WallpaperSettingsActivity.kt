@@ -46,7 +46,7 @@ class WallpaperSettingsActivity : AppCompatActivity() {
     companion object {
         const val EXTRA_SHOW_CONNECTED_TOAST = "extra_connected_username"
         private const val TAG = "MusicWall"
-        private val PERIODLESS_KINDS = setOf("LOVED", "WEEKLY_ALBUMS", "WEEKLY_ARTISTS")
+        private val PERIODLESS_KINDS = setOf("LOVED")
     }
 
     @Inject lateinit var getMusicImages: GetMusicImagesUseCase
@@ -65,8 +65,8 @@ class WallpaperSettingsActivity : AppCompatActivity() {
     private lateinit var tvStatus: TextView
     private lateinit var ivPreview: ImageView
 
-    private val imageKindEntries = arrayOf("Álbumes", "Artistas", "Canciones", "Favoritas", "Esta semana")
-    private val imageKindValues  = arrayOf("ALBUMS", "ARTISTS", "TRACKS", "LOVED", "WEEKLY_ALBUMS")
+    private val imageKindEntries = arrayOf("Álbumes", "Artistas", "Canciones", "Favoritas")
+    private val imageKindValues  = arrayOf("ALBUMS", "ARTISTS", "TRACKS", "LOVED")
 
     private val periodEntries = arrayOf("Última semana", "Último mes", "3 meses", "6 meses", "12 meses", "General")
     private val periodValues  = arrayOf("7day", "1month", "3month", "6month", "12month", "overall")

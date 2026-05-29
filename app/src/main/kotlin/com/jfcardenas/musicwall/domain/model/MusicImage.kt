@@ -15,8 +15,6 @@ data class MusicImage(
         ALBUM,
         ARTIST,
         TRACK,
-        LOVED_TRACK,
-        WEEKLY_ALBUM,
-        WEEKLY_ARTIST
+        LOVED_TRACK
     }
 }

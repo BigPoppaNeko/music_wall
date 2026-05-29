@@ -32,13 +32,6 @@ interface LastFmService {
     ): TopArtistsResponse
 
     @GET(".")
-    suspend fun getRecentTracks(
-        @Query("method") method: String = "user.getrecenttracks",
-        @Query("user") user: String,
-        @Query("limit") limit: Int
-    ): RecentTracksResponse
-
-    @GET(".")
     suspend fun getUserInfo(
         @Query("method") method: String = "user.getinfo",
         @Query("user") user: String
@@ -58,22 +51,6 @@ interface LastFmService {
         @Query("user") user: String,
         @Query("limit") limit: Int
     ): LovedTracksResponse
-
-    @GET(".")
-    suspend fun getWeeklyAlbumChart(
-        @Query("method") method: String = "user.getweeklyalbumchart",
-        @Query("user") user: String,
-        @Query("from") from: Long? = null,
-        @Query("to") to: Long? = null
-    ): WeeklyAlbumChartResponse
-
-    @GET(".")
-    suspend fun getWeeklyArtistChart(
-        @Query("method") method: String = "user.getweeklyartistchart",
-        @Query("user") user: String,
-        @Query("from") from: Long? = null,
-        @Query("to") to: Long? = null
-    ): WeeklyArtistChartResponse
 }
 
 class LastFmApiException(val code: Int, message: String) : IOException(message)
@@ -116,26 +93,22 @@ private class LastFmErrorInterceptor : Interceptor {
     }
 }
 
-object LastFmApi {
-    private const val BASE_URL = "https://ws.audioscrobbler.com/2.0/"
-
-    val service: LastFmService by lazy {
-        val logging = HttpLoggingInterceptor().apply {
-            level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BASIC
-                    else HttpLoggingInterceptor.Level.NONE
-        }
-        val client = OkHttpClient.Builder()
-            .addInterceptor(ApiKeyInterceptor())
-            .addInterceptor(LastFmErrorInterceptor())
-            .addInterceptor(logging)
-            .connectTimeout(15, TimeUnit.SECONDS)
-            .readTimeout(30, TimeUnit.SECONDS)
-            .build()
-        Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .client(client)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-            .create(LastFmService::class.java)
+internal fun createLastFmService(): LastFmService {
+    val logging = HttpLoggingInterceptor().apply {
+        level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BASIC
+                else HttpLoggingInterceptor.Level.NONE
     }
+    val client = OkHttpClient.Builder()
+        .addInterceptor(ApiKeyInterceptor())
+        .addInterceptor(LastFmErrorInterceptor())
+        .addInterceptor(logging)
+        .connectTimeout(15, TimeUnit.SECONDS)
+        .readTimeout(30, TimeUnit.SECONDS)
+        .build()
+    return Retrofit.Builder()
+        .baseUrl("https://ws.audioscrobbler.com/2.0/")
+        .client(client)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+        .create(LastFmService::class.java)
 }

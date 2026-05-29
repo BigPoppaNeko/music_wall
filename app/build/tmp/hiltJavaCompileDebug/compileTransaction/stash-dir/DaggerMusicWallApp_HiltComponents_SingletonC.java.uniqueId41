@@ -19,14 +19,16 @@ import com.jfcardenas.musicwall.data.LastFmRepository;
 import com.jfcardenas.musicwall.data.local.db.MusicWallDatabase;
 import com.jfcardenas.musicwall.data.local.db.dao.AlbumDao;
 import com.jfcardenas.musicwall.data.local.db.dao.ArtistDao;
+import com.jfcardenas.musicwall.data.local.db.dao.TrackDao;
 import com.jfcardenas.musicwall.di.DatabaseModule_ProvideAlbumDaoFactory;
 import com.jfcardenas.musicwall.di.DatabaseModule_ProvideArtistDaoFactory;
 import com.jfcardenas.musicwall.di.DatabaseModule_ProvideDatabaseFactory;
+import com.jfcardenas.musicwall.di.DatabaseModule_ProvideTrackDaoFactory;
 import com.jfcardenas.musicwall.di.NetworkModule_ProvideImageLoaderFactory;
 import com.jfcardenas.musicwall.di.NetworkModule_ProvideLastFmServiceFactory;
 import com.jfcardenas.musicwall.domain.usecase.GetMusicImagesUseCase;
 import com.jfcardenas.musicwall.features.connect.ConnectActivity;
-import com.jfcardenas.musicwall.features.wallpaper.renderer.GridCollageRenderer;
+import com.jfcardenas.musicwall.features.wallpaper.renderer.AlbumWallRenderer;
 import com.jfcardenas.musicwall.features.wallpaper.renderer.WallpaperRendererFactory;
 import com.jfcardenas.musicwall.service.CollageWallpaper;
 import com.jfcardenas.musicwall.service.CollageWallpaper_MembersInjector;
@@ -429,6 +431,7 @@ public final class DaggerMusicWallApp_HiltComponents_SingletonC {
         WallpaperSettingsActivity instance) {
       WallpaperSettingsActivity_MembersInjector.injectGetMusicImages(instance, getMusicImagesUseCase());
       WallpaperSettingsActivity_MembersInjector.injectImageLoader(instance, singletonCImpl.provideImageLoaderProvider.get());
+      WallpaperSettingsActivity_MembersInjector.injectRendererFactory(instance, singletonCImpl.wallpaperRendererFactoryProvider.get());
       return instance;
     }
   }
@@ -585,6 +588,10 @@ public final class DaggerMusicWallApp_HiltComponents_SingletonC {
       return DatabaseModule_ProvideArtistDaoFactory.provideArtistDao(provideDatabaseProvider.get());
     }
 
+    TrackDao trackDao() {
+      return DatabaseModule_ProvideTrackDaoFactory.provideTrackDao(provideDatabaseProvider.get());
+    }
+
     @SuppressWarnings("unchecked")
     private void initialize(final ApplicationContextModule applicationContextModuleParam) {
       this.wallpaperRefreshWorker_AssistedFactoryProvider = SingleCheck.provider(new SwitchingProvider<WallpaperRefreshWorker_AssistedFactory>(singletonCImpl, 0));
@@ -644,7 +651,7 @@ public final class DaggerMusicWallApp_HiltComponents_SingletonC {
           };
 
           case 1: // com.jfcardenas.musicwall.data.LastFmRepository
-          return (T) new LastFmRepository(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule), singletonCImpl.provideLastFmServiceProvider.get(), singletonCImpl.albumDao(), singletonCImpl.artistDao());
+          return (T) new LastFmRepository(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule), singletonCImpl.provideLastFmServiceProvider.get(), singletonCImpl.albumDao(), singletonCImpl.artistDao(), singletonCImpl.trackDao());
 
           case 2: // com.jfcardenas.musicwall.api.LastFmService
           return (T) NetworkModule_ProvideLastFmServiceFactory.provideLastFmService();
@@ -656,7 +663,7 @@ public final class DaggerMusicWallApp_HiltComponents_SingletonC {
           return (T) NetworkModule_ProvideImageLoaderFactory.provideImageLoader(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
 
           case 5: // com.jfcardenas.musicwall.features.wallpaper.renderer.WallpaperRendererFactory
-          return (T) new WallpaperRendererFactory(new GridCollageRenderer());
+          return (T) new WallpaperRendererFactory(new AlbumWallRenderer());
 
           default: throw new AssertionError(id);
         }

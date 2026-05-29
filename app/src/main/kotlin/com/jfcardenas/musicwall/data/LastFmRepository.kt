@@ -23,10 +23,7 @@ import javax.inject.Singleton
 
 private const val TAG = "LastFmRepository"
 private const val CACHE_TTL_MS = 3_600_000L
-
-// Fixed cache keys for sources that don't use a period parameter
 private const val CACHE_KEY_LOVED = "loved"
-private const val CACHE_KEY_WEEKLY = "weekly_current"
 
 @Singleton
 class LastFmRepository @Inject constructor(
@@ -106,14 +103,6 @@ class LastFmRepository @Inject constructor(
         }
     }
 
-    override suspend fun clearCache(username: String?) {
-        val cutoff = System.currentTimeMillis()
-        albumDao.deleteOlderThan(cutoff)
-        artistDao.deleteOlderThan(cutoff)
-        trackDao.deleteOlderThan(cutoff)
-        Log.d(TAG, "Cache cleared for ${username ?: "all users"}")
-    }
-
     // ── API fetch ─────────────────────────────────────────────────────────────
 
     private suspend fun fetchFromApi(
@@ -188,42 +177,6 @@ class LastFmRepository @Inject constructor(
                 }
             }
 
-        "WEEKLY_ALBUMS" -> service.getWeeklyAlbumChart(user = username)
-            .chart.albums
-            .take(limit)
-            .mapIndexedNotNull { index, album ->
-                album.images?.getExtraLargeUrl()?.let { url ->
-                    MusicImage(
-                        url = url,
-                        name = album.name,
-                        artistName = album.artist.name,
-                        rank = index + 1,
-                        kind = MusicImage.Kind.WEEKLY_ALBUM,
-                        playcount = album.playcount?.toIntOrNull() ?: 0,
-                        mbid = album.mbid?.takeIf { it.isNotEmpty() },
-                        lastFmUrl = album.url?.takeIf { it.isNotEmpty() }
-                    )
-                }
-            }
-
-        "WEEKLY_ARTISTS" -> service.getWeeklyArtistChart(user = username)
-            .chart.artists
-            .take(limit)
-            .mapIndexedNotNull { index, artist ->
-                artist.images?.getExtraLargeUrl()?.let { url ->
-                    MusicImage(
-                        url = url,
-                        name = artist.name,
-                        artistName = artist.name,
-                        rank = index + 1,
-                        kind = MusicImage.Kind.WEEKLY_ARTIST,
-                        playcount = artist.playcount?.toIntOrNull() ?: 0,
-                        mbid = artist.mbid?.takeIf { it.isNotEmpty() },
-                        lastFmUrl = artist.url?.takeIf { it.isNotEmpty() }
-                    )
-                }
-            }
-
         else -> emptyList()
     }
 
@@ -233,18 +186,12 @@ class LastFmRepository @Inject constructor(
         username: String, imageKind: String, cacheKey: String, limit: Int
     ): List<MusicImage> = when (imageKind) {
 
-        "ALBUMS", "WEEKLY_ALBUMS" -> {
-            val kind = if (imageKind == "ALBUMS") MusicImage.Kind.ALBUM else MusicImage.Kind.WEEKLY_ALBUM
-            albumDao.get(username, cacheKey, limit).map { e ->
-                MusicImage(e.imageUrl, e.albumName, e.artistName, e.rank, kind, e.playcount, e.mbid, e.lastFmUrl)
-            }
+        "ALBUMS" -> albumDao.get(username, cacheKey, limit).map { e ->
+            MusicImage(e.imageUrl, e.albumName, e.artistName, e.rank, MusicImage.Kind.ALBUM, e.playcount, e.mbid, e.lastFmUrl)
         }
 
-        "ARTISTS", "WEEKLY_ARTISTS" -> {
-            val kind = if (imageKind == "ARTISTS") MusicImage.Kind.ARTIST else MusicImage.Kind.WEEKLY_ARTIST
-            artistDao.get(username, cacheKey, limit).map { e ->
-                MusicImage(e.imageUrl, e.artistName, e.artistName, e.rank, kind, e.playcount, e.mbid, e.lastFmUrl)
-            }
+        "ARTISTS" -> artistDao.get(username, cacheKey, limit).map { e ->
+            MusicImage(e.imageUrl, e.artistName, e.artistName, e.rank, MusicImage.Kind.ARTIST, e.playcount, e.mbid, e.lastFmUrl)
         }
 
         "TRACKS" -> trackDao.get(username, cacheKey, "TOP", limit).map { e ->
@@ -265,7 +212,7 @@ class LastFmRepository @Inject constructor(
     ) {
         when (imageKind) {
 
-            "ALBUMS", "WEEKLY_ALBUMS" -> {
+            "ALBUMS" -> {
                 albumDao.deleteForUserPeriod(username, cacheKey)
                 albumDao.insertAll(images.map { img ->
                     AlbumEntity(
@@ -278,7 +225,7 @@ class LastFmRepository @Inject constructor(
                 })
             }
 
-            "ARTISTS", "WEEKLY_ARTISTS" -> {
+            "ARTISTS" -> {
                 artistDao.deleteForUserPeriod(username, cacheKey)
                 artistDao.insertAll(images.map { img ->
                     ArtistEntity(
@@ -322,8 +269,8 @@ class LastFmRepository @Inject constructor(
 
     private suspend fun isCacheValid(username: String, imageKind: String, cacheKey: String): Boolean {
         val oldest = when (imageKind) {
-            "ALBUMS", "WEEKLY_ALBUMS" -> albumDao.oldestFetchTime(username, cacheKey)
-            "ARTISTS", "WEEKLY_ARTISTS" -> artistDao.oldestFetchTime(username, cacheKey)
+            "ALBUMS" -> albumDao.oldestFetchTime(username, cacheKey)
+            "ARTISTS" -> artistDao.oldestFetchTime(username, cacheKey)
             "TRACKS" -> trackDao.oldestFetchTime(username, cacheKey, "TOP")
             "LOVED" -> trackDao.oldestFetchTime(username, cacheKey, "LOVED")
             else -> null
@@ -333,11 +280,8 @@ class LastFmRepository @Inject constructor(
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
-    private fun cacheKeyFor(imageKind: String, period: String): String = when (imageKind) {
-        "LOVED" -> CACHE_KEY_LOVED
-        "WEEKLY_ALBUMS", "WEEKLY_ARTISTS" -> CACHE_KEY_WEEKLY
-        else -> period
-    }
+    private fun cacheKeyFor(imageKind: String, period: String): String =
+        if (imageKind == "LOVED") CACHE_KEY_LOVED else period
 
     private fun isNetworkAvailable(): Boolean {
         val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager

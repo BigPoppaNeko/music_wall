@@ -11,6 +11,4 @@ interface MusicRepository {
         limit: Int,
         forceRefresh: Boolean = false
     ): NetworkResult<List<MusicImage>>
-
-    suspend fun clearCache(username: String? = null)
 }

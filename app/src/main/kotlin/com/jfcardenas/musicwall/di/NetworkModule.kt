@@ -4,8 +4,8 @@ import android.content.Context
 import coil.ImageLoader
 import coil.disk.DiskCache
 import coil.memory.MemoryCache
-import com.jfcardenas.musicwall.api.LastFmApi
 import com.jfcardenas.musicwall.api.LastFmService
+import com.jfcardenas.musicwall.api.createLastFmService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -19,7 +19,7 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideLastFmService(): LastFmService = LastFmApi.service
+    fun provideLastFmService(): LastFmService = createLastFmService()
 
     @Provides
     @Singleton

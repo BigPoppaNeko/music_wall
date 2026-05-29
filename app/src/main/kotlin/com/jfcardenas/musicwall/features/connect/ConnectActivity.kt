@@ -15,16 +15,19 @@ import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.button.MaterialButton
 import android.widget.TextView
 import com.jfcardenas.musicwall.R
-import com.jfcardenas.musicwall.api.LastFmApi
 import com.jfcardenas.musicwall.api.LastFmApiException
+import com.jfcardenas.musicwall.api.LastFmService
 import com.jfcardenas.musicwall.service.CollageWallpaper
 import com.jfcardenas.musicwall.settings.WallpaperSettingsActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.io.IOException
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class ConnectActivity : AppCompatActivity() {
+
+    @Inject lateinit var lastFmService: LastFmService
 
     private lateinit var tilUsername: TextInputLayout
     private lateinit var etUsername: TextInputEditText
@@ -74,7 +77,7 @@ class ConnectActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             try {
-                val user = LastFmApi.service.getUserInfo(user = username).user
+                val user = lastFmService.getUserInfo(user = username).user
 
                 // Guardar username y nombre real
                 getSharedPreferences(CollageWallpaper.PREFS_NAME, MODE_PRIVATE)
