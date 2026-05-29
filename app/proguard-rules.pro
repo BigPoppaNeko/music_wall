@@ -1,0 +1,1 @@
+-keep class com.jfcardenas.musicwall.api.** { *; }

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="image_kind_entries">
+        <item>Álbumes</item>
+        <item>Artistas</item>
+    </string-array>
+    <string-array name="image_kind_values">
+        <item>ALBUMS</item>
+        <item>ARTISTS</item>
+    </string-array>
+
+    <string-array name="period_entries">
+        <item>Última semana</item>
+        <item>Último mes</item>
+        <item>3 meses</item>
+        <item>6 meses</item>
+        <item>12 meses</item>
+        <item>General</item>
+    </string-array>
+    <string-array name="period_values">
+        <item>7day</item>
+        <item>1month</item>
+        <item>3month</item>
+        <item>6month</item>
+        <item>12month</item>
+        <item>overall</item>
+    </string-array>
+
+    <string-array name="limit_entries">
+        <item>10 imágenes</item>
+        <item>25 imágenes</item>
+        <item>50 imágenes</item>
+    </string-array>
+    <string-array name="limit_values">
+        <item>10</item>
+        <item>25</item>
+        <item>50</item>
+    </string-array>
+</resources>

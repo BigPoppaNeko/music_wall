@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.MusicWall" parent="Theme.AppCompat.DayNight.DarkActionBar">
+        <item name="colorPrimary">#D51007</item>
+        <item name="colorPrimaryDark">#B00E06</item>
+        <item name="colorAccent">#D51007</item>
+    </style>
+</resources>
