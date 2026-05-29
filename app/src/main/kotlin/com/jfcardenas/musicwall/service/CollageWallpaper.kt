@@ -35,6 +35,7 @@ class CollageWallpaper : WallpaperService() {
         const val PREF_COLLAGE_PATH = "collage_path"
         const val ACTION_REFRESH    = "com.jfcardenas.musicwall.action.REFRESH"
         private const val TAG       = "MusicWall"
+        private const val MIN_IMAGES = 4
     }
 
     @Inject lateinit var getMusicImages: GetMusicImagesUseCase
@@ -88,20 +89,22 @@ class CollageWallpaper : WallpaperService() {
     }
 
     private suspend fun downloadBitmap(url: String): Bitmap? {
-        val request = ImageRequest.Builder(applicationContext)
-            .data(url)
-            .size(Size.ORIGINAL)
-            .allowHardware(false)
-            .build()
-        return try {
-            val bmp = (imageLoader.execute(request).drawable
-                    as? android.graphics.drawable.BitmapDrawable)?.bitmap
-            if (bmp == null) Log.w(TAG, "✗ Bitmap null: $url")
-            bmp
-        } catch (e: Exception) {
-            Log.w(TAG, "✗ Download error: $url — ${e.message}")
-            null
+        repeat(3) { attempt ->
+            try {
+                val request = ImageRequest.Builder(applicationContext)
+                    .data(url)
+                    .size(Size.ORIGINAL)
+                    .allowHardware(false)
+                    .build()
+                val bmp = (imageLoader.execute(request).drawable
+                        as? android.graphics.drawable.BitmapDrawable)?.bitmap
+                if (bmp != null) return bmp
+            } catch (e: Exception) {
+                Log.w(TAG, "✗ Download attempt ${attempt + 1}/3: $url — ${e.message}")
+            }
+            if (attempt < 2) delay(300L * (attempt + 1))
         }
+        return null
     }
 
     inner class CollageEngine : Engine() {
@@ -183,8 +186,12 @@ class CollageWallpaper : WallpaperService() {
                         }
                     }
 
-                    if (renderItems.isEmpty()) {
-                        toast("No se pudieron descargar las imágenes")
+                    val loaded = renderItems.size
+                    val total  = musicImages.size
+                    Log.d(TAG, "✓ $loaded/$total imágenes descargadas")
+
+                    if (loaded < MIN_IMAGES) {
+                        toast("Solo $loaded/$total imágenes disponibles")
                         return
                     }
 

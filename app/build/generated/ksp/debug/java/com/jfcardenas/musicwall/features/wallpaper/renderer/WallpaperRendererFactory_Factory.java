@@ -24,23 +24,23 @@ import javax.annotation.processing.Generated;
     "nullness:initialization.field.uninitialized"
 })
 public final class WallpaperRendererFactory_Factory implements Factory<WallpaperRendererFactory> {
-  private final Provider<AlbumWallRenderer> albumWallRendererProvider;
+  private final Provider<EcosystemRenderer> ecosystemRendererProvider;
 
-  private WallpaperRendererFactory_Factory(Provider<AlbumWallRenderer> albumWallRendererProvider) {
-    this.albumWallRendererProvider = albumWallRendererProvider;
+  private WallpaperRendererFactory_Factory(Provider<EcosystemRenderer> ecosystemRendererProvider) {
+    this.ecosystemRendererProvider = ecosystemRendererProvider;
   }
 
   @Override
   public WallpaperRendererFactory get() {
-    return newInstance(albumWallRendererProvider.get());
+    return newInstance(ecosystemRendererProvider.get());
   }
 
   public static WallpaperRendererFactory_Factory create(
-      Provider<AlbumWallRenderer> albumWallRendererProvider) {
-    return new WallpaperRendererFactory_Factory(albumWallRendererProvider);
+      Provider<EcosystemRenderer> ecosystemRendererProvider) {
+    return new WallpaperRendererFactory_Factory(ecosystemRendererProvider);
   }
 
-  public static WallpaperRendererFactory newInstance(AlbumWallRenderer albumWallRenderer) {
-    return new WallpaperRendererFactory(albumWallRenderer);
+  public static WallpaperRendererFactory newInstance(EcosystemRenderer ecosystemRenderer) {
+    return new WallpaperRendererFactory(ecosystemRenderer);
   }
 }

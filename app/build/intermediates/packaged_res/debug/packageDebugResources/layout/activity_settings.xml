@@ -111,33 +111,40 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="4dp"
+                android:layout_marginBottom="8dp"
                 android:text="Tipo de imágenes"
                 android:textColor="#CCCCCC"
                 android:textSize="13sp" />
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/til_image_kind"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/btn_group_image_kind"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:boxBackgroundColor="#2A2A2A"
-                app:boxStrokeColor="#555555"
-                app:hintTextColor="#888888">
+                app:singleSelection="true"
+                app:selectionRequired="true">
 
-                <AutoCompleteTextView
-                    android:id="@+id/acv_image_kind"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="none"
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_kind_albums"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="48dp"
+                    android:text="Álbumes"
                     android:textColor="#FFFFFF"
-                    android:textSize="15sp"
-                    android:paddingTop="14dp"
-                    android:paddingBottom="14dp"
-                    android:dropDownVerticalOffset="4dp" />
+                    app:strokeColor="#555555" />
 
-            </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_kind_artists"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="48dp"
+                    android:text="Artistas"
+                    android:textColor="#FFFFFF"
+                    app:strokeColor="#555555" />
+
+            </com.google.android.material.button.MaterialButtonToggleGroup>
 
             <!-- Período -->
             <TextView
@@ -244,6 +251,29 @@
                 android:layout_marginTop="16dp"
                 android:adjustViewBounds="true"
                 android:scaleType="fitCenter"
+                android:visibility="gone" />
+
+            <!-- Etiqueta de ítems utilizados -->
+            <TextView
+                android:id="@+id/tv_used_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="8dp"
+                android:textColor="#D51007"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.12"
+                android:visibility="gone" />
+
+            <!-- Chips de álbumes/artistas utilizados -->
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chip_group_used_items"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                app:chipSpacingHorizontal="6dp"
+                app:chipSpacingVertical="4dp"
                 android:visibility="gone" />
 
         </LinearLayout>

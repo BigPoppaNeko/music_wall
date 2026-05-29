@@ -3165,7 +3165,6 @@ id action_mode_close_button
 id action_text
 id actions
 id activity_chooser_view_content
-id acv_image_kind
 id acv_limit
 id acv_period
 id add
@@ -3195,6 +3194,9 @@ id btn_apply_wallpaper
 id btn_change_account
 id btn_connect
 id btn_generate
+id btn_group_image_kind
+id btn_kind_albums
+id btn_kind_artists
 id buttonPanel
 id cancel_button
 id center
@@ -3206,6 +3208,7 @@ id chain
 id chains
 id checkbox
 id checked
+id chip_group_used_items
 id chronometer
 id circle_center
 id clear_text
@@ -3540,7 +3543,6 @@ id textinput_helper_text
 id textinput_placeholder
 id textinput_prefix_text
 id textinput_suffix_text
-id til_image_kind
 id til_limit
 id til_period
 id til_username
@@ -3566,6 +3568,7 @@ id transition_transform
 id triangle
 id tv_create_account
 id tv_status
+id tv_used_label
 id unchecked
 id uniform
 id unlabeled

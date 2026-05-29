@@ -5,7 +5,7 @@ import javax.inject.Singleton
 
 @Singleton
 class WallpaperRendererFactory @Inject constructor(
-    private val albumWallRenderer: AlbumWallRenderer
+    private val ecosystemRenderer: EcosystemRenderer
 ) {
-    fun get(): WallpaperRenderer = albumWallRenderer
+    fun get(): WallpaperRenderer = ecosystemRenderer
 }

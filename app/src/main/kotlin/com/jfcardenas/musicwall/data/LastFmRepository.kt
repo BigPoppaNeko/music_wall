@@ -7,6 +7,9 @@ import android.util.Log
 import com.jfcardenas.musicwall.api.LastFmApiException
 import com.jfcardenas.musicwall.api.LastFmService
 import com.jfcardenas.musicwall.api.getExtraLargeUrl
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import com.jfcardenas.musicwall.data.local.db.dao.AlbumDao
 import com.jfcardenas.musicwall.data.local.db.dao.ArtistDao
 import com.jfcardenas.musicwall.data.local.db.dao.TrackDao
@@ -31,7 +34,8 @@ class LastFmRepository @Inject constructor(
     private val service: LastFmService,
     private val albumDao: AlbumDao,
     private val artistDao: ArtistDao,
-    private val trackDao: TrackDao
+    private val trackDao: TrackDao,
+    private val artistImageResolver: ArtistImageResolver
 ) : MusicRepository {
 
     override suspend fun getImages(
@@ -126,22 +130,30 @@ class LastFmRepository @Inject constructor(
                 }
             }
 
-        "ARTISTS" -> service.getTopArtists(user = username, period = period, limit = limit)
-            .topArtists.artists
-            .mapIndexedNotNull { index, artist ->
-                artist.images?.getExtraLargeUrl()?.let { url ->
-                    MusicImage(
-                        url = url,
-                        name = artist.name,
-                        artistName = artist.name,
-                        rank = index + 1,
-                        kind = MusicImage.Kind.ARTIST,
-                        playcount = artist.playcount?.toIntOrNull() ?: 0,
-                        mbid = artist.mbid?.takeIf { it.isNotEmpty() },
-                        lastFmUrl = artist.url?.takeIf { it.isNotEmpty() }
-                    )
-                }
+        "ARTISTS" -> {
+            val artists = service.getTopArtists(user = username, period = period, limit = limit)
+                .topArtists.artists
+            coroutineScope {
+                artists.mapIndexed { index, artist ->
+                    async {
+                        val imageUrl = artist.images?.getExtraLargeUrl()
+                            ?: artistImageResolver.getImageUrl(artist.name)
+                        imageUrl?.let { url ->
+                            MusicImage(
+                                url = url,
+                                name = artist.name,
+                                artistName = artist.name,
+                                rank = index + 1,
+                                kind = MusicImage.Kind.ARTIST,
+                                playcount = artist.playcount?.toIntOrNull() ?: 0,
+                                mbid = artist.mbid?.takeIf { it.isNotEmpty() },
+                                lastFmUrl = artist.url?.takeIf { it.isNotEmpty() }
+                            )
+                        }
+                    }
+                }.awaitAll().filterNotNull()
             }
+        }
 
         "TRACKS" -> service.getTopTracks(user = username, period = period, limit = limit)
             .topTracks.tracks

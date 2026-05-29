@@ -15,6 +15,7 @@ import androidx.work.WorkerParameters;
 import coil.ImageLoader;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.jfcardenas.musicwall.api.LastFmService;
+import com.jfcardenas.musicwall.data.ArtistImageResolver;
 import com.jfcardenas.musicwall.data.LastFmRepository;
 import com.jfcardenas.musicwall.data.local.db.MusicWallDatabase;
 import com.jfcardenas.musicwall.data.local.db.dao.AlbumDao;
@@ -29,7 +30,7 @@ import com.jfcardenas.musicwall.di.NetworkModule_ProvideLastFmServiceFactory;
 import com.jfcardenas.musicwall.domain.usecase.GetMusicImagesUseCase;
 import com.jfcardenas.musicwall.features.connect.ConnectActivity;
 import com.jfcardenas.musicwall.features.connect.ConnectActivity_MembersInjector;
-import com.jfcardenas.musicwall.features.wallpaper.renderer.AlbumWallRenderer;
+import com.jfcardenas.musicwall.features.wallpaper.renderer.EcosystemRenderer;
 import com.jfcardenas.musicwall.features.wallpaper.renderer.WallpaperRendererFactory;
 import com.jfcardenas.musicwall.service.CollageWallpaper;
 import com.jfcardenas.musicwall.service.CollageWallpaper_MembersInjector;
@@ -567,9 +568,13 @@ public final class DaggerMusicWallApp_HiltComponents_SingletonC {
 
     dagger.internal.Provider<MusicWallDatabase> provideDatabaseProvider;
 
+    dagger.internal.Provider<ArtistImageResolver> artistImageResolverProvider;
+
     dagger.internal.Provider<LastFmRepository> lastFmRepositoryProvider;
 
     dagger.internal.Provider<ImageLoader> provideImageLoaderProvider;
+
+    dagger.internal.Provider<EcosystemRenderer> ecosystemRendererProvider;
 
     dagger.internal.Provider<WallpaperRendererFactory> wallpaperRendererFactoryProvider;
 
@@ -605,9 +610,11 @@ public final class DaggerMusicWallApp_HiltComponents_SingletonC {
       this.wallpaperRefreshWorker_AssistedFactoryProvider = SingleCheck.provider(new SwitchingProvider<WallpaperRefreshWorker_AssistedFactory>(singletonCImpl, 0));
       this.provideLastFmServiceProvider = DoubleCheck.provider(new SwitchingProvider<LastFmService>(singletonCImpl, 1));
       this.provideDatabaseProvider = DoubleCheck.provider(new SwitchingProvider<MusicWallDatabase>(singletonCImpl, 3));
+      this.artistImageResolverProvider = DoubleCheck.provider(new SwitchingProvider<ArtistImageResolver>(singletonCImpl, 4));
       this.lastFmRepositoryProvider = DoubleCheck.provider(new SwitchingProvider<LastFmRepository>(singletonCImpl, 2));
-      this.provideImageLoaderProvider = DoubleCheck.provider(new SwitchingProvider<ImageLoader>(singletonCImpl, 4));
-      this.wallpaperRendererFactoryProvider = DoubleCheck.provider(new SwitchingProvider<WallpaperRendererFactory>(singletonCImpl, 5));
+      this.provideImageLoaderProvider = DoubleCheck.provider(new SwitchingProvider<ImageLoader>(singletonCImpl, 5));
+      this.ecosystemRendererProvider = DoubleCheck.provider(new SwitchingProvider<EcosystemRenderer>(singletonCImpl, 7));
+      this.wallpaperRendererFactoryProvider = DoubleCheck.provider(new SwitchingProvider<WallpaperRendererFactory>(singletonCImpl, 6));
     }
 
     @Override
@@ -662,16 +669,22 @@ public final class DaggerMusicWallApp_HiltComponents_SingletonC {
           return (T) NetworkModule_ProvideLastFmServiceFactory.provideLastFmService();
 
           case 2: // com.jfcardenas.musicwall.data.LastFmRepository
-          return (T) new LastFmRepository(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule), singletonCImpl.provideLastFmServiceProvider.get(), singletonCImpl.albumDao(), singletonCImpl.artistDao(), singletonCImpl.trackDao());
+          return (T) new LastFmRepository(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule), singletonCImpl.provideLastFmServiceProvider.get(), singletonCImpl.albumDao(), singletonCImpl.artistDao(), singletonCImpl.trackDao(), singletonCImpl.artistImageResolverProvider.get());
 
           case 3: // com.jfcardenas.musicwall.data.local.db.MusicWallDatabase
           return (T) DatabaseModule_ProvideDatabaseFactory.provideDatabase(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
 
-          case 4: // coil.ImageLoader
+          case 4: // com.jfcardenas.musicwall.data.ArtistImageResolver
+          return (T) new ArtistImageResolver();
+
+          case 5: // coil.ImageLoader
           return (T) NetworkModule_ProvideImageLoaderFactory.provideImageLoader(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
 
-          case 5: // com.jfcardenas.musicwall.features.wallpaper.renderer.WallpaperRendererFactory
-          return (T) new WallpaperRendererFactory(new AlbumWallRenderer());
+          case 6: // com.jfcardenas.musicwall.features.wallpaper.renderer.WallpaperRendererFactory
+          return (T) new WallpaperRendererFactory(singletonCImpl.ecosystemRendererProvider.get());
+
+          case 7: // com.jfcardenas.musicwall.features.wallpaper.renderer.EcosystemRenderer
+          return (T) new EcosystemRenderer();
 
           default: throw new AssertionError(id);
         }

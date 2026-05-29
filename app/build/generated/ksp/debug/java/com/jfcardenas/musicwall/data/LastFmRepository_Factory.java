@@ -39,29 +39,35 @@ public final class LastFmRepository_Factory implements Factory<LastFmRepository>
 
   private final Provider<TrackDao> trackDaoProvider;
 
+  private final Provider<ArtistImageResolver> artistImageResolverProvider;
+
   private LastFmRepository_Factory(Provider<Context> contextProvider,
       Provider<LastFmService> serviceProvider, Provider<AlbumDao> albumDaoProvider,
-      Provider<ArtistDao> artistDaoProvider, Provider<TrackDao> trackDaoProvider) {
+      Provider<ArtistDao> artistDaoProvider, Provider<TrackDao> trackDaoProvider,
+      Provider<ArtistImageResolver> artistImageResolverProvider) {
     this.contextProvider = contextProvider;
     this.serviceProvider = serviceProvider;
     this.albumDaoProvider = albumDaoProvider;
     this.artistDaoProvider = artistDaoProvider;
     this.trackDaoProvider = trackDaoProvider;
+    this.artistImageResolverProvider = artistImageResolverProvider;
   }
 
   @Override
   public LastFmRepository get() {
-    return newInstance(contextProvider.get(), serviceProvider.get(), albumDaoProvider.get(), artistDaoProvider.get(), trackDaoProvider.get());
+    return newInstance(contextProvider.get(), serviceProvider.get(), albumDaoProvider.get(), artistDaoProvider.get(), trackDaoProvider.get(), artistImageResolverProvider.get());
   }
 
   public static LastFmRepository_Factory create(Provider<Context> contextProvider,
       Provider<LastFmService> serviceProvider, Provider<AlbumDao> albumDaoProvider,
-      Provider<ArtistDao> artistDaoProvider, Provider<TrackDao> trackDaoProvider) {
-    return new LastFmRepository_Factory(contextProvider, serviceProvider, albumDaoProvider, artistDaoProvider, trackDaoProvider);
+      Provider<ArtistDao> artistDaoProvider, Provider<TrackDao> trackDaoProvider,
+      Provider<ArtistImageResolver> artistImageResolverProvider) {
+    return new LastFmRepository_Factory(contextProvider, serviceProvider, albumDaoProvider, artistDaoProvider, trackDaoProvider, artistImageResolverProvider);
   }
 
   public static LastFmRepository newInstance(Context context, LastFmService service,
-      AlbumDao albumDao, ArtistDao artistDao, TrackDao trackDao) {
-    return new LastFmRepository(context, service, albumDao, artistDao, trackDao);
+      AlbumDao albumDao, ArtistDao artistDao, TrackDao trackDao,
+      ArtistImageResolver artistImageResolver) {
+    return new LastFmRepository(context, service, albumDao, artistDao, trackDao, artistImageResolver);
   }
 }
