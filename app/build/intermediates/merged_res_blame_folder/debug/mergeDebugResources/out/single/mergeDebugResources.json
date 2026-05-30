@@ -1,38 +1,38 @@
 [
     {
-        "merged": "C:\\Users\\jfcar\\.gradle\\daemon\\9.4.1\\com.jfcardenas.musicwall.app-debug-46:\\layout_activity_settings.xml.flat",
-        "source": "C:\\Users\\jfcar\\.gradle\\daemon\\9.4.1\\com.jfcardenas.musicwall.app-main-48:\\layout\\activity_settings.xml"
+        "merged": "C:\\Users\\jfcar\\.gradle\\daemon\\9.4.1\\com.jfcardenas.musicwall.app-debug-79:\\layout_activity_settings.xml.flat",
+        "source": "C:\\Users\\jfcar\\.gradle\\daemon\\9.4.1\\com.jfcardenas.musicwall.app-main-81:\\layout\\activity_settings.xml"
     },
     {
-        "merged": "C:\\Users\\jfcar\\.gradle\\daemon\\9.4.1\\com.jfcardenas.musicwall.app-debug-46:\\drawable_ic_launcher_foreground.xml.flat",
-        "source": "C:\\Users\\jfcar\\.gradle\\daemon\\9.4.1\\com.jfcardenas.musicwall.app-main-48:\\drawable\\ic_launcher_foreground.xml"
+        "merged": "C:\\Users\\jfcar\\.gradle\\daemon\\9.4.1\\com.jfcardenas.musicwall.app-debug-79:\\mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "C:\\Users\\jfcar\\.gradle\\daemon\\9.4.1\\com.jfcardenas.musicwall.app-main-81:\\mipmap-anydpi-v26\\ic_launcher_round.xml"
     },
     {
-        "merged": "C:\\Users\\jfcar\\.gradle\\daemon\\9.4.1\\com.jfcardenas.musicwall.app-debug-46:\\layout_dropdown_item.xml.flat",
-        "source": "C:\\Users\\jfcar\\.gradle\\daemon\\9.4.1\\com.jfcardenas.musicwall.app-main-48:\\layout\\dropdown_item.xml"
+        "merged": "C:\\Users\\jfcar\\.gradle\\daemon\\9.4.1\\com.jfcardenas.musicwall.app-debug-79:\\drawable_ic_launcher_foreground.xml.flat",
+        "source": "C:\\Users\\jfcar\\.gradle\\daemon\\9.4.1\\com.jfcardenas.musicwall.app-main-81:\\drawable\\ic_launcher_foreground.xml"
     },
     {
-        "merged": "C:\\Users\\jfcar\\.gradle\\daemon\\9.4.1\\com.jfcardenas.musicwall.app-debug-46:\\mipmap-anydpi-v26_ic_launcher_round.xml.flat",
-        "source": "C:\\Users\\jfcar\\.gradle\\daemon\\9.4.1\\com.jfcardenas.musicwall.app-main-48:\\mipmap-anydpi-v26\\ic_launcher_round.xml"
+        "merged": "C:\\Users\\jfcar\\.gradle\\daemon\\9.4.1\\com.jfcardenas.musicwall.app-debug-79:\\mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "C:\\Users\\jfcar\\.gradle\\daemon\\9.4.1\\com.jfcardenas.musicwall.app-main-81:\\mipmap-anydpi-v26\\ic_launcher.xml"
     },
     {
-        "merged": "C:\\Users\\jfcar\\.gradle\\daemon\\9.4.1\\com.jfcardenas.musicwall.app-debug-46:\\layout_activity_connect.xml.flat",
-        "source": "C:\\Users\\jfcar\\.gradle\\daemon\\9.4.1\\com.jfcardenas.musicwall.app-main-48:\\layout\\activity_connect.xml"
+        "merged": "C:\\Users\\jfcar\\.gradle\\daemon\\9.4.1\\com.jfcardenas.musicwall.app-debug-79:\\layout_dropdown_item.xml.flat",
+        "source": "C:\\Users\\jfcar\\.gradle\\daemon\\9.4.1\\com.jfcardenas.musicwall.app-main-81:\\layout\\dropdown_item.xml"
     },
     {
-        "merged": "C:\\Users\\jfcar\\.gradle\\daemon\\9.4.1\\com.jfcardenas.musicwall.app-debug-46:\\xml_preferences.xml.flat",
-        "source": "C:\\Users\\jfcar\\.gradle\\daemon\\9.4.1\\com.jfcardenas.musicwall.app-main-48:\\xml\\preferences.xml"
+        "merged": "C:\\Users\\jfcar\\.gradle\\daemon\\9.4.1\\com.jfcardenas.musicwall.app-debug-79:\\xml_wallpaper.xml.flat",
+        "source": "C:\\Users\\jfcar\\.gradle\\daemon\\9.4.1\\com.jfcardenas.musicwall.app-main-81:\\xml\\wallpaper.xml"
     },
     {
-        "merged": "C:\\Users\\jfcar\\.gradle\\daemon\\9.4.1\\com.jfcardenas.musicwall.app-debug-46:\\xml_wallpaper.xml.flat",
-        "source": "C:\\Users\\jfcar\\.gradle\\daemon\\9.4.1\\com.jfcardenas.musicwall.app-main-48:\\xml\\wallpaper.xml"
+        "merged": "C:\\Users\\jfcar\\.gradle\\daemon\\9.4.1\\com.jfcardenas.musicwall.app-debug-79:\\layout_activity_connect.xml.flat",
+        "source": "C:\\Users\\jfcar\\.gradle\\daemon\\9.4.1\\com.jfcardenas.musicwall.app-main-81:\\layout\\activity_connect.xml"
     },
     {
-        "merged": "com.jfcardenas.musicwall.app-debug-46:/layout_activity_settings.xml.flat",
-        "source": "com.jfcardenas.musicwall.app-main-48:/layout/activity_settings.xml"
+        "merged": "com.jfcardenas.musicwall.app-debug-79:/xml_file_paths.xml.flat",
+        "source": "com.jfcardenas.musicwall.app-main-81:/xml/file_paths.xml"
     },
     {
-        "merged": "C:\\Users\\jfcar\\.gradle\\daemon\\9.4.1\\com.jfcardenas.musicwall.app-debug-46:\\mipmap-anydpi-v26_ic_launcher.xml.flat",
-        "source": "C:\\Users\\jfcar\\.gradle\\daemon\\9.4.1\\com.jfcardenas.musicwall.app-main-48:\\mipmap-anydpi-v26\\ic_launcher.xml"
+        "merged": "C:\\Users\\jfcar\\.gradle\\daemon\\9.4.1\\com.jfcardenas.musicwall.app-debug-79:\\xml_file_paths.xml.flat",
+        "source": "C:\\Users\\jfcar\\.gradle\\daemon\\9.4.1\\com.jfcardenas.musicwall.app-main-81:\\xml\\file_paths.xml"
     }
 ]

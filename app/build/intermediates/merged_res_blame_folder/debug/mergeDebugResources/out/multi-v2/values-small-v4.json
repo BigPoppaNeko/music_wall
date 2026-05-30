@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.jfcardenas.musicwall.app-mergeDebugResources-44:/values-small-v4/values-small-v4.xml",
+            "outputFile": "com.jfcardenas.musicwall.app-mergeDebugResources-77:/values-small-v4/values-small-v4.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\jfcar\\.gradle\\caches\\9.4.1\\transforms\\9145a3518fcea121704e0771512f0e2b\\transformed\\material-1.12.0\\res\\values-small-v4\\values-small-v4.xml",
+                    "source": "C:\\Users\\jfcar\\.gradle\\caches\\9.4.1\\transforms\\afacf25e39a7a8ff5c5160f218388842\\transformed\\material-1.12.0\\res\\values-small-v4\\values-small-v4.xml",
                     "from": {
                         "startLines": "2,3,4,5",
                         "startColumns": "4,4,4,4",

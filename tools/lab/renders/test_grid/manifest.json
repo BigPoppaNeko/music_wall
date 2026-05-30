@@ -1,0 +1,122 @@
+[
+  {
+    "n": 1,
+    "file": "exp_0001_fl200_pt100_aura0.38_haze0.28_ghost0.13_cfa210_geoTrue_gloTrue.png",
+    "render_ms": 816,
+    "params": {
+      "flow_lines": 200,
+      "particles": 100,
+      "hero_aura": 0.38,
+      "hero_haze": 0.28,
+      "hero_ghost": 0.13,
+      "color_field_alpha": 210,
+      "geometry": true,
+      "glows": true
+    }
+  },
+  {
+    "n": 2,
+    "file": "exp_0002_fl200_pt100_aura0.38_haze0.28_ghost0.13_cfa210_geoFalse_gloTrue.png",
+    "render_ms": 806,
+    "params": {
+      "flow_lines": 200,
+      "particles": 100,
+      "hero_aura": 0.38,
+      "hero_haze": 0.28,
+      "hero_ghost": 0.13,
+      "color_field_alpha": 210,
+      "geometry": false,
+      "glows": true
+    }
+  },
+  {
+    "n": 3,
+    "file": "exp_0003_fl200_pt280_aura0.38_haze0.28_ghost0.13_cfa210_geoTrue_gloTrue.png",
+    "render_ms": 801,
+    "params": {
+      "flow_lines": 200,
+      "particles": 280,
+      "hero_aura": 0.38,
+      "hero_haze": 0.28,
+      "hero_ghost": 0.13,
+      "color_field_alpha": 210,
+      "geometry": true,
+      "glows": true
+    }
+  },
+  {
+    "n": 4,
+    "file": "exp_0004_fl200_pt280_aura0.38_haze0.28_ghost0.13_cfa210_geoFalse_gloTrue.png",
+    "render_ms": 786,
+    "params": {
+      "flow_lines": 200,
+      "particles": 280,
+      "hero_aura": 0.38,
+      "hero_haze": 0.28,
+      "hero_ghost": 0.13,
+      "color_field_alpha": 210,
+      "geometry": false,
+      "glows": true
+    }
+  },
+  {
+    "n": 5,
+    "file": "exp_0005_fl700_pt100_aura0.38_haze0.28_ghost0.13_cfa210_geoTrue_gloTrue.png",
+    "render_ms": 1608,
+    "params": {
+      "flow_lines": 700,
+      "particles": 100,
+      "hero_aura": 0.38,
+      "hero_haze": 0.28,
+      "hero_ghost": 0.13,
+      "color_field_alpha": 210,
+      "geometry": true,
+      "glows": true
+    }
+  },
+  {
+    "n": 6,
+    "file": "exp_0006_fl700_pt100_aura0.38_haze0.28_ghost0.13_cfa210_geoFalse_gloTrue.png",
+    "render_ms": 1606,
+    "params": {
+      "flow_lines": 700,
+      "particles": 100,
+      "hero_aura": 0.38,
+      "hero_haze": 0.28,
+      "hero_ghost": 0.13,
+      "color_field_alpha": 210,
+      "geometry": false,
+      "glows": true
+    }
+  },
+  {
+    "n": 7,
+    "file": "exp_0007_fl700_pt280_aura0.38_haze0.28_ghost0.13_cfa210_geoTrue_gloTrue.png",
+    "render_ms": 1597,
+    "params": {
+      "flow_lines": 700,
+      "particles": 280,
+      "hero_aura": 0.38,
+      "hero_haze": 0.28,
+      "hero_ghost": 0.13,
+      "color_field_alpha": 210,
+      "geometry": true,
+      "glows": true
+    }
+  },
+  {
+    "n": 8,
+    "file": "exp_0008_fl700_pt280_aura0.38_haze0.28_ghost0.13_cfa210_geoFalse_gloTrue.png",
+    "render_ms": 1603,
+    "params": {
+      "flow_lines": 700,
+      "particles": 280,
+      "hero_aura": 0.38,
+      "hero_haze": 0.28,
+      "hero_ghost": 0.13,
+      "color_field_alpha": 210,
+      "geometry": false,
+      "glows": true
+    }
+  }
+]

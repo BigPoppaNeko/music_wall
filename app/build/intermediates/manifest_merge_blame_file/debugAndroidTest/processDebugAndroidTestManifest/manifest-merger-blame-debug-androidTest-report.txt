@@ -1,0 +1,31 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.jfcardenas.musicwall.debug.test" >
+4
+5    <uses-sdk
+5-->D:\Github\music_wall\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest13688952170092701135.xml:5:5-74
+6        android:minSdkVersion="26"
+6-->D:\Github\music_wall\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest13688952170092701135.xml:5:15-41
+7        android:targetSdkVersion="35" />
+7-->D:\Github\music_wall\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest13688952170092701135.xml:5:42-71
+8
+9    <instrumentation
+9-->D:\Github\music_wall\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest13688952170092701135.xml:7:5-11:80
+10        android:name="androidx.test.runner.AndroidJUnitRunner"
+10-->D:\Github\music_wall\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest13688952170092701135.xml:7:22-76
+11        android:functionalTest="false"
+11-->D:\Github\music_wall\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest13688952170092701135.xml:10:22-52
+12        android:handleProfiling="false"
+12-->D:\Github\music_wall\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest13688952170092701135.xml:9:22-53
+13        android:label="Tests for com.jfcardenas.musicwall.debug"
+13-->D:\Github\music_wall\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest13688952170092701135.xml:11:22-78
+14        android:targetPackage="com.jfcardenas.musicwall.debug" />
+14-->D:\Github\music_wall\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest13688952170092701135.xml:8:22-76
+15
+16    <application
+16-->INJECTED
+17        android:debuggable="true"
+18        android:extractNativeLibs="false" />
+18-->INJECTED
+19
+20</manifest>

@@ -215,8 +215,8 @@ class CollageWallpaper : WallpaperService() {
         }
 
         private fun saveBitmap(bmp: Bitmap): String {
-            val file = File(cacheDir, "collage.png")
-            FileOutputStream(file).use { bmp.compress(Bitmap.CompressFormat.PNG, 90, it) }
+            val file = File(cacheDir, "collage.jpg")
+            FileOutputStream(file).use { bmp.compress(Bitmap.CompressFormat.JPEG, 92, it) }
             return file.absolutePath
         }
 

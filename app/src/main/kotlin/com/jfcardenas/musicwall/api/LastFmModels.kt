@@ -122,6 +122,81 @@ data class LastFmImage(
     val size: String
 )
 
+// ── Recent Tracks ─────────────────────────────────────────────────────────────
+
+data class RecentTracksResponse(
+    @SerializedName("recenttracks") val recentTracks: RecentTracks
+)
+
+data class RecentTracks(
+    @SerializedName("track") val tracks: List<RecentTrack>,
+    @SerializedName("@attr") val attr: RecentTracksAttr?,
+)
+
+data class RecentTracksAttr(
+    val total: String?,
+    val user: String?,
+)
+
+data class RecentTrack(
+    val name: String,
+    val artist: SimpleRef,
+    val album: SimpleRef,
+    @SerializedName("image") val images: List<LastFmImage>,
+    @SerializedName("@attr") val attr: NowPlayingAttr?,
+    val date: TrackDate?,
+    val url: String?,
+)
+
+data class SimpleRef(
+    @SerializedName("#text") val name: String,
+    val mbid: String? = null,
+)
+
+data class NowPlayingAttr(
+    val nowplaying: String?,
+)
+
+// ── Search ────────────────────────────────────────────────────────────────────
+
+data class ArtistSearchResponse(
+    val results: ArtistSearchResults
+)
+
+data class ArtistSearchResults(
+    @SerializedName("artistmatches") val artistMatches: ArtistMatches
+)
+
+data class ArtistMatches(
+    @SerializedName("artist") val artists: List<SearchArtist>
+)
+
+data class SearchArtist(
+    val name: String,
+    val listeners: String?,
+    @SerializedName("image") val images: List<LastFmImage>?
+)
+
+data class AlbumSearchResponse(
+    val results: AlbumSearchResults
+)
+
+data class AlbumSearchResults(
+    @SerializedName("albummatches") val albumMatches: AlbumMatches
+)
+
+data class AlbumMatches(
+    @SerializedName("album") val albums: List<SearchAlbum>
+)
+
+data class SearchAlbum(
+    val name: String,
+    val artist: String,
+    @SerializedName("image") val images: List<LastFmImage>?
+)
+
+// ── Images ────────────────────────────────────────────────────────────────────
+
 fun List<LastFmImage>.getExtraLargeUrl(): String? =
     firstOrNull { it.size == "mega" }?.url?.takeIf { it.isNotEmpty() }
         ?: firstOrNull { it.size == "extralarge" }?.url?.takeIf { it.isNotEmpty() }

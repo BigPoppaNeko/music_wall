@@ -1,29 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.jfcardenas.musicwall.app-mergeDebugResources-44:/values-v28/values-v28.xml",
+            "outputFile": "com.jfcardenas.musicwall.app-mergeDebugResources-77:/values-v28/values-v28.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\jfcar\\.gradle\\caches\\9.4.1\\transforms\\9145a3518fcea121704e0771512f0e2b\\transformed\\material-1.12.0\\res\\values-v28\\values-v28.xml",
-                    "from": {
-                        "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14",
-                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4",
-                        "startOffsets": "55,153,249,344,441,529,617,705,793,880,967,1054,1141",
-                        "endLines": "2,3,4,5,6,7,8,9,10,11,12,13,17",
-                        "endColumns": "97,95,94,96,87,87,87,87,86,86,86,86,10",
-                        "endOffsets": "148,244,339,436,524,612,700,788,875,962,1049,1136,1423"
-                    },
-                    "to": {
-                        "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,24",
-                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4",
-                        "startOffsets": "55,153,249,344,441,529,617,705,793,880,967,1054,1675",
-                        "endLines": "2,3,4,5,6,7,8,9,10,11,12,13,27",
-                        "endColumns": "97,95,94,96,87,87,87,87,86,86,86,86,10",
-                        "endOffsets": "148,244,339,436,524,612,700,788,875,962,1049,1136,1957"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\jfcar\\.gradle\\caches\\9.4.1\\transforms\\fa53d8805035983fa9daf96c369c7a65\\transformed\\appcompat-1.7.0\\res\\values-v28\\values-v28.xml",
+                    "source": "C:\\Users\\jfcar\\.gradle\\caches\\9.4.1\\transforms\\8ee93ef23074bc330226a083db096a5b\\transformed\\appcompat-1.7.0\\res\\values-v28\\values-v28.xml",
                     "from": {
                         "startLines": "2,3,4,8",
                         "startColumns": "4,4,4,4",
@@ -39,6 +20,25 @@
                         "endLines": "14,15,19,23",
                         "endColumns": "74,86,12,12",
                         "endOffsets": "1211,1298,1478,1670"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\jfcar\\.gradle\\caches\\9.4.1\\transforms\\afacf25e39a7a8ff5c5160f218388842\\transformed\\material-1.12.0\\res\\values-v28\\values-v28.xml",
+                    "from": {
+                        "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "55,153,249,344,441,529,617,705,793,880,967,1054,1141",
+                        "endLines": "2,3,4,5,6,7,8,9,10,11,12,13,17",
+                        "endColumns": "97,95,94,96,87,87,87,87,86,86,86,86,10",
+                        "endOffsets": "148,244,339,436,524,612,700,788,875,962,1049,1136,1423"
+                    },
+                    "to": {
+                        "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,24",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "55,153,249,344,441,529,617,705,793,880,967,1054,1675",
+                        "endLines": "2,3,4,5,6,7,8,9,10,11,12,13,27",
+                        "endColumns": "97,95,94,96,87,87,87,87,86,86,86,86,10",
+                        "endOffsets": "148,244,339,436,524,612,700,788,875,962,1049,1136,1957"
                     }
                 }
             ]

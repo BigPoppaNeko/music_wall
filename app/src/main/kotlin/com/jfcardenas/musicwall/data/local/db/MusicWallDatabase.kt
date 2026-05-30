@@ -6,20 +6,23 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.jfcardenas.musicwall.data.local.db.dao.AlbumDao
 import com.jfcardenas.musicwall.data.local.db.dao.ArtistDao
+import com.jfcardenas.musicwall.data.local.db.dao.MuralDao
 import com.jfcardenas.musicwall.data.local.db.dao.TrackDao
 import com.jfcardenas.musicwall.data.local.db.entity.AlbumEntity
 import com.jfcardenas.musicwall.data.local.db.entity.ArtistEntity
+import com.jfcardenas.musicwall.data.local.db.entity.MuralRecord
 import com.jfcardenas.musicwall.data.local.db.entity.TrackEntity
 
 @Database(
-    entities = [AlbumEntity::class, ArtistEntity::class, TrackEntity::class],
-    version = 2,
+    entities = [AlbumEntity::class, ArtistEntity::class, TrackEntity::class, MuralRecord::class],
+    version = 3,
     exportSchema = false
 )
 abstract class MusicWallDatabase : RoomDatabase() {
     abstract fun albumDao(): AlbumDao
     abstract fun artistDao(): ArtistDao
     abstract fun trackDao(): TrackDao
+    abstract fun muralDao(): MuralDao
 
     companion object {
         fun create(context: Context): MusicWallDatabase =

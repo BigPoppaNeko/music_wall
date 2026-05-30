@@ -1,0 +1,5 @@
+renders/**/*.png
+renders/**/*.jpg
+renders/reports/**/*.json
+!renders/.gitkeep
+!renders/reports/.gitkeep

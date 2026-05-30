@@ -1,0 +1,29 @@
+{
+  "user": "rj",
+  "mode": "albums",
+  "period": "overall",
+  "width": 1080,
+  "height": 1920,
+  "renders": [
+    {
+      "renderer": "street",
+      "render_ms": 1009,
+      "file": "street.png"
+    },
+    {
+      "renderer": "muro",
+      "render_ms": 611,
+      "file": "muro.png"
+    },
+    {
+      "renderer": "explosion",
+      "render_ms": 3914,
+      "file": "explosion.png"
+    },
+    {
+      "renderer": "adn",
+      "render_ms": 229,
+      "file": "adn.png"
+    }
+  ]
+}

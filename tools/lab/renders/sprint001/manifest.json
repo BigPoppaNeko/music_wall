@@ -1,0 +1,34 @@
+{
+  "user": "rj",
+  "mode": "albums",
+  "period": "overall",
+  "width": 1080,
+  "height": 1920,
+  "renders": [
+    {
+      "renderer": "ecosystem",
+      "render_ms": 3634,
+      "file": "ecosystem.png"
+    },
+    {
+      "renderer": "mosaic",
+      "render_ms": 296,
+      "file": "mosaic.png"
+    },
+    {
+      "renderer": "hero",
+      "render_ms": 189,
+      "file": "hero.png"
+    },
+    {
+      "renderer": "constellation",
+      "render_ms": 241,
+      "file": "constellation.png"
+    },
+    {
+      "renderer": "museum",
+      "render_ms": 127,
+      "file": "museum.png"
+    }
+  ]
+}

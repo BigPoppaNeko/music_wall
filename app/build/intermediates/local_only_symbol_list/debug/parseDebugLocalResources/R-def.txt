@@ -48,4 +48,5 @@ string hint_username
 string settings_title
 string verifying
 style Theme.MusicWall
+xml file_paths
 xml wallpaper

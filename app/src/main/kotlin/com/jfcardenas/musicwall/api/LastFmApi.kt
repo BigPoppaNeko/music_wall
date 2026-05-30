@@ -46,11 +46,32 @@ interface LastFmService {
     ): TopTracksResponse
 
     @GET(".")
+    suspend fun getRecentTracks(
+        @Query("method") method: String = "user.getrecenttracks",
+        @Query("user") user: String,
+        @Query("limit") limit: Int = 1,
+    ): RecentTracksResponse
+
+    @GET(".")
     suspend fun getLovedTracks(
         @Query("method") method: String = "user.getlovedtracks",
         @Query("user") user: String,
         @Query("limit") limit: Int
     ): LovedTracksResponse
+
+    @GET(".")
+    suspend fun searchArtists(
+        @Query("method") method: String = "artist.search",
+        @Query("artist") artist: String,
+        @Query("limit") limit: Int = 20
+    ): ArtistSearchResponse
+
+    @GET(".")
+    suspend fun searchAlbums(
+        @Query("method") method: String = "album.search",
+        @Query("album") album: String,
+        @Query("limit") limit: Int = 20
+    ): AlbumSearchResponse
 }
 
 class LastFmApiException(val code: Int, message: String) : IOException(message)

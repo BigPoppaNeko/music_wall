@@ -2,10 +2,9 @@ package com.jfcardenas.musicwall;
 
 import android.content.Context;
 import android.os.Bundle;
+import androidx.activity.ComponentActivity;
 import androidx.activity.contextaware.OnContextAvailableListener;
 import androidx.annotation.CallSuper;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import dagger.hilt.android.internal.lifecycle.DefaultViewModelFactories;
 import dagger.hilt.android.internal.managers.ActivityComponentManager;
@@ -19,7 +18,7 @@ import javax.annotation.processing.Generated;
  * A generated base class to be extended by the @dagger.hilt.android.AndroidEntryPoint annotated class. If using the Gradle plugin, this is swapped as the base class via bytecode transformation.
  */
 @Generated("dagger.hilt.android.processor.internal.androidentrypoint.ActivityGenerator")
-public abstract class Hilt_MainActivity extends AppCompatActivity implements GeneratedComponentManagerHolder {
+public abstract class Hilt_MainActivity extends ComponentActivity implements GeneratedComponentManagerHolder {
   private volatile ActivityComponentManager componentManager;
 
   private final Object componentManagerLock = new Object();
@@ -31,8 +30,8 @@ public abstract class Hilt_MainActivity extends AppCompatActivity implements Gen
     _initHiltInternal();
   }
 
-  Hilt_MainActivity(int p0) {
-    super(p0);
+  Hilt_MainActivity(int contentLayoutId) {
+    super(contentLayoutId);
     _initHiltInternal();
   }
 
@@ -51,7 +50,7 @@ public abstract class Hilt_MainActivity extends AppCompatActivity implements Gen
 
   @CallSuper
   @Override
-  protected void onCreate(@Nullable Bundle savedInstanceState) {
+  protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     initSavedStateHandleHolders();
   }

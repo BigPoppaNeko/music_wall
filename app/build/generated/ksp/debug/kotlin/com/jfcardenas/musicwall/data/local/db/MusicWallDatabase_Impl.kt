@@ -13,6 +13,8 @@ import com.jfcardenas.musicwall.`data`.local.db.dao.AlbumDao
 import com.jfcardenas.musicwall.`data`.local.db.dao.AlbumDao_Impl
 import com.jfcardenas.musicwall.`data`.local.db.dao.ArtistDao
 import com.jfcardenas.musicwall.`data`.local.db.dao.ArtistDao_Impl
+import com.jfcardenas.musicwall.`data`.local.db.dao.MuralDao
+import com.jfcardenas.musicwall.`data`.local.db.dao.MuralDao_Impl
 import com.jfcardenas.musicwall.`data`.local.db.dao.TrackDao
 import com.jfcardenas.musicwall.`data`.local.db.dao.TrackDao_Impl
 import javax.`annotation`.processing.Generated
@@ -45,8 +47,12 @@ public class MusicWallDatabase_Impl : MusicWallDatabase() {
     TrackDao_Impl(this)
   }
 
+  private val _muralDao: Lazy<MuralDao> = lazy {
+    MuralDao_Impl(this)
+  }
+
   protected override fun createOpenDelegate(): RoomOpenDelegate {
-    val _openDelegate: RoomOpenDelegate = object : RoomOpenDelegate(2, "110a5bbb08451a16d0aa3a2860c3feb0", "971e5b414aae9efb2c7bf11568664f37") {
+    val _openDelegate: RoomOpenDelegate = object : RoomOpenDelegate(3, "8ccc02b3fc20039ad3ff311cc6b16129", "1d0ea9c73aa070d5bf5ecf64dfc6b4b4") {
       public override fun createAllTables(connection: SQLiteConnection) {
         connection.execSQL("CREATE TABLE IF NOT EXISTS `albums` (`id` TEXT NOT NULL, `username` TEXT NOT NULL, `period` TEXT NOT NULL, `albumName` TEXT NOT NULL, `artistName` TEXT NOT NULL, `imageUrl` TEXT NOT NULL, `rank` INTEGER NOT NULL, `playcount` INTEGER NOT NULL, `mbid` TEXT, `lastFmUrl` TEXT, `fetchedAt` INTEGER NOT NULL, PRIMARY KEY(`id`))")
         connection.execSQL("CREATE INDEX IF NOT EXISTS `idx_albums_user_period` ON `albums` (`username`, `period`)")
@@ -54,14 +60,16 @@ public class MusicWallDatabase_Impl : MusicWallDatabase() {
         connection.execSQL("CREATE INDEX IF NOT EXISTS `idx_artists_user_period` ON `artists` (`username`, `period`)")
         connection.execSQL("CREATE TABLE IF NOT EXISTS `tracks` (`id` TEXT NOT NULL, `username` TEXT NOT NULL, `period` TEXT NOT NULL, `kind` TEXT NOT NULL, `trackName` TEXT NOT NULL, `artistName` TEXT NOT NULL, `albumName` TEXT NOT NULL, `imageUrl` TEXT NOT NULL, `rank` INTEGER NOT NULL, `playcount` INTEGER NOT NULL, `mbid` TEXT, `lastFmUrl` TEXT, `fetchedAt` INTEGER NOT NULL, PRIMARY KEY(`id`))")
         connection.execSQL("CREATE INDEX IF NOT EXISTS `idx_tracks_user_period_kind` ON `tracks` (`username`, `period`, `kind`)")
+        connection.execSQL("CREATE TABLE IF NOT EXISTS `mural_history` (`id` INTEGER NOT NULL, `styleId` TEXT NOT NULL, `filePath` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, PRIMARY KEY(`id`))")
         connection.execSQL("CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)")
-        connection.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '110a5bbb08451a16d0aa3a2860c3feb0')")
+        connection.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8ccc02b3fc20039ad3ff311cc6b16129')")
       }
 
       public override fun dropAllTables(connection: SQLiteConnection) {
         connection.execSQL("DROP TABLE IF EXISTS `albums`")
         connection.execSQL("DROP TABLE IF EXISTS `artists`")
         connection.execSQL("DROP TABLE IF EXISTS `tracks`")
+        connection.execSQL("DROP TABLE IF EXISTS `mural_history`")
       }
 
       public override fun onCreate(connection: SQLiteConnection) {
@@ -158,6 +166,24 @@ public class MusicWallDatabase_Impl : MusicWallDatabase() {
               | Found:
               |""".trimMargin() + _existingTracks)
         }
+        val _columnsMuralHistory: MutableMap<String, TableInfo.Column> = mutableMapOf()
+        _columnsMuralHistory.put("id", TableInfo.Column("id", "INTEGER", true, 1, null, TableInfo.CREATED_FROM_ENTITY))
+        _columnsMuralHistory.put("styleId", TableInfo.Column("styleId", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY))
+        _columnsMuralHistory.put("filePath", TableInfo.Column("filePath", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY))
+        _columnsMuralHistory.put("createdAt", TableInfo.Column("createdAt", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY))
+        val _foreignKeysMuralHistory: MutableSet<TableInfo.ForeignKey> = mutableSetOf()
+        val _indicesMuralHistory: MutableSet<TableInfo.Index> = mutableSetOf()
+        val _infoMuralHistory: TableInfo = TableInfo("mural_history", _columnsMuralHistory, _foreignKeysMuralHistory, _indicesMuralHistory)
+        val _existingMuralHistory: TableInfo = read(connection, "mural_history")
+        if (!_infoMuralHistory.equals(_existingMuralHistory)) {
+          return RoomOpenDelegate.ValidationResult(false, """
+              |mural_history(com.jfcardenas.musicwall.data.local.db.entity.MuralRecord).
+              | Expected:
+              |""".trimMargin() + _infoMuralHistory + """
+              |
+              | Found:
+              |""".trimMargin() + _existingMuralHistory)
+        }
         return RoomOpenDelegate.ValidationResult(true, null)
       }
     }
@@ -167,11 +193,11 @@ public class MusicWallDatabase_Impl : MusicWallDatabase() {
   protected override fun createInvalidationTracker(): InvalidationTracker {
     val _shadowTablesMap: MutableMap<String, String> = mutableMapOf()
     val _viewTables: MutableMap<String, Set<String>> = mutableMapOf()
-    return InvalidationTracker(this, _shadowTablesMap, _viewTables, "albums", "artists", "tracks")
+    return InvalidationTracker(this, _shadowTablesMap, _viewTables, "albums", "artists", "tracks", "mural_history")
   }
 
   public override fun clearAllTables() {
-    super.performClear(false, "albums", "artists", "tracks")
+    super.performClear(false, "albums", "artists", "tracks", "mural_history")
   }
 
   protected override fun getRequiredTypeConverterClasses(): Map<KClass<*>, List<KClass<*>>> {
@@ -179,6 +205,7 @@ public class MusicWallDatabase_Impl : MusicWallDatabase() {
     _typeConvertersMap.put(AlbumDao::class, AlbumDao_Impl.getRequiredConverters())
     _typeConvertersMap.put(ArtistDao::class, ArtistDao_Impl.getRequiredConverters())
     _typeConvertersMap.put(TrackDao::class, TrackDao_Impl.getRequiredConverters())
+    _typeConvertersMap.put(MuralDao::class, MuralDao_Impl.getRequiredConverters())
     return _typeConvertersMap
   }
 
@@ -197,4 +224,6 @@ public class MusicWallDatabase_Impl : MusicWallDatabase() {
   public override fun artistDao(): ArtistDao = _artistDao.value
 
   public override fun trackDao(): TrackDao = _trackDao.value
+
+  public override fun muralDao(): MuralDao = _muralDao.value
 }

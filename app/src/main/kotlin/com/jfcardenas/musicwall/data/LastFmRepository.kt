@@ -158,35 +158,37 @@ class LastFmRepository @Inject constructor(
         "TRACKS" -> service.getTopTracks(user = username, period = period, limit = limit)
             .topTracks.tracks
             .mapIndexedNotNull { index, track ->
-                track.images.getExtraLargeUrl()?.let { url ->
-                    MusicImage(
-                        url = url,
-                        name = track.name,
-                        artistName = track.artist.name,
-                        rank = track.attr?.rank?.toIntOrNull() ?: (index + 1),
-                        kind = MusicImage.Kind.TRACK,
-                        playcount = track.playcount?.toIntOrNull() ?: 0,
-                        mbid = track.mbid?.takeIf { it.isNotEmpty() },
-                        lastFmUrl = track.url?.takeIf { it.isNotEmpty() }
-                    )
-                }
+                val url = track.images.getExtraLargeUrl()
+                    ?: artistImageResolver.getTrackImageUrl(track.artist.name, track.name)
+                    ?: return@mapIndexedNotNull null
+                MusicImage(
+                    url        = url,
+                    name       = track.name,
+                    artistName = track.artist.name,
+                    rank       = track.attr?.rank?.toIntOrNull() ?: (index + 1),
+                    kind       = MusicImage.Kind.TRACK,
+                    playcount  = track.playcount?.toIntOrNull() ?: 0,
+                    mbid       = track.mbid?.takeIf { it.isNotEmpty() },
+                    lastFmUrl  = track.url?.takeIf { it.isNotEmpty() }
+                )
             }
 
         "LOVED" -> service.getLovedTracks(user = username, limit = limit)
             .lovedTracks.tracks
             .mapIndexedNotNull { index, track ->
-                track.images.getExtraLargeUrl()?.let { url ->
-                    MusicImage(
-                        url = url,
-                        name = track.name,
-                        artistName = track.artist.name,
-                        rank = index + 1,
-                        kind = MusicImage.Kind.LOVED_TRACK,
-                        mbid = track.mbid?.takeIf { it.isNotEmpty() },
-                        lastFmUrl = track.url?.takeIf { it.isNotEmpty() },
-                        timestampUts = track.date?.uts?.toLongOrNull()
-                    )
-                }
+                val url = track.images.getExtraLargeUrl()
+                    ?: artistImageResolver.getTrackImageUrl(track.artist.name, track.name)
+                    ?: return@mapIndexedNotNull null
+                MusicImage(
+                    url           = url,
+                    name          = track.name,
+                    artistName    = track.artist.name,
+                    rank          = index + 1,
+                    kind          = MusicImage.Kind.LOVED_TRACK,
+                    mbid          = track.mbid?.takeIf { it.isNotEmpty() },
+                    lastFmUrl     = track.url?.takeIf { it.isNotEmpty() },
+                    timestampUts  = track.date?.uts?.toLongOrNull()
+                )
             }
 
         else -> emptyList()

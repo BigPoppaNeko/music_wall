@@ -4,6 +4,7 @@ import android.content.Context
 import com.jfcardenas.musicwall.data.local.db.MusicWallDatabase
 import com.jfcardenas.musicwall.data.local.db.dao.AlbumDao
 import com.jfcardenas.musicwall.data.local.db.dao.ArtistDao
+import com.jfcardenas.musicwall.data.local.db.dao.MuralDao
 import com.jfcardenas.musicwall.data.local.db.dao.TrackDao
 import dagger.Module
 import dagger.Provides
@@ -29,4 +30,7 @@ object DatabaseModule {
 
     @Provides
     fun provideTrackDao(db: MusicWallDatabase): TrackDao = db.trackDao()
+
+    @Provides
+    fun provideMuralDao(db: MusicWallDatabase): MuralDao = db.muralDao()
 }

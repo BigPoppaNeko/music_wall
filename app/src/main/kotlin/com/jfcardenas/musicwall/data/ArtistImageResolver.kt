@@ -27,15 +27,24 @@ class ArtistImageResolver @Inject constructor() {
     suspend fun getImageUrl(artistName: String): String? {
         if (cache.containsKey(artistName)) return cache[artistName]
         return withContext(Dispatchers.IO) {
-            fetchFromItunes(artistName).also { cache[artistName] = it }
+            fetchFromItunes(artistName, entity = "musicArtist").also { cache[artistName] = it }
         }
     }
 
-    private fun fetchFromItunes(artistName: String): String? {
+    suspend fun getTrackImageUrl(artistName: String, trackName: String): String? {
+        val key = "$artistName|$trackName"
+        if (cache.containsKey(key)) return cache[key]
+        return withContext(Dispatchers.IO) {
+            val query = "$artistName $trackName"
+            fetchFromItunes(query, entity = "song").also { cache[key] = it }
+        }
+    }
+
+    private fun fetchFromItunes(query: String, entity: String): String? {
         return try {
-            val query = URLEncoder.encode(artistName, "UTF-8")
+            val encoded = URLEncoder.encode(query, "UTF-8")
             val request = Request.Builder()
-                .url("https://itunes.apple.com/search?term=$query&media=music&entity=musicArtist&limit=1")
+                .url("https://itunes.apple.com/search?term=$encoded&media=music&entity=$entity&limit=1")
                 .build()
             val body = client.newCall(request).execute().use { it.body?.string() }
                 ?: return null
@@ -46,7 +55,7 @@ class ArtistImageResolver @Inject constructor() {
                 .replace("100x100bb", "600x600bb")
                 .takeIf { it.isNotEmpty() && it.startsWith("http") }
         } catch (e: Exception) {
-            Log.w(TAG, "iTunes lookup failed for '$artistName': ${e.message}")
+            Log.w(TAG, "iTunes lookup failed for '$query': ${e.message}")
             null
         }
     }
