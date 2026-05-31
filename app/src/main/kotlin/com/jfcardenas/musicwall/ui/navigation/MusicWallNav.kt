@@ -76,9 +76,9 @@ fun MusicWallNav(onOnboardingComplete: () -> Unit = {}) {
         }
 
         composable(Route.STYLE) {
-            StyleSelectionScreen(
-                onBack      = { nav.popBackStack() },
-                onContinuar = { styleId ->
+            MuralesScreen(
+                onBack           = { nav.popBackStack() },
+                onSelectRenderer = { styleId ->
                     nav.navigate(Route.generating(styleId))
                 },
             )

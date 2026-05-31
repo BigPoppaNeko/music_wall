@@ -17,7 +17,7 @@ from pathlib import Path
 import click
 from tqdm import tqdm
 
-from lastfm import get_top_albums, get_top_artists
+from lastfm import get_top_albums, get_top_artists, get_chart_albums, get_tag_albums
 from downloader import download
 from analyzer import analyze
 from renderer import EcosystemRenderer, RenderItem, RENDERERS, StreetPosterRenderer, OrganicRenderer
@@ -34,8 +34,9 @@ def cli():
 
 
 @cli.command()
-@click.option("--user", default=None, help="Last.fm username")
+@click.option("--user", default=None, help="Last.fm username (uses top albums/artists)")
 @click.option("--spotify", default=None, help="Spotify playlist URL (public)")
+@click.option("--tags", default=None, help="Genre tags, comma-separated: rock,jazz,punk,metal")
 @click.option("--mode", default="albums", type=click.Choice(["albums", "artists"]))
 @click.option("--limit", default=20, help="Items to fetch")
 @click.option("--period", default="overall",
@@ -53,25 +54,29 @@ def cli():
 @click.option("--no-geometry", is_flag=True)
 @click.option("--no-glows", is_flag=True)
 @click.option("--no-vignette", is_flag=True)
-@click.option("--renderer", default="ecosystem",
+@click.option("--renderer", default="diagonal",
               type=click.Choice(list(RENDERERS.keys()) + ["organic", "perspective"]), show_default=True)
 @click.option("--logos", is_flag=True, help="Fetch artist logos from fanart.tv (needs FANART_API_KEY)")
 @click.option("--logo-alpha", default=110, type=int, help="Stencil logo alpha for street renderer (try 90/110/130)")
 @click.option("--layout", default=None, help="Layout ID for organic renderer (filename without extension in assets/organic/)")
-def render(user, spotify, mode, limit, period, width, height, out,
+def render(user, spotify, tags, mode, limit, period, width, height, out,
            flow_lines, particles, hero_aura, hero_haze, hero_ghost,
            color_field_alpha, no_geometry, no_glows, no_vignette, renderer, logos, logo_alpha, layout):
-    """Fetch + render a single collage. Source: --user (Last.fm) or --spotify (playlist URL)."""
-    if not user and not spotify:
-        click.echo("Error: provide --user (Last.fm) or --spotify (playlist URL).", err=True)
-        sys.exit(1)
-
+    """Fetch + render a single collage.
+    Sources (pick one): --user, --spotify, --tags, or omit all for global chart.
+    """
     RENDERS_DIR.mkdir(exist_ok=True)
 
     if spotify:
         render_items, t_fetch = _fetch_spotify(spotify, limit)
-    else:
+    elif user:
         items_data, t_fetch = _fetch(user, mode, limit, period)
+        render_items = _download_items(items_data, with_logos=logos)
+    elif tags:
+        items_data, t_fetch = _fetch_tags(tags.split(","), limit)
+        render_items = _download_items(items_data, with_logos=logos)
+    else:
+        items_data, t_fetch = _fetch_chart(limit)
         render_items = _download_items(items_data, with_logos=logos)
 
     if len(render_items) < 4:
@@ -369,6 +374,24 @@ def _fetch(user, mode, limit, period):
     items = fn(user, limit, period)
     ms = int((time.time() - t0) * 1000)
     click.echo(f"  {len(items)} items from Last.fm ({ms}ms)")
+    return items, ms
+
+
+def _fetch_chart(limit):
+    click.echo(f"Fetching global chart top {limit} albums...")
+    t0 = time.time()
+    items = get_chart_albums(limit)
+    ms = int((time.time() - t0) * 1000)
+    click.echo(f"  {len(items)} items from Last.fm chart ({ms}ms)")
+    return items, ms
+
+
+def _fetch_tags(tags, limit):
+    click.echo(f"Fetching top albums for tags: {', '.join(tags)} (limit={limit})...")
+    t0 = time.time()
+    items = get_tag_albums(tags, limit)
+    ms = int((time.time() - t0) * 1000)
+    click.echo(f"  {len(items)} items from tags [{', '.join(tags)}] ({ms}ms)")
     return items, ms
 
 

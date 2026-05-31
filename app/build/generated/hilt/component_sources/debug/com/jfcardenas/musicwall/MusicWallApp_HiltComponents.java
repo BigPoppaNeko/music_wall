@@ -3,17 +3,23 @@ package com.jfcardenas.musicwall;
 import androidx.hilt.work.HiltWrapper_WorkerFactoryModule;
 import com.jfcardenas.musicwall.di.DatabaseModule;
 import com.jfcardenas.musicwall.di.NetworkModule;
+import com.jfcardenas.musicwall.di.OrganicScenesModule;
 import com.jfcardenas.musicwall.di.RepositoryModule;
 import com.jfcardenas.musicwall.di.SpotifyModule;
 import com.jfcardenas.musicwall.features.connect.ConnectActivity_GeneratedInjector;
 import com.jfcardenas.musicwall.service.CollageWallpaper_GeneratedInjector;
 import com.jfcardenas.musicwall.settings.WallpaperSettingsActivity_GeneratedInjector;
+import com.jfcardenas.musicwall.ui.viewmodel.ArtistasViewModel_HiltModules;
 import com.jfcardenas.musicwall.ui.viewmodel.ExploreViewModel_HiltModules;
+import com.jfcardenas.musicwall.ui.viewmodel.FavoritesViewModel_HiltModules;
+import com.jfcardenas.musicwall.ui.viewmodel.GeneratingViewModel_HiltModules;
 import com.jfcardenas.musicwall.ui.viewmodel.HomeViewModel_HiltModules;
 import com.jfcardenas.musicwall.ui.viewmodel.LastFmSourceViewModel_HiltModules;
 import com.jfcardenas.musicwall.ui.viewmodel.MuralHistoryViewModel_HiltModules;
+import com.jfcardenas.musicwall.ui.viewmodel.NowPlayingDetailViewModel_HiltModules;
 import com.jfcardenas.musicwall.ui.viewmodel.PreviewViewModel_HiltModules;
 import com.jfcardenas.musicwall.ui.viewmodel.SpotifySourceViewModel_HiltModules;
+import com.jfcardenas.musicwall.ui.viewmodel.StyleViewModel_HiltModules;
 import com.jfcardenas.musicwall.worker.WallpaperRefreshWorker_HiltModule;
 import dagger.Binds;
 import dagger.Component;
@@ -146,6 +152,7 @@ public final class MusicWallApp_HiltComponents {
           ActivityRetainedCBuilderModule.class,
           ServiceCBuilderModule.class,
           NetworkModule.class,
+          OrganicScenesModule.class,
           RepositoryModule.class,
           SpotifyModule.class,
           WallpaperRefreshWorker_HiltModule.class
@@ -173,7 +180,10 @@ public final class MusicWallApp_HiltComponents {
 
   @Subcomponent(
       modules = {
+          ArtistasViewModel_HiltModules.KeyModule.class,
           ExploreViewModel_HiltModules.KeyModule.class,
+          FavoritesViewModel_HiltModules.KeyModule.class,
+          GeneratingViewModel_HiltModules.KeyModule.class,
           HiltWrapper_ActivityRetainedComponentManager_LifecycleModule.class,
           HiltWrapper_ActivitySavedStateHandleModule.class,
           HomeViewModel_HiltModules.KeyModule.class,
@@ -181,8 +191,10 @@ public final class MusicWallApp_HiltComponents {
           MuralHistoryViewModel_HiltModules.KeyModule.class,
           ActivityCBuilderModule.class,
           ViewModelCBuilderModule.class,
+          NowPlayingDetailViewModel_HiltModules.KeyModule.class,
           PreviewViewModel_HiltModules.KeyModule.class,
-          SpotifySourceViewModel_HiltModules.KeyModule.class
+          SpotifySourceViewModel_HiltModules.KeyModule.class,
+          StyleViewModel_HiltModules.KeyModule.class
       }
   )
   @ActivityRetainedScoped
@@ -221,13 +233,18 @@ public final class MusicWallApp_HiltComponents {
 
   @Subcomponent(
       modules = {
+          ArtistasViewModel_HiltModules.BindsModule.class,
           ExploreViewModel_HiltModules.BindsModule.class,
+          FavoritesViewModel_HiltModules.BindsModule.class,
+          GeneratingViewModel_HiltModules.BindsModule.class,
           HiltWrapper_HiltViewModelFactory_ViewModelModule.class,
           HomeViewModel_HiltModules.BindsModule.class,
           LastFmSourceViewModel_HiltModules.BindsModule.class,
           MuralHistoryViewModel_HiltModules.BindsModule.class,
+          NowPlayingDetailViewModel_HiltModules.BindsModule.class,
           PreviewViewModel_HiltModules.BindsModule.class,
-          SpotifySourceViewModel_HiltModules.BindsModule.class
+          SpotifySourceViewModel_HiltModules.BindsModule.class,
+          StyleViewModel_HiltModules.BindsModule.class
       }
   )
   @ViewModelScoped

@@ -138,6 +138,75 @@ RGBA = Tuple[int, int, int, int]
 RGB = Tuple[int, int, int]
 
 
+# ── DiagonalSliceRenderer ─────────────────────────────────────────────────────
+# El canvas es una persiana cortada en diagonal.
+# Cada franja = un álbum diferente a pantalla completa.
+# Sin decoración, sin efectos, sin ruido. Solo los discos.
+
+class DiagonalSliceRenderer:
+
+    def render(self, items: List[RenderItem], width: int, height: int) -> Image.Image:
+        import colorsys
+        rng = np.random.default_rng(42)
+
+        # Ordenar por matiz (hue) para que la transición de color sea suave
+        def hue(item):
+            r, g, b = _dominant_rgb(item.image)
+            return colorsys.rgb_to_hsv(r / 255, g / 255, b / 255)[0]
+
+        sorted_items = sorted(items, key=hue)
+        n = len(sorted_items)
+
+        canvas = Image.new("RGBA", (width, height), (0, 0, 0, 255))
+
+        # Ángulo de corte — 72° da franjas dramáticas sin ser horizontal
+        angle_deg = 72.0
+        angle_rad = math.radians(angle_deg)
+        tan_a = math.tan(angle_rad)
+
+        # Cada franja ocupa slice_w píxeles horizontales en la base de la diagonal
+        total_span = width + height / tan_a
+        slice_span = total_span / n
+
+        for i, item in enumerate(sorted_items):
+            # Álbum escalado a pantalla completa (cover completa, recortada al centro)
+            album = item.image.convert("RGBA")
+            # Escalar para cubrir todo el canvas
+            scale = max(width / album.width, height / album.height)
+            aw = int(album.width  * scale)
+            ah = int(album.height * scale)
+            album = album.resize((aw, ah), Image.LANCZOS)
+            # Centrar
+            ox = (aw - width)  // 2
+            oy = (ah - height) // 2
+            album = album.crop((ox, oy, ox + width, oy + height))
+
+            # Máscara de franja diagonal
+            mask = Image.new("L", (width, height), 0)
+            draw = ImageDraw.Draw(mask)
+
+            x_left  = i       * slice_span - height / tan_a
+            x_right = (i + 1) * slice_span - height / tan_a
+
+            # Polígono de la franja — paralelogramo inclinado
+            poly = [
+                (int(x_left),          0),
+                (int(x_right),         0),
+                (int(x_right + height / tan_a), height),
+                (int(x_left  + height / tan_a), height),
+            ]
+            draw.polygon(poly, fill=255)
+
+            # Separador: línea de 2px negra en el borde izquierdo de cada franja
+            sep_x = [int(x_left), int(x_left + height / tan_a)]
+            draw.line([(sep_x[0], 0), (sep_x[1], height)], fill=0, width=3)
+
+            album.putalpha(mask)
+            canvas = Image.alpha_composite(canvas, album)
+
+        return canvas.convert("RGB")
+
+
 @dataclass
 class RenderItem:
     image: Image.Image
@@ -1740,6 +1809,313 @@ class OrganicRenderer:
         return canvas.convert("RGB")
 
 
+# ── ManifiestoRenderer ────────────────────────────────────────────────────────
+# Pensado como sistema generativo (estilo MidJourney):
+#   – Composición en arco diagonal, no cluster aleatorio
+#   – Fondo oscuro con halos de color extraídos de los álbumes
+#   – Jerarquía extrema: hero 50% | support 28% | micro 10%
+#   – Logos como elementos ambientales (3 estilos: bloque, outline, spray)
+#   – Al menos 4 logos flotantes, posicionados como diseño, no como etiquetas
+#   – Bordes rasgados + sombras de oclusión + cinta
+#   – Grano de película + viñeta cinemática
+
+class ManifiestoRenderer:
+
+    def render(self, items: List[RenderItem], width: int, height: int,
+               with_logos: bool = True) -> Image.Image:
+        rng   = np.random.default_rng(sum(ord(c) for c in (items[0].artist if items else "x")))
+        items = _sort_by_relevance(items)[:18]
+
+        canvas = self._dark_base(width, height, rng)
+        canvas = self._color_halos(canvas, items[:5], rng)
+        canvas = self._place_all(canvas, items, width, height, rng)
+        if with_logos:
+            canvas = self._place_logos(canvas, items, width, height, rng)
+        canvas = self._vignette(canvas, width, height)
+        canvas = self._film_grain(canvas, rng)
+        return canvas.convert("RGB")
+
+    # ── Fondos atmosféricos ───────────────────────────────────────────────────
+
+    def _dark_base(self, w: int, h: int, rng) -> Image.Image:
+        # Near-black con drift de temperatura de color
+        arr = np.full((h, w, 3), [14, 12, 16], dtype=np.int16)
+        arr += rng.integers(-6, 7, (h, w, 3), dtype=np.int16)
+        return Image.fromarray(np.clip(arr, 0, 255).astype(np.uint8), "RGB").convert("RGBA")
+
+    def _color_halos(self, canvas: Image.Image, items: List[RenderItem], rng) -> Image.Image:
+        w, h = canvas.size
+        layer = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+        # Posiciones fijas para que los halos anclen la composición
+        anchors = [
+            (int(w * 0.28), int(h * 0.35)),
+            (int(w * 0.72), int(h * 0.55)),
+            (int(w * 0.15), int(h * 0.70)),
+            (int(w * 0.80), int(h * 0.25)),
+            (int(w * 0.50), int(h * 0.50)),
+        ]
+        for item, (cx, cy) in zip(items, anchors):
+            r, g, b = _dominant_rgb(item.image)
+            radius = int(rng.integers(int(h * 0.25), int(h * 0.40)))
+            ys, xs = np.ogrid[:h, :w]
+            dist = np.sqrt((xs - cx) ** 2 + (ys - cy) ** 2).astype(np.float32)
+            alpha = np.clip((1.0 - dist / radius) ** 1.6 * 55, 0, 55).astype(np.uint8)
+            blob = np.zeros((h, w, 4), dtype=np.uint8)
+            blob[..., 0] = r; blob[..., 1] = g; blob[..., 2] = b; blob[..., 3] = alpha
+            layer = Image.alpha_composite(layer, Image.fromarray(blob, "RGBA"))
+        return Image.alpha_composite(canvas, layer)
+
+    # ── Composición en arco diagonal ─────────────────────────────────────────
+    # El ojo entra por arriba-izquierda (micro cluster), cruza por el héroe
+    # (centro-izquierda) y sale por abajo-derecha (micro cluster).
+
+    def _place_all(self, canvas: Image.Image, items: List[RenderItem],
+                   w: int, h: int, rng) -> Image.Image:
+        hero_s    = int(w * 0.50)
+        support_s = int(w * 0.28)
+        medium_s  = int(w * 0.17)
+        micro_s   = int(w * 0.10)
+
+        # Micro texture — back layer, dispersos en diagonal
+        micro_positions = [
+            (int(w * 0.14), int(h * 0.12)), (int(w * 0.82), int(h * 0.08)),
+            (int(w * 0.06), int(h * 0.35)), (int(w * 0.90), int(h * 0.28)),
+            (int(w * 0.08), int(h * 0.72)), (int(w * 0.86), int(h * 0.70)),
+            (int(w * 0.20), int(h * 0.88)), (int(w * 0.78), int(h * 0.90)),
+            (int(w * 0.50), int(h * 0.05)), (int(w * 0.50), int(h * 0.95)),
+        ]
+        for i, (px, py) in enumerate(micro_positions[:min(len(items) - 5, 10)]):
+            idx = i + 5
+            if idx >= len(items): break
+            angle = float(rng.uniform(-35, 35))
+            canvas = self._stamp_album(canvas, items[idx], px, py, micro_s, angle, rng, roughness=5)
+
+        # Medium albums — middle layer
+        medium_positions = [
+            (int(w * 0.22), int(h * 0.60)), (int(w * 0.76), int(h * 0.42)),
+            (int(w * 0.68), int(h * 0.72)),
+        ]
+        for i, (px, py) in enumerate(medium_positions[:min(3, len(items) - 2)]):
+            idx = i + 2
+            angle = float(rng.choice([-1, 1])) * float(rng.uniform(8, 22))
+            canvas = self._stamp_album(canvas, items[idx], px, py, medium_s, angle, rng, roughness=6)
+
+        # Support albums
+        support_positions = [
+            (int(w * 0.24), int(h * 0.28)),
+            (int(w * 0.72), int(h * 0.58)),
+        ]
+        for i, (px, py) in enumerate(support_positions[:min(2, len(items) - 1)]):
+            angle = float(rng.choice([-1, 1])) * float(rng.uniform(4, 14))
+            canvas = self._stamp_album(canvas, items[i], px, py, support_s, angle, rng, roughness=7, tape=True)
+
+        # Hero — top of z-stack, regla áurea horizontal
+        canvas = self._stamp_album(canvas, items[0],
+                                   int(w * 0.46), int(h * 0.42),
+                                   hero_s, float(rng.uniform(-4, 4)), rng,
+                                   roughness=4, tape=True)
+        return canvas
+
+    def _stamp_album(self, canvas, item, cx, cy, size, angle, rng,
+                     roughness=5, tape=False) -> Image.Image:
+        from PIL import ImageFilter
+        img = item.image.resize((size, size), Image.LANCZOS).convert("RGBA")
+
+        # Sombra de oclusión
+        blur_r = max(4, size // 14)
+        sh_s   = size + blur_r * 6
+        shadow = Image.new("RGBA", (sh_s, sh_s), (0, 0, 0, 0))
+        inner  = Image.new("RGBA", (size, size), (0, 0, 0, 175))
+        shadow.paste(inner, (blur_r * 3, blur_r * 3))
+        shadow = shadow.filter(ImageFilter.GaussianBlur(blur_r))
+        canvas = _paste_rgba(canvas, shadow, cx + blur_r, cy + blur_r)
+
+        # Borde rasgado
+        img = self._torn_mask(img, roughness, rng)
+
+        # Rotación
+        if abs(angle) > 0.5:
+            img = img.rotate(-angle, expand=True, resample=Image.BICUBIC)
+        canvas = _paste_rgba(canvas, img, cx, cy)
+
+        # Cinta adhesiva
+        if tape:
+            for _ in range(rng.integers(1, 3)):
+                canvas = self._tape(canvas, cx, cy, size, angle, rng)
+
+        return canvas
+
+    def _torn_mask(self, img: Image.Image, roughness: int, rng) -> Image.Image:
+        from PIL import ImageFilter
+        w, h = img.size
+        arr  = np.array(img)
+        mask = arr[..., 3].astype(np.int16).copy()
+        b    = roughness * 2
+        for x in range(w):
+            mask[:max(0, b + int(rng.normal(0, roughness))), x] = 0
+            cut = max(0, b + int(rng.normal(0, roughness)))
+            mask[max(0, h - cut):, x] = 0
+        for y in range(h):
+            mask[y, :max(0, b + int(rng.normal(0, roughness)))] = 0
+            cut = max(0, b + int(rng.normal(0, roughness)))
+            mask[y, max(0, w - cut):] = 0
+        mimg = Image.fromarray(np.clip(mask, 0, 255).astype(np.uint8))
+        arr[..., 3] = np.array(mimg.filter(ImageFilter.GaussianBlur(1.8)))
+        return Image.fromarray(arr)
+
+    def _tape(self, canvas, cx, cy, size, album_angle, rng) -> Image.Image:
+        tw, th = int(rng.integers(60, 100)), int(rng.integers(16, 26))
+        tape   = Image.new("RGBA", (tw, th), (255, 252, 228, int(rng.integers(50, 80))))
+        noise  = rng.integers(-20, 21, (th, tw), dtype=np.int16)
+        ta     = np.array(tape)
+        ta[..., 3] = np.clip(ta[..., 3].astype(np.int16) + noise, 0, 255).astype(np.uint8)
+        tape   = Image.fromarray(ta).rotate(-(album_angle + float(rng.uniform(-10, 10))),
+                                            expand=True, resample=Image.BICUBIC)
+        ox = int(rng.integers(-size // 3, size // 3))
+        oy = int(rng.choice([-1, 1])) * int(rng.integers(8, size // 4))
+        return _paste_rgba(canvas, tape, cx + ox, cy + oy)
+
+    # ── Logos como elementos ambientales ─────────────────────────────────────
+    # Tres estilos: BLOQUE (fondo sólido + texto), OUTLINE, SPRAY (texto difuso)
+
+    def _place_logos(self, canvas: Image.Image, items: List[RenderItem],
+                     w: int, h: int, rng) -> Image.Image:
+        # Elegir 4-6 items al azar (sin repetir)
+        pool = list(range(len(items)))
+        rng.shuffle(pool)
+        logo_indices = pool[:min(6, len(items))]
+
+        # Posiciones fijas para logos — distribuidos en la imagen
+        logo_slots = [
+            (int(w * 0.50), int(h * 0.08),  0),    # top center
+            (int(w * 0.15), int(h * 0.50), -90),   # left vertical
+            (int(w * 0.85), int(h * 0.52),  90),   # right vertical
+            (int(w * 0.50), int(h * 0.93),  0),    # bottom center
+            (int(w * 0.25), int(h * 0.80), -12),   # lower left
+            (int(w * 0.75), int(h * 0.18),  8),    # upper right
+        ]
+        styles = ["bloque", "outline", "spray", "bloque", "outline", "spray"]
+
+        for slot_i, item_i in enumerate(logo_indices[:len(logo_slots)]):
+            item = items[item_i]
+            cx, cy, base_angle = logo_slots[slot_i]
+            style  = styles[slot_i]
+            angle  = base_angle + float(rng.uniform(-5, 5))
+            logo_w = int(w * rng.uniform(0.28, 0.42))
+
+            logo_img = None
+            # Intentar logo real si existe
+            if item.logo is not None:
+                from logos import stencil
+                lh = max(1, int(logo_w * item.logo.height / max(item.logo.width, 1)))
+                color = _dominant_rgb(item.image)
+                inv   = self._contrast_color(color)
+                logo_img = stencil(item.logo, inv, 160, (logo_w, lh))
+
+            # Fallback: logo tipográfico con estilo
+            if logo_img is None:
+                logo_img = self._text_logo(item.artist, item.image, logo_w, style, rng)
+
+            if logo_img is None:
+                continue
+
+            if abs(angle) > 0.5:
+                logo_img = logo_img.rotate(-angle, expand=True, resample=Image.BICUBIC)
+            canvas = _paste_rgba(canvas, logo_img, cx, cy)
+
+        return canvas
+
+    def _text_logo(self, artist: str, ref_img: Image.Image,
+                   target_w: int, style: str, rng) -> Optional[Image.Image]:
+        name  = artist.upper()[:16]
+        color = _dominant_rgb(ref_img)
+        inv   = self._contrast_color(color)
+
+        # Elegir tamaño de fuente para que quepa en target_w
+        for fsize in range(80, 14, -4):
+            fnt = _font(fsize)
+            tmp = Image.new("RGBA", (1, 1))
+            try:
+                bb = ImageDraw.Draw(tmp).textbbox((0, 0), name, font=fnt)
+                tw, th = bb[2] - bb[0], bb[3] - bb[1]
+            except Exception:
+                tw, th = len(name) * fsize // 2, fsize
+            if tw <= target_w - 20:
+                break
+
+        pad_x, pad_y = 14, 10
+
+        if style == "bloque":
+            # Rectángulo sólido de color dominante + texto contrastante
+            bg_color = (*color, 220)
+            logo = Image.new("RGBA", (tw + pad_x * 2, th + pad_y * 2), bg_color)
+            draw = ImageDraw.Draw(logo)
+            draw.text((pad_x, pad_y), name, font=fnt, fill=(*inv, 255))
+            # Borde externo fino
+            draw.rectangle([0, 0, logo.width - 1, logo.height - 1],
+                           outline=(*inv, 140), width=2)
+
+        elif style == "outline":
+            # Solo texto en outline, sin fondo
+            logo = Image.new("RGBA", (tw + pad_x * 2, th + pad_y * 2), (0, 0, 0, 0))
+            draw = ImageDraw.Draw(logo)
+            # Trazo grueso como outline
+            for dx in (-2, -1, 0, 1, 2):
+                for dy in (-2, -1, 0, 1, 2):
+                    if dx == 0 and dy == 0: continue
+                    draw.text((pad_x + dx, pad_y + dy), name, font=fnt, fill=(*inv, 60))
+            draw.text((pad_x, pad_y), name, font=fnt, fill=(*inv, 200))
+            # Línea horizontal encima y abajo
+            draw.line([(pad_x, pad_y - 4), (tw + pad_x, pad_y - 4)],
+                      fill=(*inv, 150), width=2)
+            draw.line([(pad_x, th + pad_y + 4), (tw + pad_x, th + pad_y + 4)],
+                      fill=(*inv, 150), width=2)
+
+        else:  # spray
+            # Texto difuso — como stencil spray
+            logo = Image.new("RGBA", (tw + pad_x * 2 + 6, th + pad_y * 2 + 6), (0, 0, 0, 0))
+            draw = ImageDraw.Draw(logo)
+            # Capa difusa
+            for _ in range(3):
+                ox = int(rng.integers(-3, 4))
+                oy = int(rng.integers(-3, 4))
+                draw.text((pad_x + ox, pad_y + oy), name, font=fnt, fill=(*inv, 55))
+            # Capa principal
+            draw.text((pad_x, pad_y), name, font=fnt, fill=(*inv, 210))
+            # Ruido sobre el texto
+            from PIL import ImageFilter
+            logo = logo.filter(ImageFilter.GaussianBlur(0.6))
+
+        return logo
+
+    def _contrast_color(self, rgb: Tuple[int, int, int]) -> Tuple[int, int, int]:
+        r, g, b = rgb
+        lum = 0.299 * r + 0.587 * g + 0.114 * b
+        if lum > 128:
+            return (max(0, r - 130), max(0, g - 130), max(0, b - 130))
+        else:
+            return (min(255, r + 160), min(255, g + 160), min(255, b + 160))
+
+    # ── Post-processing ───────────────────────────────────────────────────────
+
+    def _vignette(self, canvas: Image.Image, w: int, h: int) -> Image.Image:
+        vig = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+        ys, xs = np.ogrid[:h, :w]
+        dx = (xs / w - 0.5) * 2
+        dy = (ys / h - 0.5) * 2
+        dist = np.sqrt(dx**2 + dy**2)
+        alpha = np.clip((dist - 0.5) / 0.5 * 165, 0, 165).astype(np.uint8)
+        va = np.zeros((h, w, 4), dtype=np.uint8)
+        va[..., 3] = alpha
+        return Image.alpha_composite(canvas, Image.fromarray(va, "RGBA"))
+
+    def _film_grain(self, canvas: Image.Image, rng) -> Image.Image:
+        w, h = canvas.size
+        arr  = np.array(canvas).astype(np.int16)
+        arr[..., :3] += rng.integers(-22, 23, (h, w, 1), dtype=np.int16)
+        return Image.fromarray(np.clip(arr, 0, 255).astype(np.uint8), "RGBA")
+
+
 # ── Registry ──────────────────────────────────────────────────────────────────
 
 RENDERERS = {
@@ -1752,4 +2128,6 @@ RENDERERS = {
     "muro":           MuroVivoRenderer,
     "explosion":      ExplosionRenderer,
     "adn":            ADNMusicalRenderer,
+    "manifiesto":     ManifiestoRenderer,
+    "diagonal":       DiagonalSliceRenderer,
 }

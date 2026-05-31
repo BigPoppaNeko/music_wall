@@ -1,0 +1,26 @@
+{
+  "id": "155fc4ba-11fe-42be-ab07-47051a81344c",
+  "genre": "scene_woodstock",
+  "mood": "festival_vintage",
+  "totalSlots": 12,
+  "slots": [
+    { "id": 1,  "x": 0.1528, "y": 0.2401, "width": 0.2213, "height": 0.1568, "rotation": 0.0, "lightingZone": [140, 105, 55] },
+    { "id": 2,  "x": 0.3889, "y": 0.2411, "width": 0.2194, "height": 0.1557, "rotation": 0.0, "lightingZone": [138, 103, 53] },
+    { "id": 3,  "x": 0.6213, "y": 0.2401, "width": 0.2204, "height": 0.1568, "rotation": 0.0, "lightingZone": [135, 100, 51] },
+    { "id": 4,  "x": 0.1528, "y": 0.4026, "width": 0.2213, "height": 0.1536, "rotation": 0.0, "lightingZone": [130, 98,  50] },
+    { "id": 5,  "x": 0.3833, "y": 0.4031, "width": 0.2250, "height": 0.1531, "rotation": 0.0, "lightingZone": [128, 96,  48] },
+    { "id": 6,  "x": 0.6204, "y": 0.4026, "width": 0.2213, "height": 0.1536, "rotation": 0.0, "lightingZone": [126, 94,  47] },
+    { "id": 7,  "x": 0.1528, "y": 0.5615, "width": 0.2213, "height": 0.1547, "rotation": 0.0, "lightingZone": [122, 92,  46] },
+    { "id": 8,  "x": 0.3833, "y": 0.5630, "width": 0.2250, "height": 0.1531, "rotation": 0.0, "lightingZone": [120, 90,  45] },
+    { "id": 9,  "x": 0.6185, "y": 0.5630, "width": 0.2231, "height": 0.1531, "rotation": 0.0, "lightingZone": [118, 88,  44] },
+    { "id": 10, "x": 0.1528, "y": 0.7234, "width": 0.2213, "height": 0.1510, "rotation": 0.0, "lightingZone": [115, 86,  42] },
+    { "id": 11, "x": 0.3870, "y": 0.7229, "width": 0.2213, "height": 0.1516, "rotation": 0.0, "lightingZone": [113, 84,  41] },
+    { "id": 12, "x": 0.6194, "y": 0.7229, "width": 0.2222, "height": 0.1516, "rotation": 0.0, "lightingZone": [111, 82,  40] }
+  ],
+  "lightingMap": {
+    "type": "gradient",
+    "mainLightColor": "#C87830",
+    "ambientColor": "#2A1A08",
+    "shadowDirection": "bottom-right"
+  }
+}

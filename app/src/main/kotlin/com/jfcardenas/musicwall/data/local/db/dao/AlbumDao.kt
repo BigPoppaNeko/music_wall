@@ -23,4 +23,10 @@ interface AlbumDao {
 
     @Query("DELETE FROM albums WHERE fetchedAt < :before")
     suspend fun deleteOlderThan(before: Long)
+
+    @Query("SELECT * FROM albums WHERE imageUrl != '' ORDER BY RANDOM() LIMIT :limit")
+    suspend fun getRandomWithImage(limit: Int): List<AlbumEntity>
+
+    @Query("UPDATE albums SET imageUrl = :imageUrl WHERE albumName = :albumName AND artistName = :artistName AND imageUrl = ''")
+    suspend fun updateImageUrlIfEmpty(albumName: String, artistName: String, imageUrl: String)
 }

@@ -5,7 +5,13 @@ import coil.ImageLoader
 import coil.disk.DiskCache
 import coil.memory.MemoryCache
 import com.jfcardenas.musicwall.api.LastFmService
+import com.jfcardenas.musicwall.api.DeezerService
+import com.jfcardenas.musicwall.api.DiscogsService
+import com.jfcardenas.musicwall.api.LyricsService
+import com.jfcardenas.musicwall.api.createDeezerService
+import com.jfcardenas.musicwall.api.createDiscogsService
 import com.jfcardenas.musicwall.api.createLastFmService
+import com.jfcardenas.musicwall.api.createLyricsService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -20,6 +26,18 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideLastFmService(): LastFmService = createLastFmService()
+
+    @Provides
+    @Singleton
+    fun provideLyricsService(): LyricsService = createLyricsService()
+
+    @Provides
+    @Singleton
+    fun provideDiscogsService(): DiscogsService = createDiscogsService()
+
+    @Provides
+    @Singleton
+    fun provideDeezerService(): DeezerService = createDeezerService()
 
     @Provides
     @Singleton

@@ -96,6 +96,58 @@ def get_top_artists(username: str, limit: int = 50, period: str = "overall") -> 
     return results
 
 
+_CHART_TAGS = ["rock", "pop", "electronic", "jazz", "hip-hop", "metal", "indie", "classical"]
+
+def get_chart_albums(limit: int = 50) -> List[MediaImage]:
+    """Mix of popular genre tags — no user required. Good for lab experimentation."""
+    return get_tag_albums(_CHART_TAGS, limit)
+
+
+def get_tag_albums(tags: List[str], limit: int = 50) -> List[MediaImage]:
+    """Fetch top albums for one or more genre tags and mix them.
+    Tags: rock, jazz, punk, metal, hip-hop, electronic, ambient, etc.
+    """
+    api_key = load_api_key()
+    per_tag = max(8, limit // len(tags))
+    seen: set = set()
+    results: List[MediaImage] = []
+
+    for tag in tags:
+        resp = requests.get(BASE_URL, params={
+            "method": "tag.gettopalbums",
+            "tag": tag.strip(), "limit": per_tag,
+            "api_key": api_key, "format": "json",
+        }, timeout=15)
+        if not resp.ok:
+            continue
+        data = resp.json()
+        if "error" in data:
+            continue
+        for album in data.get("albums", {}).get("album", []):
+            key = f"{album.get('artist', {}).get('name', '')}|{album.get('name', '')}"
+            if key in seen:
+                continue
+            seen.add(key)
+            url = _best_image(album.get("image", []))
+            artist_data = album.get("artist", {})
+            mbid = (artist_data.get("mbid") or album.get("mbid") or "").strip() or None
+            results.append(MediaImage(
+                album=album.get("name", ""),
+                artist=artist_data.get("name", ""),
+                rank=len(results) + 1,
+                playcount=0,
+                image_url=url,
+                provider="lastfm" if url else "none",
+                mbid=mbid,
+            ))
+
+    import random as _random
+    _random.shuffle(results)
+    for i, r in enumerate(results):
+        r.rank = i + 1
+    return results[:limit]
+
+
 def _best_image(images: list) -> Optional[str]:
     for size in ("mega", "extralarge", "large"):
         for img in images:

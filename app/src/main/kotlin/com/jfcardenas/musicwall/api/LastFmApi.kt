@@ -72,6 +72,33 @@ interface LastFmService {
         @Query("album") album: String,
         @Query("limit") limit: Int = 20
     ): AlbumSearchResponse
+
+    @GET(".")
+    suspend fun getTrackInfo(
+        @Query("method") method: String = "track.getinfo",
+        @Query("artist") artist: String,
+        @Query("track") track: String,
+    ): TrackInfoResponse
+
+    @GET(".")
+    suspend fun getArtistInfo(
+        @Query("method") method: String = "artist.getinfo",
+        @Query("artist") artist: String,
+    ): ArtistInfoResponse
+
+    @GET(".")
+    suspend fun getUserTopTags(
+        @Query("method") method: String = "user.gettoptags",
+        @Query("user") user: String,
+        @Query("limit") limit: Int = 15,
+    ): UserTopTagsResponse
+
+    @GET(".")
+    suspend fun getArtistTopAlbums(
+        @Query("method") method: String = "artist.gettopalbums",
+        @Query("artist") artist: String,
+        @Query("limit") limit: Int = 4,
+    ): TopAlbumsResponse
 }
 
 class LastFmApiException(val code: Int, message: String) : IOException(message)

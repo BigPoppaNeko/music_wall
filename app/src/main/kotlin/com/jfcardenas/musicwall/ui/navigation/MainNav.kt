@@ -1,5 +1,6 @@
 package com.jfcardenas.musicwall.ui.navigation
 
+import android.net.Uri
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,10 +24,10 @@ import com.jfcardenas.musicwall.ui.theme.*
 private data class TabItem(val route: String, val label: String, val icon: ImageVector)
 
 private val TABS = listOf(
-    TabItem("inicio",  "Inicio",  Icons.Filled.Home),
-    TabItem("estilos", "Estilos", Icons.Filled.GridView),
-    TabItem("fuente",  "Fuente",  Icons.Filled.MusicNote),
-    TabItem("ajustes", "Ajustes", Icons.Filled.Settings),
+    TabItem("inicio",   "Inicio",   Icons.Filled.Home),
+    TabItem("murales",  "Murales",  Icons.Filled.GridView),
+    TabItem("fuente",   "Fuente",   Icons.Filled.MusicNote),
+    TabItem("ajustes",  "Ajustes",  Icons.Filled.Settings),
 )
 
 private val TAB_ROUTES = TABS.map { it.route }.toSet()
@@ -42,7 +43,8 @@ fun MainNav() {
     Scaffold(
         containerColor = Color.Transparent,
         bottomBar = {
-            val baseRoute = currentRoute?.substringBefore("/")
+            // Strip both path "/" and query "?" separators to get base route
+            val baseRoute = currentRoute?.substringBefore("/")?.substringBefore("?")
             if (baseRoute in TAB_ROUTES) {
                 NavigationBar(containerColor = Surface) {
                     TABS.forEach { tab ->
@@ -82,15 +84,33 @@ fun MainNav() {
             // ── Tabs ──────────────────────────────────────────────────────────
             composable("inicio") {
                 HomeScreen(
-                    onGoToDescubrimientos = { nav.navigate("descubrimientos") },
-                    onGoToHistorial       = { nav.navigate("historial") },
+                    onGoToEstilos   = {
+                        nav.navigate("murales?tab=1") {
+                            popUpTo("inicio") { saveState = true }
+                            launchSingleTop = false
+                            restoreState    = false
+                        }
+                    },
+                    onGoToHistorial   = { nav.navigate("historial") },
+                    onGoToArtistas    = { nav.navigate("artistas") },
+                    onGoToFavoritas   = { nav.navigate("favoritas") },
+                    onNowPlayingClick = { artist, track ->
+                        nav.navigate("nowplaying/${Uri.encode(artist)}/${Uri.encode(track)}")
+                    },
                 )
             }
 
-            composable("estilos") {
-                StyleSelectionScreen(
-                    onBack     = null,
-                    onContinuar = { styleId -> nav.navigate("generating/$styleId") },
+            composable(
+                route = "murales?tab={tab}",
+                arguments = listOf(
+                    navArgument("tab") { type = NavType.IntType; defaultValue = 0 }
+                ),
+            ) { back ->
+                val tab = back.arguments?.getInt("tab") ?: 0
+                MuralesScreen(
+                    initialTab       = tab,
+                    onBack           = null,
+                    onSelectRenderer = { styleId -> nav.navigate("generating/$styleId") },
                 )
             }
 
@@ -131,14 +151,7 @@ fun MainNav() {
                 )
             }
 
-            // ── Descubrimientos & Historial ───────────────────────────────────
-            composable("descubrimientos") {
-                DiscoveriesScreen(
-                    onBack     = { nav.popBackStack() },
-                    onDiscover = { styleId -> nav.navigate("generating/$styleId") },
-                )
-            }
-
+            // ── Historial ─────────────────────────────────────────────────────
             composable("historial") {
                 MuralHistoryScreen(
                     onBack       = { nav.popBackStack() },
@@ -146,7 +159,34 @@ fun MainNav() {
                 )
             }
 
-            // ── Generating flow (from Estilos tab) ────────────────────────────
+            // ── Artistas ──────────────────────────────────────────────────────
+            composable("artistas") {
+                ArtistasScreen(onBack = { nav.popBackStack() })
+            }
+
+            // ── Mis portadas favoritas ─────────────────────────────────────────
+            composable("favoritas") {
+                FavoritesScreen(onBack = { nav.popBackStack() })
+            }
+
+            // ── Now Playing Detail ─────────────────────────────────────────────
+            composable(
+                route = "nowplaying/{artist}/{track}",
+                arguments = listOf(
+                    navArgument("artist") { type = NavType.StringType },
+                    navArgument("track")  { type = NavType.StringType },
+                ),
+            ) { back ->
+                val artist    = back.arguments?.getString("artist") ?: ""
+                val trackName = back.arguments?.getString("track")  ?: ""
+                NowPlayingDetailScreen(
+                    artist    = artist,
+                    trackName = trackName,
+                    onBack    = { nav.popBackStack() },
+                )
+            }
+
+            // ── Generating flow ────────────────────────────────────────────────
             composable(
                 route     = "generating/{styleId}",
                 arguments = listOf(navArgument("styleId") { type = NavType.StringType }),

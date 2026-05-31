@@ -6,6 +6,7 @@ import com.jfcardenas.musicwall.features.wallpaper.renderer.RenderItem
 import com.jfcardenas.musicwall.features.wallpaper.renderer.WallpaperRenderer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.util.Random
 
 /**
  * OrganicRenderer — integra portadas reales en escenas generadas por IA.
@@ -25,16 +26,24 @@ import kotlinx.coroutines.withContext
  * No modifica ningún renderer existente ni la factory de wallpapers.
  */
 class OrganicRenderer(
-    private val context:  Context,
-    val layoutId: String,
+    private val context:     Context,
+    val layoutId:            String,
+    private val postProcess: Boolean = false,
 ) : WallpaperRenderer {
 
     override val id        = "organic/$layoutId"
     override val isPremium = false
 
     // Caché en memoria — un OrganicRenderer por layoutId
-    private var cachedBackground: Bitmap?      = null
+    private var cachedBackground: Bitmap?        = null
     private var cachedLayout:     OrganicLayout? = null
+
+    // Transform del background: imagen → canvas (fill+center-crop)
+    private var srcW  = 0
+    private var srcH  = 0
+    private var bgScl = 1f
+    private var bgDx  = 0
+    private var bgDy  = 0
 
     // ── API pública ───────────────────────────────────────────────────────────
 
@@ -42,31 +51,39 @@ class OrganicRenderer(
         withContext(Dispatchers.Default) {
 
             val layout     = getLayout()
-            val background = getBackground(width, height)
+            val background = getBackground()
 
-            val result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+            val imgW = (background?.width  ?: width).coerceAtLeast(1)
+            val imgH = (background?.height ?: height).coerceAtLeast(1)
+
+            val result = Bitmap.createBitmap(imgW, imgH, Bitmap.Config.ARGB_8888)
             val canvas = Canvas(result)
 
-            // 1 — Fondo
+            // 1 — Portadas detrás: el PNG tiene huecos transparentes donde se verán
+            if (items.isNotEmpty()) {
+                layout.slots.forEachIndexed { idx, slot ->
+                    val item = items[idx % items.size]
+                    renderSlotBehind(canvas, item.bitmap, slot, imgW, imgH, layout.lightingMap)
+                }
+            }
+
+            // 2 — PNG de escena encima: sus marcos opacos cubren todo excepto los huecos
             if (background != null) {
                 canvas.drawBitmap(background, 0f, 0f, null)
             } else {
                 canvas.drawColor(parseColor(layout.lightingMap.ambientColor, Color.BLACK))
             }
 
-            if (items.isEmpty()) {
-                drawVignette(canvas, width, height)
-                return@withContext result
+            // 3 — Post-processing global o vignette básico
+            if (postProcess) {
+                drawAmbientOcclusion(canvas, layout, imgW, imgH)
+                drawColorGrading(canvas, imgW, imgH)
+                drawDirectionalLight(canvas, imgW, imgH)
+                drawSoftVignette(canvas, imgW, imgH)
+                drawFilmTexture(canvas, imgW, imgH)
+            } else {
+                drawVignette(canvas, imgW, imgH)
             }
-
-            // 2 — Portadas en slots
-            layout.slots.forEachIndexed { idx, slot ->
-                val item = items[idx % items.size]
-                renderSlot(canvas, item.bitmap, slot, width, height, layout.lightingMap)
-            }
-
-            // 3 — Vignette de cohesión
-            drawVignette(canvas, width, height)
 
             result
         }
@@ -75,6 +92,7 @@ class OrganicRenderer(
         cachedBackground?.recycle()
         cachedBackground = null
         cachedLayout = null
+        srcW = 0
     }
 
     // ── Carga de assets ───────────────────────────────────────────────────────
@@ -90,36 +108,58 @@ class OrganicRenderer(
         }
     }
 
-    private fun getBackground(canvasW: Int, canvasH: Int): Bitmap? {
+    private fun getBackground(): Bitmap? {
         cachedBackground?.let { return it }
         val exts = listOf(".jpg", ".jpeg", ".png", ".webp")
         for (ext in exts) {
             try {
-                val raw = context.assets.open("organic/$layoutId$ext").use {
+                val bmp = context.assets.open("organic/$layoutId$ext").use {
                     BitmapFactory.decodeStream(it)
                 } ?: continue
 
-                // Ajustar escala manteniendo relación de aspecto (fill)
-                val scale = maxOf(canvasW.toFloat() / raw.width, canvasH.toFloat() / raw.height)
-                val sw    = (raw.width  * scale).toInt()
-                val sh    = (raw.height * scale).toInt()
-                val scaled = Bitmap.createScaledBitmap(raw, sw, sh, true)
+                // Sin escala ni recorte: los slots se posicionan en el espacio nativo del asset
+                srcW  = bmp.width
+                srcH  = bmp.height
+                bgScl = 1f
+                bgDx  = 0
+                bgDy  = 0
 
-                // Centro y recorte al canvas
-                val dx = (sw - canvasW) / 2
-                val dy = (sh - canvasH) / 2
-                val cropped = Bitmap.createBitmap(scaled, dx, dy, canvasW, canvasH)
-
-                if (scaled !== raw) raw.recycle()
-                if (cropped !== scaled) scaled.recycle()
-
-                return cropped.also { cachedBackground = it }
+                return bmp.also { cachedBackground = it }
             } catch (_: Exception) {}
         }
         return null
     }
 
     // ── Renderizado de un slot ────────────────────────────────────────────────
+
+    /** Coloca la portada exactamente en el hueco del marco; el PNG de escena ya aporta
+     *  el tratamiento visual principal. Con postProcess activo añade contact shadow. */
+    private fun renderSlotBehind(
+        canvas:   Canvas,
+        album:    Bitmap,
+        slot:     OrganicSlot,
+        cw:       Int,
+        ch:       Int,
+        lighting: OrganicLightingMap,
+    ) {
+        val pw = if (srcW > 0) (slot.width  * srcW).toInt().coerceAtLeast(4)
+                 else          (slot.width  * cw  ).toInt().coerceAtLeast(4)
+        val ph = if (srcH > 0) (slot.height * srcH).toInt().coerceAtLeast(4)
+                 else          (slot.height * ch  ).toInt().coerceAtLeast(4)
+        val px = if (srcW > 0) slot.x * srcW else slot.x * cw
+        val py = if (srcH > 0) slot.y * srcH else slot.y * ch
+
+        val scaled = scaleCropBitmap(album, pw, ph)
+        val paint  = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            colorFilter = buildLightingFilter(slot.lightingZone, strength = 0.18f)
+        }
+        canvas.save()
+        canvas.rotate(slot.rotation, px + pw / 2f, py + ph / 2f)
+        if (postProcess) drawContactShadow(canvas, px, py, pw.toFloat(), ph.toFloat())
+        canvas.drawBitmap(scaled, px, py, paint)
+        canvas.restore()
+        if (scaled !== album) scaled.recycle()
+    }
 
     private fun renderSlot(
         canvas:   Canvas,
@@ -129,25 +169,32 @@ class OrganicRenderer(
         ch:       Int,
         lighting: OrganicLightingMap,
     ) {
-        val pw = (slot.width  * cw).toInt().coerceAtLeast(4)
-        val ph = (slot.height * ch).toInt().coerceAtLeast(4)
-        val px = slot.x * cw
-        val py = slot.y * ch
+        val pw: Int; val ph: Int; val px: Float; val py: Float
+        if (srcW > 0) {
+            val sW = srcW * bgScl
+            val sH = srcH * bgScl
+            pw = (slot.width  * sW).toInt().coerceAtLeast(4)
+            ph = (slot.height * sH).toInt().coerceAtLeast(4)
+            px = slot.x * sW - bgDx
+            py = slot.y * sH - bgDy
+        } else {
+            pw = (slot.width  * cw).toInt().coerceAtLeast(4)
+            ph = (slot.height * ch).toInt().coerceAtLeast(4)
+            px = slot.x * cw
+            py = slot.y * ch
+        }
         val cx = px + pw / 2f
         val cy = py + ph / 2f
 
-        // Escalar portada al slot (recortar si la relación de aspecto difiere)
         val scaled = scaleCropBitmap(album, pw, ph)
 
         canvas.save()
         canvas.rotate(slot.rotation, cx, cy)
 
-        // Sombra suave
         drawSlotShadow(canvas, px, py, pw.toFloat(), ph.toFloat(),
                        shadowOffset(lighting.shadowDirection, pw.toFloat()),
                        cornerRadius = pw * 0.05f)
 
-        // Portada con grading de luz
         val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             colorFilter = buildLightingFilter(slot.lightingZone, strength = 0.28f)
         }
@@ -197,6 +244,132 @@ class OrganicRenderer(
             "bottom"       ->  0f to  d
             "bottom-right" ->  d to  d
             else           ->  d to  d
+        }
+    }
+
+    // ── Post-processing global (Woodstock) ────────────────────────────────────
+
+    /** Contact shadow: blur 15px, offset Y 4px, 25% opacidad. */
+    private fun drawContactShadow(canvas: Canvas, x: Float, y: Float, w: Float, h: Float) {
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = Color.argb(64, 0, 0, 0)
+            maskFilter = BlurMaskFilter(15f, BlurMaskFilter.Blur.NORMAL)
+        }
+        canvas.drawRect(x, y + 4f, x + w, y + h + 4f, paint)
+    }
+
+    /** Ambient occlusion: sombra interior en bordes de cada slot, 7% intensidad. */
+    private fun drawAmbientOcclusion(canvas: Canvas, layout: OrganicLayout, imgW: Int, imgH: Int) {
+        val alpha = 18  // ~7% de 255
+        layout.slots.forEach { slot ->
+            val pw  = if (srcW > 0) slot.width  * srcW else slot.width  * imgW
+            val ph  = if (srcH > 0) slot.height * srcH else slot.height * imgH
+            val px  = if (srcW > 0) slot.x * srcW      else slot.x * imgW
+            val py  = if (srcH > 0) slot.y * srcH      else slot.y * imgH
+            val cx  = px + pw / 2f
+            val cy  = py + ph / 2f
+            val ewx = pw * 0.12f
+            val ewy = ph * 0.12f
+            val black = Color.argb(alpha, 0, 0, 0)
+
+            canvas.save()
+            canvas.rotate(slot.rotation, cx, cy)
+            canvas.clipRect(px, py, px + pw, py + ph)
+
+            Paint(Paint.ANTI_ALIAS_FLAG).let { p ->
+                p.shader = LinearGradient(px, 0f, px + ewx, 0f, black, Color.TRANSPARENT, Shader.TileMode.CLAMP)
+                canvas.drawRect(px, py, px + ewx, py + ph, p)
+            }
+            Paint(Paint.ANTI_ALIAS_FLAG).let { p ->
+                p.shader = LinearGradient(px + pw, 0f, px + pw - ewx, 0f, black, Color.TRANSPARENT, Shader.TileMode.CLAMP)
+                canvas.drawRect(px + pw - ewx, py, px + pw, py + ph, p)
+            }
+            Paint(Paint.ANTI_ALIAS_FLAG).let { p ->
+                p.shader = LinearGradient(0f, py, 0f, py + ewy, black, Color.TRANSPARENT, Shader.TileMode.CLAMP)
+                canvas.drawRect(px, py, px + pw, py + ewy, p)
+            }
+            Paint(Paint.ANTI_ALIAS_FLAG).let { p ->
+                p.shader = LinearGradient(0f, py + ph, 0f, py + ph - ewy, black, Color.TRANSPARENT, Shader.TileMode.CLAMP)
+                canvas.drawRect(px, py + ph - ewy, px + pw, py + ph, p)
+            }
+
+            canvas.restore()
+        }
+    }
+
+    /** Color grading: overlay sépia cálido ~12% para unificar fondo y portadas. */
+    private fun drawColorGrading(canvas: Canvas, w: Int, h: Int) {
+        val paint = Paint().apply { color = Color.argb(30, 180, 130, 70) }
+        canvas.drawRect(0f, 0f, w.toFloat(), h.toFloat(), paint)
+    }
+
+    /** Luz direccional cálida desde arriba-izquierda; sombra en la parte inferior. */
+    private fun drawDirectionalLight(canvas: Canvas, w: Int, h: Int) {
+        val wf = w.toFloat()
+        val hf = h.toFloat()
+        // Brillo superior cálido
+        Paint(Paint.ANTI_ALIAS_FLAG).let { p ->
+            p.shader = LinearGradient(0f, 0f, 0f, hf * 0.4f, Color.argb(40, 255, 200, 120), Color.TRANSPARENT, Shader.TileMode.CLAMP)
+            canvas.drawRect(0f, 0f, wf, hf, p)
+        }
+        // Sombra inferior
+        Paint(Paint.ANTI_ALIAS_FLAG).let { p ->
+            p.shader = LinearGradient(0f, hf, 0f, hf * 0.6f, Color.argb(50, 0, 0, 0), Color.TRANSPARENT, Shader.TileMode.CLAMP)
+            canvas.drawRect(0f, 0f, wf, hf, p)
+        }
+        // Realce lateral izquierdo cálido
+        Paint(Paint.ANTI_ALIAS_FLAG).let { p ->
+            p.shader = LinearGradient(0f, 0f, wf * 0.3f, 0f, Color.argb(20, 255, 210, 140), Color.TRANSPARENT, Shader.TileMode.CLAMP)
+            canvas.drawRect(0f, 0f, wf, hf, p)
+        }
+    }
+
+    /** Soft vignette: bordes -20%, centro sin cambios. */
+    private fun drawSoftVignette(canvas: Canvas, w: Int, h: Int) {
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            shader = RadialGradient(
+                w / 2f, h / 2f, maxOf(w, h) * 0.75f,
+                intArrayOf(Color.TRANSPARENT, Color.argb(51, 0, 0, 0)),
+                floatArrayOf(0f, 1f),
+                Shader.TileMode.CLAMP,
+            )
+        }
+        canvas.drawRect(0f, 0f, w.toFloat(), h.toFloat(), paint)
+    }
+
+    /** Film texture: grain + polvo + arañazos sutiles sobre toda la composición. */
+    private fun drawFilmTexture(canvas: Canvas, w: Int, h: Int) {
+        val rng = Random(42L)
+
+        // Grain: bitmap de ruido de 128×128 tileado
+        val gs = 128
+        val grainBmp = Bitmap.createBitmap(gs, gs, Bitmap.Config.ARGB_8888)
+        val grainPx = IntArray(gs * gs) {
+            val v = (128 + rng.nextInt(60) - 30).coerceIn(0, 255)
+            Color.argb(35, v, v, v)
+        }
+        grainBmp.setPixels(grainPx, 0, gs, 0, 0, gs, gs)
+        val grainPaint = Paint()
+        var ty = 0
+        while (ty < h) { var tx = 0; while (tx < w) { canvas.drawBitmap(grainBmp, tx.toFloat(), ty.toFloat(), grainPaint); tx += gs }; ty += gs }
+        grainBmp.recycle()
+
+        // Polvo: puntos blancos pequeños
+        val dustPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.argb(55, 255, 255, 255) }
+        repeat(12) {
+            canvas.drawCircle(rng.nextInt(w).toFloat(), rng.nextInt(h).toFloat(), 1f + rng.nextFloat() * 2f, dustPaint)
+        }
+
+        // Arañazos: líneas verticales tenues
+        val scratchPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = Color.argb(38, 255, 255, 255)
+            strokeWidth = 1f
+            style = Paint.Style.STROKE
+        }
+        repeat(3) {
+            val sx = rng.nextInt(w).toFloat()
+            val startY = h * 0.1f + rng.nextFloat() * h * 0.4f
+            canvas.drawLine(sx, startY, sx, startY + h * 0.1f + rng.nextFloat() * h * 0.25f, scratchPaint)
         }
     }
 
@@ -263,8 +436,9 @@ class OrganicRenderer(
         val scaleY = targetH.toFloat() / src.height
         val scale  = maxOf(scaleX, scaleY)
 
-        val sw = (src.width  * scale).toInt()
-        val sh = (src.height * scale).toInt()
+        // +1 para absorber errores de redondeo float que harían sw/sh < target
+        val sw = (src.width  * scale).toInt().coerceAtLeast(targetW)
+        val sh = (src.height * scale).toInt().coerceAtLeast(targetH)
         val dx = (sw - targetW) / 2
         val dy = (sh - targetH) / 2
 

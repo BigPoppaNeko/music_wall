@@ -197,7 +197,68 @@ data class SearchAlbum(
 
 // ── Images ────────────────────────────────────────────────────────────────────
 
-fun List<LastFmImage>.getExtraLargeUrl(): String? =
-    firstOrNull { it.size == "mega" }?.url?.takeIf { it.isNotEmpty() }
-        ?: firstOrNull { it.size == "extralarge" }?.url?.takeIf { it.isNotEmpty() }
-        ?: firstOrNull { it.size == "large" }?.url?.takeIf { it.isNotEmpty() }
+fun List<LastFmImage>.getExtraLargeUrl(): String? {
+    fun String.isRealImage() = isNotEmpty() && !contains("2a96cbd8b46e442fc41c2b86b821562f")
+    return firstOrNull { it.size == "mega" }?.url?.takeIf { it.isRealImage() }
+        ?: firstOrNull { it.size == "extralarge" }?.url?.takeIf { it.isRealImage() }
+        ?: firstOrNull { it.size == "large" }?.url?.takeIf { it.isRealImage() }
+}
+
+// ── Track Info ────────────────────────────────────────────────────────────────
+
+data class TrackInfoResponse(
+    @SerializedName("track") val track: TrackInfoDetail?
+)
+
+data class TrackInfoDetail(
+    val name: String,
+    val artist: ArtistRef,
+    val album: TrackAlbumRef?,
+    val wiki: WikiSection?,
+    val duration: String? = null,
+)
+
+data class TrackAlbumRef(
+    val title: String?,
+    val mbid: String?,
+    @SerializedName("image") val images: List<LastFmImage>?
+)
+
+data class WikiSection(
+    val published: String?,
+    val summary: String?,
+    val content: String?
+)
+
+// ── Artist Info ───────────────────────────────────────────────────────────────
+
+data class ArtistInfoResponse(
+    @SerializedName("artist") val artist: ArtistInfoDetail?
+)
+
+data class ArtistInfoDetail(
+    val name: String,
+    val bio: BioSection?
+)
+
+data class BioSection(
+    val published: String?,
+    val summary: String?,
+    val content: String?
+)
+
+// ── User Top Tags ─────────────────────────────────────────────────────────────
+
+data class UserTopTagsResponse(
+    @SerializedName("toptags") val topTags: UserTopTags
+)
+
+data class UserTopTags(
+    @SerializedName("tag") val tags: List<UserTag>
+)
+
+data class UserTag(
+    val name: String,
+    val count: String,
+    val url: String?
+)

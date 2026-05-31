@@ -11,6 +11,15 @@ data class StyleOption(
     val gradientEnd: Color,
 )
 
+data class WallItem(
+    val id: String,
+    val title: String,
+    val description: String,
+    val imageUrl: String? = null,
+    val gradientStart: Color = Color(0xFF1A0A2E),
+    val gradientEnd: Color   = Color(0xFF0A0A18),
+)
+
 data class Quote(
     val text: String,
     val author: String,
@@ -18,40 +27,64 @@ data class Quote(
 
 val STYLE_OPTIONS = listOf(
     StyleOption(
-        id = "street",
-        name = "Street Poster",
-        tagline = "Caótico, urbano,\ncon textura real",
-        gradientStart = Color(0xFF5C2A0A),
-        gradientEnd   = Color(0xFF1A0A04),
+        id            = "scene_woodstock",
+        name          = "Woodstock",
+        tagline       = "3 días de paz y música.\nTus portadas en el cartel.",
+        gradientStart = Color(0xFF2A1A08),
+        gradientEnd   = Color(0xFF120C04),
+    ),
+)
+
+// Experimentos pendientes de pulir — se moverán a STYLE_OPTIONS cuando estén listos
+val STYLE_OPTIONS_INACTIVE = listOf(
+    StyleOption(
+        id            = "scene_bano_bar_lima",
+        name          = "Baño Bar Lima",
+        tagline       = "Tus portadas colgadas\nen las paredes de un bar de Lima",
+        gradientStart = Color(0xFF2A1406),
+        gradientEnd   = Color(0xFF0E0704),
     ),
     StyleOption(
-        id = "cinematic",
-        name = "Cinematic",
-        tagline = "Oscuro, capas,\nluz y sombra",
-        gradientStart = Color(0xFF0A0A3A),
-        gradientEnd   = Color(0xFF05051A),
+        id            = "scene_manchester",
+        name          = "Manchester Wall",
+        tagline       = "Tu música grabada en la pared.\nSolo código, cero imágenes.",
+        gradientStart = Color(0xFF1A0C07),
+        gradientEnd   = Color(0xFF0A0604),
     ),
     StyleOption(
-        id = "album",
-        name = "Album Wall",
-        tagline = "Mosaico de portadas,\njerarquía visual",
-        gradientStart = Color(0xFF1A1A22),
-        gradientEnd   = Color(0xFF0A0A0E),
+        id            = "scene_britrock",
+        name          = "Rocknrolla",
+        tagline       = "Tu música en la pared\nde un adolescente en Manchester",
+        gradientStart = Color(0xFF1A0A04),
+        gradientEnd   = Color(0xFF0A0602),
     ),
     StyleOption(
-        id = "ecosystem",
-        name = "Ecosystem",
-        tagline = "Arte generativo,\ngeometría y flujo",
-        gradientStart = Color(0xFF0A1A3A),
-        gradientEnd   = Color(0xFF1A0A2E),
+        id            = "mosaic",
+        name          = "Mosaico",
+        tagline       = "25 portadas fusionadas,\ncapas y desenfoque",
+        gradientStart = Color(0xFF1A0A2E),
+        gradientEnd   = Color(0xFF0A0A18),
     ),
     StyleOption(
-        id = "physical",
-        name = "Physical",
-        tagline = "Objetos reales,\ntextura, imperfección",
-        gradientStart = Color(0xFF2A1C0A),
-        gradientEnd   = Color(0xFF100A04),
+        id            = "puzzle",
+        name          = "Rompecabezas",
+        tagline       = "12 portadas encajadas,\ncada pieza en su lugar",
+        gradientStart = Color(0xFF0D1A0D),
+        gradientEnd   = Color(0xFF080D08),
     ),
+    StyleOption(
+        id            = "psychedelic",
+        name          = "Psicodélico",
+        tagline       = "Grilla 3×5, tonos alterados,\nla esencia sin filtro",
+        gradientStart = Color(0xFF2A0A2A),
+        gradientEnd   = Color(0xFF0A0514),
+    ),
+)
+
+// Agrega aquí tus imágenes generadas con IA.
+// imageUrl puede ser una URL remota (HTTPS) o null para mostrar el gradiente placeholder.
+val CURATED_WALLS: List<WallItem> = listOf(
+    // WallItem(id = "wall_01", title = "Nombre", description = "Descripción", imageUrl = "https://…"),
 )
 
 val LOADING_QUOTES = listOf(

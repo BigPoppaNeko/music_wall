@@ -21,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.jfcardenas.musicwall.service.CollageWallpaper
 import com.jfcardenas.musicwall.ui.components.AlbumGridBackground
@@ -28,7 +29,7 @@ import com.jfcardenas.musicwall.ui.components.MWLogo
 import com.jfcardenas.musicwall.ui.model.LOADING_QUOTES
 import com.jfcardenas.musicwall.ui.model.Quote
 import com.jfcardenas.musicwall.ui.theme.*
-import kotlinx.coroutines.delay
+import com.jfcardenas.musicwall.ui.viewmodel.GeneratingViewModel
 import java.io.File
 
 private data class BuildStage(val icon: String, val message: String)
@@ -40,39 +41,42 @@ private val BUILD_STAGES = listOf(
     BuildStage("✦", "Añadiendo detalles finales del mural..."),
 )
 
+private enum class ScreenState { LOADING, DONE, ERROR }
+
 @Composable
 fun GeneratingScreen(
     styleId: String,
     onComplete: () -> Unit,
     onCancel: () -> Unit,
+    vm: GeneratingViewModel = hiltViewModel(),
 ) {
-    var progress by remember { mutableStateOf(0f) }
-    var quoteIndex by remember { mutableStateOf(0) }
-    var stageIndex by remember { mutableStateOf(0) }
-    var isDone by remember { mutableStateOf(false) }
-
     val context = LocalContext.current
-    val collagePath = remember {
+
+    val screenState = when (vm.state) {
+        is GeneratingViewModel.UiState.Done  -> ScreenState.DONE
+        is GeneratingViewModel.UiState.Error -> ScreenState.ERROR
+        else                                 -> ScreenState.LOADING
+    }
+
+    val progress = (vm.state as? GeneratingViewModel.UiState.Loading)?.progress ?:
+        if (screenState == ScreenState.DONE) 1f else 0f
+
+    val stageIndex = (vm.state as? GeneratingViewModel.UiState.Loading)?.stage ?:
+        if (screenState == ScreenState.DONE) 3 else 0
+
+    val quoteIndex = when {
+        progress < 0.25f -> 0
+        progress < 0.50f -> 1
+        progress < 0.75f -> 2
+        progress < 0.93f -> 3
+        else             -> 4
+    }
+
+    val collagePath = remember(screenState) {
+        if (screenState != ScreenState.DONE) return@remember null
         context.getSharedPreferences(CollageWallpaper.PREFS_NAME, Context.MODE_PRIVATE)
             .getString(CollageWallpaper.PREF_COLLAGE_PATH, null)
             ?.let { if (File(it).exists()) it else null }
-    }
-
-    LaunchedEffect(styleId) {
-        val totalSteps = 100
-        val delayMs = 50L
-        repeat(totalSteps) { step ->
-            delay(delayMs)
-            progress = (step + 1).toFloat() / totalSteps
-            when (step) {
-                24 -> { quoteIndex = 1; stageIndex = 1 }
-                47 -> { quoteIndex = 2; stageIndex = 2 }
-                71 -> { quoteIndex = 3; stageIndex = 3 }
-                93 -> { quoteIndex = 4 }
-            }
-        }
-        delay(400)
-        isDone = true
     }
 
     Box(
@@ -83,20 +87,24 @@ fun GeneratingScreen(
         AlbumGridBackground()
 
         AnimatedContent(
-            targetState = isDone,
+            targetState = screenState,
             transitionSpec = {
                 fadeIn(tween(700)).togetherWith(fadeOut(tween(400)))
             },
             label = "screen-state",
-        ) { done ->
-            if (done) {
-                ReadyContent(collagePath = collagePath, onVerMural = onComplete)
-            } else {
-                LoadingContent(
-                    progress = progress,
+        ) { state ->
+            when (state) {
+                ScreenState.DONE  -> ReadyContent(collagePath = collagePath, onVerMural = onComplete)
+                ScreenState.ERROR -> ErrorContent(
+                    message = (vm.state as? GeneratingViewModel.UiState.Error)?.message ?: "",
+                    onRetry  = { vm.retry() },
+                    onCancel = onCancel,
+                )
+                ScreenState.LOADING -> LoadingContent(
+                    progress   = progress,
                     quoteIndex = quoteIndex,
                     stageIndex = stageIndex,
-                    onCancel = onCancel,
+                    onCancel   = onCancel,
                 )
             }
         }
@@ -142,7 +150,6 @@ private fun ReadyContent(collagePath: String?, onVerMural: () -> Unit) {
 
         Spacer(Modifier.height(40.dp))
 
-        // Mini mural preview
         Box(
             modifier = Modifier
                 .scale(scale)
@@ -192,6 +199,61 @@ private fun ReadyContent(collagePath: String?, onVerMural: () -> Unit) {
         }
 
         Spacer(Modifier.height(52.dp))
+    }
+}
+
+@Composable
+private fun ErrorContent(message: String, onRetry: () -> Unit, onCancel: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .statusBarsPadding()
+            .padding(horizontal = 36.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+        Text(
+            text = "✕",
+            fontSize = 48.sp,
+            color = Color(0xFFE57373),
+        )
+
+        Spacer(Modifier.height(20.dp))
+
+        Text(
+            text = "Algo salió mal",
+            fontSize = 22.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.White,
+        )
+
+        Spacer(Modifier.height(8.dp))
+
+        Text(
+            text = message,
+            style = MaterialTheme.typography.bodyMedium,
+            textAlign = TextAlign.Center,
+            color = TextSecondary,
+        )
+
+        Spacer(Modifier.height(40.dp))
+
+        Button(
+            onClick = onRetry,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(52.dp),
+            shape = RoundedCornerShape(26.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Purple),
+        ) {
+            Text(text = "Reintentar", fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = Color.White)
+        }
+
+        Spacer(Modifier.height(12.dp))
+
+        TextButton(onClick = onCancel) {
+            Text(text = "Volver", color = TextMuted, fontSize = 15.sp)
+        }
     }
 }
 

@@ -7,6 +7,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -19,18 +20,28 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
+import com.jfcardenas.musicwall.api.Album
+import com.jfcardenas.musicwall.api.ArtistItem
+import com.jfcardenas.musicwall.api.getExtraLargeUrl
 import com.jfcardenas.musicwall.ui.model.STYLE_OPTIONS
 import com.jfcardenas.musicwall.ui.model.StyleOption
 import com.jfcardenas.musicwall.ui.theme.*
+import com.jfcardenas.musicwall.ui.viewmodel.StyleViewModel
 
 @Composable
 fun StyleSelectionScreen(
     onBack: (() -> Unit)? = null,
     onContinuar: (styleId: String) -> Unit,
+    vm: StyleViewModel = hiltViewModel(),
 ) {
     var selected by remember { mutableStateOf(STYLE_OPTIONS.first()) }
 
@@ -56,12 +67,12 @@ fun StyleSelectionScreen(
             }
             Column {
                 Text(
-                    text = "Elige tu atmósfera",
+                    text = "Crear mural",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                 )
                 Text(
-                    text = "Cada estilo transforma tu música de forma distinta.",
+                    text = "Tu música, convertida en imagen.",
                     style = MaterialTheme.typography.bodySmall,
                     color = TextSecondary,
                 )
@@ -73,11 +84,33 @@ fun StyleSelectionScreen(
             contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
+            // User music profile section
+            item {
+                UserProfileSection(state = vm.uiState)
+            }
+
+            // Section header for styles
+            item {
+                Column(modifier = Modifier.padding(top = 4.dp, bottom = 2.dp)) {
+                    Text(
+                        text = "Elige tu atmósfera",
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = TextPrimary,
+                    )
+                    Text(
+                        text = "Cada estilo transforma tu música de forma distinta.",
+                        fontSize = 12.sp,
+                        color = TextSecondary,
+                    )
+                }
+            }
+
             items(STYLE_OPTIONS) { style ->
                 AtmosphericStyleCard(
-                    style = style,
+                    style    = style,
                     selected = style.id == selected.id,
-                    onClick = { selected = style },
+                    onClick  = { selected = style },
                 )
             }
             item { Spacer(Modifier.height(4.dp)) }
@@ -91,21 +124,132 @@ fun StyleSelectionScreen(
                 .navigationBarsPadding(),
         ) {
             Button(
-                onClick = { onContinuar(selected.id) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                shape = RoundedCornerShape(28.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Purple),
+                onClick  = { onContinuar(selected.id) },
+                modifier = Modifier.fillMaxWidth().height(56.dp),
+                shape    = RoundedCornerShape(28.dp),
+                colors   = ButtonDefaults.buttonColors(containerColor = Purple),
             ) {
                 Text(
-                    text = "Generar mural",
-                    fontSize = 17.sp,
+                    text       = "Generar mural",
+                    fontSize   = 17.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color = Color.White,
+                    color      = Color.White,
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun UserProfileSection(state: StyleViewModel.UiState) {
+    if (!state.hasAccount) return
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(20.dp))
+            .background(Card)
+            .border(1.dp, CardBorder, RoundedCornerShape(20.dp))
+            .padding(16.dp),
+    ) {
+        if (state.isLoading) {
+            Box(
+                modifier         = Modifier.fillMaxWidth().height(100.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                CircularProgressIndicator(modifier = Modifier.size(22.dp), color = Purple, strokeWidth = 2.dp)
+            }
+        } else {
+            Column {
+                Text(
+                    text       = "Tu música este mes",
+                    fontSize   = 11.sp,
+                    fontWeight = FontWeight.Medium,
+                    color      = TextSecondary,
+                    letterSpacing = 0.5.sp,
+                )
+                Spacer(Modifier.height(12.dp))
+
+                if (state.topAlbums.isNotEmpty()) {
+                    LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        items(state.topAlbums) { album -> AlbumThumb(album) }
+                    }
+                }
+
+                if (state.topArtists.isNotEmpty()) {
+                    Spacer(Modifier.height(12.dp))
+                    Text(
+                        text      = "Artistas",
+                        fontSize  = 11.sp,
+                        color     = TextSecondary,
+                        letterSpacing = 0.5.sp,
+                    )
+                    Spacer(Modifier.height(6.dp))
+                    LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        items(state.topArtists) { artist -> ArtistChip(artist) }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun AlbumThumb(album: Album) {
+    val imageUrl = album.images.getExtraLargeUrl()
+    Column(
+        modifier              = Modifier.width(68.dp),
+        horizontalAlignment   = Alignment.CenterHorizontally,
+    ) {
+        Box(
+            modifier = Modifier
+                .size(68.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .background(Surface),
+        ) {
+            if (imageUrl != null) {
+                AsyncImage(
+                    model              = imageUrl,
+                    contentDescription = album.name,
+                    contentScale       = ContentScale.Crop,
+                    modifier           = Modifier.fillMaxSize(),
+                )
+            } else {
+                Box(
+                    modifier         = Modifier.fillMaxSize().background(Color(0xFF1A0A2E)),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text("♫", fontSize = 20.sp, color = Purple)
+                }
+            }
+        }
+        Spacer(Modifier.height(4.dp))
+        Text(
+            text      = album.name,
+            fontSize  = 9.sp,
+            color     = TextMuted,
+            maxLines  = 1,
+            overflow  = TextOverflow.Ellipsis,
+            textAlign = TextAlign.Center,
+        )
+    }
+}
+
+@Composable
+private fun ArtistChip(artist: ArtistItem) {
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(20.dp))
+            .background(Surface)
+            .border(1.dp, CardBorder, RoundedCornerShape(20.dp))
+            .padding(horizontal = 10.dp, vertical = 5.dp),
+    ) {
+        Text(
+            text     = artist.name,
+            fontSize = 11.sp,
+            color    = TextSecondary,
+            maxLines = 1,
+        )
     }
 }
 
@@ -126,79 +270,60 @@ private fun AtmosphericStyleCard(
             .border(borderWidth, borderColor, RoundedCornerShape(20.dp))
             .clickable { onClick() },
     ) {
-        // Atmospheric gradient background
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(
-                    Brush.linearGradient(
-                        listOf(style.gradientStart, style.gradientEnd)
-                    )
-                )
+                .background(Brush.linearGradient(listOf(style.gradientStart, style.gradientEnd)))
         )
 
-        // Subtle noise texture overlay
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(
-                    Brush.radialGradient(
-                        listOf(Color.White.copy(alpha = 0.06f), Color.Transparent)
-                    )
-                )
+                .background(Brush.radialGradient(listOf(Color.White.copy(alpha = 0.06f), Color.Transparent)))
         )
 
-        // Bottom scrim for text readability
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight(0.5f)
                 .align(Alignment.BottomCenter)
-                .background(
-                    Brush.verticalGradient(listOf(Color.Transparent, Color.Black.copy(alpha = 0.55f)))
-                )
+                .background(Brush.verticalGradient(listOf(Color.Transparent, Color.Black.copy(alpha = 0.55f))))
         )
 
-        // Text content
         Column(
             modifier = Modifier
                 .align(Alignment.BottomStart)
                 .padding(18.dp),
         ) {
             Text(
-                text = style.name,
-                fontSize = 18.sp,
+                text       = style.name,
+                fontSize   = 18.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White,
+                color      = Color.White,
             )
             Spacer(Modifier.height(2.dp))
             Text(
-                text = style.tagline.replace("\n", " · "),
-                fontSize = 12.sp,
+                text      = style.tagline.replace("\n", " · "),
+                fontSize  = 12.sp,
                 fontStyle = FontStyle.Italic,
-                color = Color.White.copy(alpha = 0.7f),
+                color     = Color.White.copy(alpha = 0.7f),
             )
         }
 
-        // Selected checkmark
         AnimatedVisibility(
-            visible = selected,
-            enter = fadeIn(tween(200)) + scaleIn(tween(200)),
-            exit = fadeOut(tween(150)) + scaleOut(tween(150)),
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(12.dp),
+            visible          = selected,
+            enter            = fadeIn(tween(200)) + scaleIn(tween(200)),
+            exit             = fadeOut(tween(150)) + scaleOut(tween(150)),
+            modifier         = Modifier.align(Alignment.TopEnd).padding(12.dp),
         ) {
             Box(
-                modifier = Modifier
-                    .size(32.dp)
-                    .background(Purple, RoundedCornerShape(16.dp)),
+                modifier         = Modifier.size(32.dp).background(Purple, RoundedCornerShape(16.dp)),
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
                     Icons.Default.Check,
                     contentDescription = "Seleccionado",
-                    tint = Color.White,
+                    tint     = Color.White,
                     modifier = Modifier.size(18.dp),
                 )
             }

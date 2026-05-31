@@ -26,20 +26,31 @@ class SpotifySourceViewModel @Inject constructor(
         private set
 
     fun fetchPreview(url: String) {
-        val clean = url.trim()
-        if (!clean.contains("spotify.com/playlist/")) {
+        val normalized = normalizeSpotifyUrl(url)
+        if (!normalized.contains("spotify.com/playlist/")) {
             state = State.Error("Pega un enlace de playlist de Spotify")
             return
         }
         state = State.Loading
         viewModelScope.launch {
             try {
-                val data = spotifyService.getPlaylistInfo(clean)
+                val data = spotifyService.getPlaylistInfo(normalized)
                 state = State.Preview(data.title, data.authorName)
             } catch (e: Exception) {
                 state = State.Error("No se pudo obtener la playlist. Verifica el enlace.")
             }
         }
+    }
+
+    private fun normalizeSpotifyUrl(input: String): String {
+        val s = input.trim()
+        // spotify:playlist:ID  →  https://open.spotify.com/playlist/ID
+        if (s.startsWith("spotify:playlist:")) {
+            val id = s.removePrefix("spotify:playlist:").substringBefore("?").substringBefore(":")
+            return "https://open.spotify.com/playlist/$id"
+        }
+        // Eliminar parámetros de rastreo innecesarios (mantiene el path limpio)
+        return s.substringBefore("?").ifEmpty { s }
     }
 
     fun clearError() {

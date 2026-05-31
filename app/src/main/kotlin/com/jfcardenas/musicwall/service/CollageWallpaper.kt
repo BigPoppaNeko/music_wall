@@ -32,8 +32,9 @@ class CollageWallpaper : WallpaperService() {
         const val PREF_IMAGE_KIND   = "image_kind"
         const val PREF_PERIOD       = "period"
         const val PREF_LIMIT        = "limit"
-        const val PREF_COLLAGE_PATH = "collage_path"
-        const val ACTION_REFRESH    = "com.jfcardenas.musicwall.action.REFRESH"
+        const val PREF_COLLAGE_PATH  = "collage_path"
+        const val PREF_REFRESH_COUNT = "refresh_count"
+        const val ACTION_REFRESH     = "com.jfcardenas.musicwall.action.REFRESH"
         private const val TAG       = "MusicWall"
         private const val MIN_IMAGES = 4
     }
@@ -82,10 +83,8 @@ class CollageWallpaper : WallpaperService() {
     }
 
     private fun wallpaperSize(): Pair<Int, Int> {
-        val wm = getSystemService(WALLPAPER_SERVICE) as WallpaperManager
-        val w = wm.desiredMinimumWidth.takeIf { it > 0 } ?: resources.displayMetrics.widthPixels
-        val h = wm.desiredMinimumHeight.takeIf { it > 0 } ?: resources.displayMetrics.heightPixels
-        return w to h
+        val dm = resources.displayMetrics
+        return dm.widthPixels to dm.heightPixels
     }
 
     private suspend fun downloadBitmap(url: String): Bitmap? {
@@ -116,6 +115,8 @@ class CollageWallpaper : WallpaperService() {
 
         override fun onCreate(surfaceHolder: SurfaceHolder) {
             super.onCreate(surfaceHolder)
+            // Wallpaper estático: no se desplaza entre pantallas del launcher
+            setOffsetNotificationsEnabled(false)
             loadCachedCollage()
         }
 
@@ -195,16 +196,25 @@ class CollageWallpaper : WallpaperService() {
                         return
                     }
 
+                    val refreshCount = prefs.getInt(PREF_REFRESH_COUNT, 0)
+                    val rotatedItems = if (renderItems.size > 1) {
+                        val offset = refreshCount % renderItems.size
+                        renderItems.drop(offset) + renderItems.take(offset)
+                    } else renderItems
+
                     val (w, h) = wallpaperSize()
                     val collageBitmap = withContext(Dispatchers.Default) {
-                        rendererFactory.get().render(renderItems, w, h)
+                        rendererFactory.get().render(rotatedItems, w, h)
                     }
                     Log.d(TAG, "✓ Collage ${collageBitmap.width}x${collageBitmap.height}")
 
                     val path = withContext(Dispatchers.IO) { saveBitmap(collageBitmap) }
                     bitmap = collageBitmap
                     drawFrame()
-                    prefs.edit().putString(PREF_COLLAGE_PATH, path).apply()
+                    prefs.edit()
+                        .putString(PREF_COLLAGE_PATH, path)
+                        .putInt(PREF_REFRESH_COUNT, refreshCount + 1)
+                        .apply()
                     toast("¡Collage listo!")
                 }
                 is NetworkResult.Error -> {
@@ -224,10 +234,25 @@ class CollageWallpaper : WallpaperService() {
             val bmp = bitmap ?: return
             val canvas = surfaceHolder.lockCanvas() ?: return
             try {
-                canvas.save()
-                canvas.translate(offsetX, offsetY)
-                canvas.drawBitmap(bmp, 0f, 0f, null)
-                canvas.restore()
+                val frame = surfaceHolder.surfaceFrame
+                val sw = frame.width().toFloat()
+                val sh = frame.height().toFloat()
+                val bw = bmp.width.toFloat()
+                val bh = bmp.height.toFloat()
+
+                // Escalar bitmap para cubrir la pantalla sin barras negras (center-crop)
+                val scale = maxOf(sw / bw, sh / bh)
+                val scaledW = bw * scale
+                val scaledH = bh * scale
+
+                val dx = (sw - scaledW) / 2f
+                val dy = (sh - scaledH) / 2f
+
+                val matrix = Matrix().apply {
+                    setScale(scale, scale)
+                    postTranslate(dx, dy)
+                }
+                canvas.drawBitmap(bmp, matrix, null)
             } finally {
                 surfaceHolder.unlockCanvasAndPost(canvas)
             }
