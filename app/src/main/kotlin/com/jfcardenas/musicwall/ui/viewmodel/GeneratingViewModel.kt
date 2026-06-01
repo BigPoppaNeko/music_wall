@@ -70,9 +70,11 @@ class GeneratingViewModel @Inject constructor(
 
     private suspend fun generate() {
         val prefs    = context.getSharedPreferences(CollageWallpaper.PREFS_NAME, Context.MODE_PRIVATE)
+        val source   = prefs.getString(CollageWallpaper.PREF_SOURCE, CollageWallpaper.PREF_SOURCE_LASTFM)
+            ?: CollageWallpaper.PREF_SOURCE_LASTFM
         val username = prefs.getString(CollageWallpaper.PREF_USERNAME, "") ?: ""
 
-        if (username.isEmpty()) {
+        if (source != CollageWallpaper.PREF_SOURCE_EXPLORE_ARTISTS && username.isEmpty()) {
             state = UiState.Error("Configura tu usuario de Last.fm primero")
             return
         }
@@ -81,12 +83,16 @@ class GeneratingViewModel @Inject constructor(
         val rawPeriod = prefs.getString(CollageWallpaper.PREF_PERIOD, "7day") ?: "7day"
         val limit     = prefs.getString(CollageWallpaper.PREF_LIMIT, "25")?.toIntOrNull() ?: 25
         val isRandom  = rawPeriod == "random"
-        val apiPeriod = if (isRandom) "overall" else rawPeriod
-        val fetchLimit = if (isRandom) 50 else limit
+        val exploreArtists = prefs.getStringSet(CollageWallpaper.PREF_EXPLORE_ARTISTS, emptySet())?.toList().orEmpty()
 
         // Stage 0 — obtener datos de Last.fm
         state = UiState.Loading(0.05f, 0)
-        val musicImages = when (val result = getMusicImages(username, imageKind, apiPeriod, fetchLimit)) {
+        val result = if (source == CollageWallpaper.PREF_SOURCE_EXPLORE_ARTISTS) {
+            getMusicImages.artistCatalogAlbums(exploreArtists, limit, forceRefresh = true)
+        } else {
+            getMusicImages(username, imageKind, rawPeriod, limit, forceRefresh = isRandom)
+        }
+        val musicImages = when (result) {
             is NetworkResult.Success -> if (isRandom) result.data.shuffled() else result.data
             is NetworkResult.Error   -> { state = UiState.Error(result.toUserMessage()); return }
         }

@@ -9,7 +9,17 @@ data class TopAlbumsResponse(
 )
 
 data class TopAlbums(
-    @SerializedName("album") val albums: List<Album>
+    @SerializedName("album") val albums: List<Album>,
+    @SerializedName("@attr") val attr: TopAlbumsAttr? = null,
+)
+
+data class TopAlbumsAttr(
+    val user: String? = null,
+    val artist: String? = null,
+    val page: String? = null,
+    val perPage: String? = null,
+    val totalPages: String? = null,
+    val total: String? = null,
 )
 
 data class Album(

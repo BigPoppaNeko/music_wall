@@ -508,7 +508,7 @@ private val PERIOD_OPTIONS = listOf(
     PeriodOption("1month",  "Mensual",    "Lo que sonó este mes"),
     PeriodOption("1day",    "Diario",     "Las últimas 24 horas"),
     PeriodOption("overall", "Histórico",  "Tus favoritos de siempre"),
-    PeriodOption("random",  "Aleatorio",  "Sorpréndeme con mi archivo"),
+    PeriodOption("random",  "Aleatorio",  "Portadas al azar de todo tu archivo histórico"),
 )
 
 @OptIn(ExperimentalMaterial3Api::class)

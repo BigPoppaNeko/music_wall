@@ -280,6 +280,16 @@ fun ExploreSourceScreen(
     }
 }
 
+private fun saveExploreArtists(context: Context, artists: Collection<String>) {
+    context.getSharedPreferences(CollageWallpaper.PREFS_NAME, Context.MODE_PRIVATE)
+        .edit()
+        .putString(CollageWallpaper.PREF_SOURCE, CollageWallpaper.PREF_SOURCE_EXPLORE_ARTISTS)
+        .putString(CollageWallpaper.PREF_IMAGE_KIND, "ALBUMS")
+        .putString(CollageWallpaper.PREF_PERIOD, "random")
+        .putStringSet(CollageWallpaper.PREF_EXPLORE_ARTISTS, artists.map { it.trim() }.filter { it.isNotEmpty() }.toSet())
+        .apply()
+}
+
 @Composable
 private fun RecentAvatar(name: String, bgColor: Color) {
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.width(64.dp)) {

@@ -83,6 +83,7 @@ class ConnectActivity : AppCompatActivity() {
                 getSharedPreferences(CollageWallpaper.PREFS_NAME, MODE_PRIVATE)
                     .edit()
                     .putString(CollageWallpaper.PREF_USERNAME, user.name)
+                    .putString(CollageWallpaper.PREF_SOURCE, CollageWallpaper.PREF_SOURCE_LASTFM)
                     .apply()
 
                 // Ir a ajustes

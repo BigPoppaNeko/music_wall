@@ -73,8 +73,8 @@ class WallpaperSettingsActivity : AppCompatActivity() {
     private lateinit var tvUsedLabel: TextView
     private lateinit var chipGroupUsedItems: ChipGroup
 
-    private val periodEntries = arrayOf("Última semana", "Último mes", "3 meses", "6 meses", "12 meses", "General")
-    private val periodValues  = arrayOf("7day", "1month", "3month", "6month", "12month", "overall")
+    private val periodEntries = arrayOf("Última semana", "Último mes", "3 meses", "6 meses", "12 meses", "General", "Aleatorio histórico")
+    private val periodValues  = arrayOf("7day", "1month", "3month", "6month", "12month", "overall", "random")
 
     private val limitEntries = arrayOf("10 imágenes", "25 imágenes", "50 imágenes")
     private val limitValues  = arrayOf("10", "25", "50")
@@ -180,7 +180,7 @@ class WallpaperSettingsActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             try {
-                when (val result = getMusicImages(username, imageKind, period, limit)) {
+                when (val result = getMusicImages(username, imageKind, period, limit, forceRefresh = period == "random")) {
                     is NetworkResult.Success -> {
                         val musicImages = result.data
                         if (musicImages.isEmpty()) {
@@ -284,6 +284,7 @@ class WallpaperSettingsActivity : AppCompatActivity() {
 
         getSharedPreferences(CollageWallpaper.PREFS_NAME, MODE_PRIVATE).edit()
             .putString(CollageWallpaper.PREF_USERNAME,   username)
+            .putString(CollageWallpaper.PREF_SOURCE,     CollageWallpaper.PREF_SOURCE_LASTFM)
             .putString(CollageWallpaper.PREF_IMAGE_KIND, imageKind)
             .putString(CollageWallpaper.PREF_PERIOD,     periodValues[periodIdx])
             .putString(CollageWallpaper.PREF_LIMIT,      limitValues[limitIdx])

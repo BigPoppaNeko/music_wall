@@ -163,8 +163,9 @@ class CollageWallpaper : WallpaperService() {
         private suspend fun refresh() {
             Log.d(TAG, "━━━ refresh()")
             val prefs     = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+            val source    = prefs.getString(PREF_SOURCE, PREF_SOURCE_LASTFM) ?: PREF_SOURCE_LASTFM
             val username  = prefs.getString(PREF_USERNAME, "") ?: ""
-            if (username.isEmpty()) {
+            if (source != PREF_SOURCE_EXPLORE_ARTISTS && username.isEmpty()) {
                 toast("Configura tu usuario de Last.fm en ajustes")
                 return
             }
@@ -172,10 +173,17 @@ class CollageWallpaper : WallpaperService() {
             val imageKind = prefs.getString(PREF_IMAGE_KIND, "ALBUMS") ?: "ALBUMS"
             val period    = prefs.getString(PREF_PERIOD, "7day") ?: "7day"
             val limit     = prefs.getString(PREF_LIMIT, "25")?.toIntOrNull() ?: 25
-            Log.d(TAG, "▸ kind=$imageKind period=$period limit=$limit")
-            toast("Obteniendo tus tops de Last.fm…")
+            val exploreArtists = prefs.getStringSet(PREF_EXPLORE_ARTISTS, emptySet())?.toList().orEmpty()
+            Log.d(TAG, "▸ source=$source kind=$imageKind period=$period limit=$limit")
+            toast(if (source == PREF_SOURCE_EXPLORE_ARTISTS) "Explorando álbumes en Last.fm…" else "Obteniendo tus tops de Last.fm…")
 
-            when (val result = getMusicImages(username, imageKind, period, limit)) {
+            val result = if (source == PREF_SOURCE_EXPLORE_ARTISTS) {
+                getMusicImages.artistCatalogAlbums(exploreArtists, limit, forceRefresh = true)
+            } else {
+                getMusicImages(username, imageKind, period, limit, forceRefresh = period == "random")
+            }
+
+            when (result) {
                 is NetworkResult.Success -> {
                     val musicImages = result.data
                     Log.d(TAG, "✓ ${musicImages.size} imágenes")

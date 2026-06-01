@@ -42,6 +42,7 @@ class LastFmSourceViewModel @Inject constructor(
                 context.getSharedPreferences(CollageWallpaper.PREFS_NAME, Context.MODE_PRIVATE)
                     .edit()
                     .putString(CollageWallpaper.PREF_USERNAME, user.name)
+                    .putString(CollageWallpaper.PREF_SOURCE, CollageWallpaper.PREF_SOURCE_LASTFM)
                     .apply()
                 state = State.Success(user.name)
             } catch (e: LastFmApiException) {

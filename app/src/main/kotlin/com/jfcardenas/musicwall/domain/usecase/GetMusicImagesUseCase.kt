@@ -23,4 +23,19 @@ class GetMusicImagesUseCase @Inject constructor(
         }
         return repository.getImages(username, imageKind, period, limit, forceRefresh)
     }
+
+    suspend fun artistCatalogAlbums(
+        artists: List<String>,
+        limit: Int,
+        forceRefresh: Boolean = false
+    ): NetworkResult<List<MusicImage>> {
+        val cleaned = artists.map { it.trim() }.filter { it.isNotEmpty() }.distinct()
+        if (cleaned.isEmpty()) {
+            return NetworkResult.Error(
+                com.jfcardenas.musicwall.data.ErrorType.UNKNOWN,
+                "Elige al menos un artista para explorar"
+            )
+        }
+        return repository.getArtistCatalogAlbums(cleaned, limit, forceRefresh)
+    }
 }

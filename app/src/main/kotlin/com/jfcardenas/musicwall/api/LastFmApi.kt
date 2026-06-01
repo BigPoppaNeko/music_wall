@@ -20,7 +20,8 @@ interface LastFmService {
         @Query("method") method: String = "user.gettopalbums",
         @Query("user") user: String,
         @Query("period") period: String,
-        @Query("limit") limit: Int
+        @Query("limit") limit: Int,
+        @Query("page") page: Int = 1,
     ): TopAlbumsResponse
 
     @GET(".")
@@ -98,6 +99,7 @@ interface LastFmService {
         @Query("method") method: String = "artist.gettopalbums",
         @Query("artist") artist: String,
         @Query("limit") limit: Int = 4,
+        @Query("page") page: Int = 1,
     ): TopAlbumsResponse
 }
 
