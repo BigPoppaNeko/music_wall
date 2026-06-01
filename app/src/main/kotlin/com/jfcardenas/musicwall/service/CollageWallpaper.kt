@@ -29,6 +29,10 @@ class CollageWallpaper : WallpaperService() {
     companion object {
         const val PREFS_NAME        = "music_wall_prefs"
         const val PREF_USERNAME     = "lastfm_username"
+        const val PREF_SOURCE       = "music_source"
+        const val PREF_SOURCE_LASTFM = "lastfm"
+        const val PREF_SOURCE_EXPLORE_ARTISTS = "explore_artists"
+        const val PREF_EXPLORE_ARTISTS = "explore_artist_names"
         const val PREF_IMAGE_KIND   = "image_kind"
         const val PREF_PERIOD       = "period"
         const val PREF_LIMIT        = "limit"

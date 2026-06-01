@@ -1,5 +1,6 @@
 package com.jfcardenas.musicwall.ui.screens
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -22,12 +23,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.jfcardenas.musicwall.service.CollageWallpaper
 import com.jfcardenas.musicwall.ui.theme.*
 import com.jfcardenas.musicwall.ui.viewmodel.ExploreViewModel
 import kotlin.math.abs
@@ -49,6 +52,8 @@ private val SUGGESTED_ARTISTS = listOf(
     StaticItem("Pink Floyd",        "Progressive Rock",  Color(0xFF5C1A6B)),
     StaticItem("Portishead",        "Trip Hop",          Color(0xFF1A3A3A)),
     StaticItem("Massive Attack",    "Trip Hop",          Color(0xFF2A1A3A)),
+    StaticItem("The Notorious B.I.G.", "Hip Hop",        Color(0xFF3A2A1A)),
+    StaticItem("Yma Sumac",         "Voz exótica",       Color(0xFF6B3A1A)),
     StaticItem("Nick Cave",         "Art Rock",          Color(0xFF3A2A1A)),
     StaticItem("Nujabes",           "Hip Hop Jazz",      Color(0xFF1A5C3A)),
     StaticItem("Boards of Canada",  "Electronic",        Color(0xFF1A3A1A)),
@@ -91,6 +96,7 @@ fun ExploreSourceScreen(
     var selectedTab by remember { mutableStateOf(0) }
     var search by remember { mutableStateOf("") }
     val selected = remember { mutableStateListOf<String>() }
+    val context = LocalContext.current
 
     LaunchedEffect(search, selectedTab) {
         viewModel.search(search, selectedTab)
@@ -129,7 +135,7 @@ fun ExploreSourceScreen(
             TABS.forEachIndexed { i, label ->
                 Tab(
                     selected = selectedTab == i,
-                    onClick  = { selectedTab = i; search = "" },
+                    onClick  = { selectedTab = i; search = ""; selected.clear() },
                     text = {
                         Text(
                             text       = label,
@@ -263,14 +269,21 @@ fun ExploreSourceScreen(
                 .padding(bottom = 24.dp),
         ) {
             Button(
-                onClick  = onContinue,
-                enabled  = selected.isNotEmpty(),
+                onClick  = {
+                    saveExploreArtists(context, selected)
+                    onContinue()
+                },
+                enabled  = selectedTab == 0 && selected.isNotEmpty(),
                 modifier = Modifier.fillMaxWidth().height(56.dp),
                 shape    = RoundedCornerShape(28.dp),
                 colors   = ButtonDefaults.buttonColors(containerColor = Purple),
             ) {
                 Text(
-                    text       = if (selected.isEmpty()) "Continuar" else "Continuar (${selected.size} seleccionados)",
+                    text       = when {
+                        selectedTab != 0 -> "Elige artistas para continuar"
+                        selected.isEmpty() -> "Continuar"
+                        else -> "Continuar (${selected.size} seleccionados)"
+                    },
                     fontSize   = 17.sp,
                     fontWeight = FontWeight.SemiBold,
                     color      = Color.White,
