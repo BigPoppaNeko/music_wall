@@ -12,9 +12,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import coil.ImageLoader
 import coil.request.ImageRequest
-import coil.size.Size
+import com.jfcardenas.musicwall.data.CoverImageSizing
 import com.jfcardenas.musicwall.data.ErrorType
 import com.jfcardenas.musicwall.data.NetworkResult
+import com.jfcardenas.musicwall.domain.model.MusicImage
 import com.jfcardenas.musicwall.domain.usecase.GetMusicImagesUseCase
 import com.jfcardenas.musicwall.features.wallpaper.renderer.RenderItem
 import com.jfcardenas.musicwall.features.wallpaper.renderer.WallpaperRendererFactory
@@ -70,9 +71,15 @@ class GeneratingViewModel @Inject constructor(
 
     private suspend fun generate() {
         val prefs    = context.getSharedPreferences(CollageWallpaper.PREFS_NAME, Context.MODE_PRIVATE)
+        val source   = prefs.getString(CollageWallpaper.PREF_SOURCE, CollageWallpaper.PREF_SOURCE_LASTFM)
+            ?: CollageWallpaper.PREF_SOURCE_LASTFM
         val username = prefs.getString(CollageWallpaper.PREF_USERNAME, "") ?: ""
 
-        if (username.isEmpty()) {
+        if (
+            source != CollageWallpaper.PREF_SOURCE_EXPLORE_ARTISTS &&
+            source != CollageWallpaper.PREF_SOURCE_SELECTED_SLOTS &&
+            username.isEmpty()
+        ) {
             state = UiState.Error("Configura tu usuario de Last.fm primero")
             return
         }
@@ -81,14 +88,26 @@ class GeneratingViewModel @Inject constructor(
         val rawPeriod = prefs.getString(CollageWallpaper.PREF_PERIOD, "7day") ?: "7day"
         val limit     = prefs.getString(CollageWallpaper.PREF_LIMIT, "25")?.toIntOrNull() ?: 25
         val isRandom  = rawPeriod == "random"
-        val apiPeriod = if (isRandom) "overall" else rawPeriod
-        val fetchLimit = if (isRandom) 50 else limit
+        val exploreArtists = prefs.getStringSet(CollageWallpaper.PREF_EXPLORE_ARTISTS, emptySet())?.toList().orEmpty()
 
         // Stage 0 — obtener datos de Last.fm
         state = UiState.Loading(0.05f, 0)
-        val musicImages = when (val result = getMusicImages(username, imageKind, apiPeriod, fetchLimit)) {
-            is NetworkResult.Success -> if (isRandom) result.data.shuffled() else result.data
-            is NetworkResult.Error   -> { state = UiState.Error(result.toUserMessage()); return }
+        val selectedImages = prefs.getString(CollageWallpaper.PREF_SELECTED_SLOT_IMAGES, null)
+            ?.takeIf { source == CollageWallpaper.PREF_SOURCE_SELECTED_SLOTS }
+            ?.decodeSelectedSlotImages()
+
+        val musicImages = if (!selectedImages.isNullOrEmpty()) {
+            selectedImages
+        } else {
+            val result = if (source == CollageWallpaper.PREF_SOURCE_EXPLORE_ARTISTS) {
+                getMusicImages.artistCatalogAlbums(exploreArtists, limit, forceRefresh = true)
+            } else {
+                getMusicImages(username, imageKind, rawPeriod, limit, forceRefresh = isRandom)
+            }
+            when (result) {
+                is NetworkResult.Success -> if (isRandom) result.data.shuffled() else result.data
+                is NetworkResult.Error   -> { state = UiState.Error(result.toUserMessage()); return }
+            }
         }
 
         // Stage 1 — descargar bitmaps con progreso real
@@ -132,7 +151,7 @@ class GeneratingViewModel @Inject constructor(
             try {
                 val req = ImageRequest.Builder(context)
                     .data(url)
-                    .size(Size.ORIGINAL)
+                    .size(CoverImageSizing.collageTileSize(context))
                     .allowHardware(false)
                     .build()
                 val bmp = (imageLoader.execute(req).drawable as? BitmapDrawable)?.bitmap
@@ -152,4 +171,23 @@ class GeneratingViewModel @Inject constructor(
         ErrorType.SERVER_ERROR    -> "Error del servidor de Last.fm"
         ErrorType.UNKNOWN         -> "Error: $message"
     }
+
+    private fun String.decodeSelectedSlotImages(): List<MusicImage> =
+        split("||")
+            .mapNotNull { encoded ->
+                val parts = encoded.split("|")
+                if (parts.size < 3) return@mapNotNull null
+                MusicImage(
+                    url = parts[0].unescapePart(),
+                    name = parts[1].unescapePart(),
+                    artistName = parts[2].unescapePart(),
+                    rank = 0,
+                    kind = MusicImage.Kind.ALBUM,
+                    mbid = parts.getOrNull(3)?.unescapePart()?.takeIf { it.isNotBlank() },
+                    lastFmUrl = parts.getOrNull(4)?.unescapePart()?.takeIf { it.isNotBlank() },
+                )
+            }
+
+    private fun String.unescapePart(): String =
+        replace("\\n", "\n").replace("\\p", "|").replace("\\\\", "\\")
 }

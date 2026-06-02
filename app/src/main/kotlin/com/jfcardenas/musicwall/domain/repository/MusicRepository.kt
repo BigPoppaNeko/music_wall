@@ -11,4 +11,10 @@ interface MusicRepository {
         limit: Int,
         forceRefresh: Boolean = false
     ): NetworkResult<List<MusicImage>>
+
+    suspend fun getArtistCatalogAlbums(
+        artists: List<String>,
+        limit: Int,
+        forceRefresh: Boolean = false
+    ): NetworkResult<List<MusicImage>>
 }

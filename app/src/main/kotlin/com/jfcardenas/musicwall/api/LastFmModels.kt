@@ -8,8 +8,22 @@ data class TopAlbumsResponse(
     @SerializedName("topalbums") val topAlbums: TopAlbums
 )
 
+data class TagTopAlbumsResponse(
+    @SerializedName("albums") val albums: TopAlbums,
+)
+
 data class TopAlbums(
-    @SerializedName("album") val albums: List<Album>
+    @SerializedName("album") val albums: List<Album>,
+    @SerializedName("@attr") val attr: TopAlbumsAttr? = null,
+)
+
+data class TopAlbumsAttr(
+    val user: String? = null,
+    val artist: String? = null,
+    val page: String? = null,
+    val perPage: String? = null,
+    val totalPages: String? = null,
+    val total: String? = null,
 )
 
 data class Album(
@@ -195,6 +209,25 @@ data class SearchAlbum(
     @SerializedName("image") val images: List<LastFmImage>?
 )
 
+data class TrackSearchResponse(
+    val results: TrackSearchResults,
+)
+
+data class TrackSearchResults(
+    @SerializedName("trackmatches") val trackMatches: TrackMatches,
+)
+
+data class TrackMatches(
+    @SerializedName("track") val tracks: List<SearchTrack>,
+)
+
+data class SearchTrack(
+    val name: String,
+    val artist: String,
+    val mbid: String?,
+    val url: String?,
+)
+
 // ── Images ────────────────────────────────────────────────────────────────────
 
 fun List<LastFmImage>.getExtraLargeUrl(): String? {
@@ -262,3 +295,60 @@ data class UserTag(
     val count: String,
     val url: String?
 )
+
+// ── Album Info ────────────────────────────────────────────────────────────────
+
+data class AlbumInfoResponse(
+    @SerializedName("album") val album: AlbumInfoDetail?,
+)
+
+data class AlbumInfoDetail(
+    val name: String,
+    val artist: String = "",
+    val mbid: String? = null,
+    @SerializedName("image") val images: List<LastFmImage>? = null,
+    val wiki: WikiSection? = null,
+    val tags: AlbumTagsWrapper? = null,
+    val tracks: AlbumTracksContainer? = null,
+    val listeners: String? = null,
+    val playcount: String? = null,
+)
+
+data class AlbumTagsWrapper(
+    @SerializedName("tag") val tags: List<UserTag>? = null,
+)
+
+data class AlbumTracksContainer(
+    @SerializedName("track") val tracks: List<AlbumTrackItem> = emptyList(),
+)
+
+data class AlbumTrackItem(
+    val name: String,
+    val duration: String? = null,
+    @SerializedName("@attr") val attr: TrackRankAttr? = null,
+)
+
+fun AlbumInfoDetail.releaseYear(): String? {
+    val text = wiki?.summary.orEmpty() + " " + wiki?.content.orEmpty()
+    return Regex("""\b(19|20)\d{2}\b""").find(text)?.value
+}
+
+fun formatTrackDuration(raw: String?): String {
+    val seconds = raw?.toLongOrNull() ?: return "—"
+    if (seconds <= 0L) return "—"
+    val mins = seconds / 60
+    val secs = seconds % 60
+    return "%d:%02d".format(mins, secs)
+}
+
+fun formatTotalDuration(totalSeconds: Long): String {
+    if (totalSeconds <= 0L) return "—"
+    val hours = totalSeconds / 3600
+    val mins = (totalSeconds % 3600) / 60
+    val secs = totalSeconds % 60
+    return if (hours > 0) {
+        "%d:%02d:%02d".format(hours, mins, secs)
+    } else {
+        "%d:%02d".format(mins, secs)
+    }
+}

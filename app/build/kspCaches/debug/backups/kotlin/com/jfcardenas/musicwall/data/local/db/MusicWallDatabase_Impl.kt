@@ -15,10 +15,16 @@ import com.jfcardenas.musicwall.`data`.local.db.dao.ArtistDao
 import com.jfcardenas.musicwall.`data`.local.db.dao.ArtistDao_Impl
 import com.jfcardenas.musicwall.`data`.local.db.dao.FavoriteAlbumDao
 import com.jfcardenas.musicwall.`data`.local.db.dao.FavoriteAlbumDao_Impl
+import com.jfcardenas.musicwall.`data`.local.db.dao.LfMatchCacheDao
+import com.jfcardenas.musicwall.`data`.local.db.dao.LfMatchCacheDao_Impl
+import com.jfcardenas.musicwall.`data`.local.db.dao.LocalScrobbleDao
+import com.jfcardenas.musicwall.`data`.local.db.dao.LocalScrobbleDao_Impl
 import com.jfcardenas.musicwall.`data`.local.db.dao.MuralDao
 import com.jfcardenas.musicwall.`data`.local.db.dao.MuralDao_Impl
 import com.jfcardenas.musicwall.`data`.local.db.dao.TrackDao
 import com.jfcardenas.musicwall.`data`.local.db.dao.TrackDao_Impl
+import com.jfcardenas.musicwall.`data`.local.db.dao.VetoedAlbumDao
+import com.jfcardenas.musicwall.`data`.local.db.dao.VetoedAlbumDao_Impl
 import javax.`annotation`.processing.Generated
 import kotlin.Lazy
 import kotlin.String
@@ -57,8 +63,20 @@ public class MusicWallDatabase_Impl : MusicWallDatabase() {
     FavoriteAlbumDao_Impl(this)
   }
 
+  private val _vetoedAlbumDao: Lazy<VetoedAlbumDao> = lazy {
+    VetoedAlbumDao_Impl(this)
+  }
+
+  private val _localScrobbleDao: Lazy<LocalScrobbleDao> = lazy {
+    LocalScrobbleDao_Impl(this)
+  }
+
+  private val _lfMatchCacheDao: Lazy<LfMatchCacheDao> = lazy {
+    LfMatchCacheDao_Impl(this)
+  }
+
   protected override fun createOpenDelegate(): RoomOpenDelegate {
-    val _openDelegate: RoomOpenDelegate = object : RoomOpenDelegate(4, "e5e21178b948b13851a2e298d022a902", "82b0e728060da10433dc618ae69271ef") {
+    val _openDelegate: RoomOpenDelegate = object : RoomOpenDelegate(6, "1b22c64f3f22fb32a4a8f49e958c8f73", "b5426f22137a1918913bf08c1616cc2e") {
       public override fun createAllTables(connection: SQLiteConnection) {
         connection.execSQL("CREATE TABLE IF NOT EXISTS `albums` (`id` TEXT NOT NULL, `username` TEXT NOT NULL, `period` TEXT NOT NULL, `albumName` TEXT NOT NULL, `artistName` TEXT NOT NULL, `imageUrl` TEXT NOT NULL, `rank` INTEGER NOT NULL, `playcount` INTEGER NOT NULL, `mbid` TEXT, `lastFmUrl` TEXT, `fetchedAt` INTEGER NOT NULL, PRIMARY KEY(`id`))")
         connection.execSQL("CREATE INDEX IF NOT EXISTS `idx_albums_user_period` ON `albums` (`username`, `period`)")
@@ -68,8 +86,13 @@ public class MusicWallDatabase_Impl : MusicWallDatabase() {
         connection.execSQL("CREATE INDEX IF NOT EXISTS `idx_tracks_user_period_kind` ON `tracks` (`username`, `period`, `kind`)")
         connection.execSQL("CREATE TABLE IF NOT EXISTS `mural_history` (`id` INTEGER NOT NULL, `styleId` TEXT NOT NULL, `filePath` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, PRIMARY KEY(`id`))")
         connection.execSQL("CREATE TABLE IF NOT EXISTS `favorite_albums` (`id` TEXT NOT NULL, `albumName` TEXT NOT NULL, `artistName` TEXT NOT NULL, `imageUrl` TEXT, `mbid` TEXT, `savedAt` INTEGER NOT NULL, PRIMARY KEY(`id`))")
+        connection.execSQL("CREATE TABLE IF NOT EXISTS `vetoed_albums` (`id` TEXT NOT NULL, `albumName` TEXT NOT NULL, `artistName` TEXT NOT NULL, `vetoedAt` INTEGER NOT NULL, PRIMARY KEY(`id`))")
+        connection.execSQL("CREATE TABLE IF NOT EXISTS `local_scrobbles` (`id` TEXT NOT NULL, `userId` TEXT NOT NULL, `artistName` TEXT NOT NULL, `trackName` TEXT NOT NULL, `albumName` TEXT NOT NULL, `imageUrl` TEXT, `artistMbid` TEXT, `trackMbid` TEXT, `albumMbid` TEXT, `matchConfidence` REAL NOT NULL, `rawArtist` TEXT NOT NULL, `rawTrack` TEXT NOT NULL, `rawAlbum` TEXT NOT NULL, `sourceApp` TEXT, `playedAt` INTEGER NOT NULL, `durationMs` INTEGER NOT NULL, `isNowPlaying` INTEGER NOT NULL, PRIMARY KEY(`id`))")
+        connection.execSQL("CREATE INDEX IF NOT EXISTS `index_local_scrobbles_userId_playedAt` ON `local_scrobbles` (`userId`, `playedAt`)")
+        connection.execSQL("CREATE INDEX IF NOT EXISTS `index_local_scrobbles_userId_artistName_trackName` ON `local_scrobbles` (`userId`, `artistName`, `trackName`)")
+        connection.execSQL("CREATE TABLE IF NOT EXISTS `lf_match_cache` (`cacheKey` TEXT NOT NULL, `artistName` TEXT NOT NULL, `trackName` TEXT NOT NULL, `albumName` TEXT NOT NULL, `imageUrl` TEXT, `artistMbid` TEXT, `trackMbid` TEXT, `albumMbid` TEXT, `matchConfidence` REAL NOT NULL, `cachedAt` INTEGER NOT NULL, PRIMARY KEY(`cacheKey`))")
         connection.execSQL("CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)")
-        connection.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e5e21178b948b13851a2e298d022a902')")
+        connection.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '1b22c64f3f22fb32a4a8f49e958c8f73')")
       }
 
       public override fun dropAllTables(connection: SQLiteConnection) {
@@ -78,6 +101,9 @@ public class MusicWallDatabase_Impl : MusicWallDatabase() {
         connection.execSQL("DROP TABLE IF EXISTS `tracks`")
         connection.execSQL("DROP TABLE IF EXISTS `mural_history`")
         connection.execSQL("DROP TABLE IF EXISTS `favorite_albums`")
+        connection.execSQL("DROP TABLE IF EXISTS `vetoed_albums`")
+        connection.execSQL("DROP TABLE IF EXISTS `local_scrobbles`")
+        connection.execSQL("DROP TABLE IF EXISTS `lf_match_cache`")
       }
 
       public override fun onCreate(connection: SQLiteConnection) {
@@ -212,6 +238,81 @@ public class MusicWallDatabase_Impl : MusicWallDatabase() {
               | Found:
               |""".trimMargin() + _existingFavoriteAlbums)
         }
+        val _columnsVetoedAlbums: MutableMap<String, TableInfo.Column> = mutableMapOf()
+        _columnsVetoedAlbums.put("id", TableInfo.Column("id", "TEXT", true, 1, null, TableInfo.CREATED_FROM_ENTITY))
+        _columnsVetoedAlbums.put("albumName", TableInfo.Column("albumName", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY))
+        _columnsVetoedAlbums.put("artistName", TableInfo.Column("artistName", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY))
+        _columnsVetoedAlbums.put("vetoedAt", TableInfo.Column("vetoedAt", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY))
+        val _foreignKeysVetoedAlbums: MutableSet<TableInfo.ForeignKey> = mutableSetOf()
+        val _indicesVetoedAlbums: MutableSet<TableInfo.Index> = mutableSetOf()
+        val _infoVetoedAlbums: TableInfo = TableInfo("vetoed_albums", _columnsVetoedAlbums, _foreignKeysVetoedAlbums, _indicesVetoedAlbums)
+        val _existingVetoedAlbums: TableInfo = read(connection, "vetoed_albums")
+        if (!_infoVetoedAlbums.equals(_existingVetoedAlbums)) {
+          return RoomOpenDelegate.ValidationResult(false, """
+              |vetoed_albums(com.jfcardenas.musicwall.data.local.db.entity.VetoedAlbum).
+              | Expected:
+              |""".trimMargin() + _infoVetoedAlbums + """
+              |
+              | Found:
+              |""".trimMargin() + _existingVetoedAlbums)
+        }
+        val _columnsLocalScrobbles: MutableMap<String, TableInfo.Column> = mutableMapOf()
+        _columnsLocalScrobbles.put("id", TableInfo.Column("id", "TEXT", true, 1, null, TableInfo.CREATED_FROM_ENTITY))
+        _columnsLocalScrobbles.put("userId", TableInfo.Column("userId", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY))
+        _columnsLocalScrobbles.put("artistName", TableInfo.Column("artistName", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY))
+        _columnsLocalScrobbles.put("trackName", TableInfo.Column("trackName", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY))
+        _columnsLocalScrobbles.put("albumName", TableInfo.Column("albumName", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY))
+        _columnsLocalScrobbles.put("imageUrl", TableInfo.Column("imageUrl", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY))
+        _columnsLocalScrobbles.put("artistMbid", TableInfo.Column("artistMbid", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY))
+        _columnsLocalScrobbles.put("trackMbid", TableInfo.Column("trackMbid", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY))
+        _columnsLocalScrobbles.put("albumMbid", TableInfo.Column("albumMbid", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY))
+        _columnsLocalScrobbles.put("matchConfidence", TableInfo.Column("matchConfidence", "REAL", true, 0, null, TableInfo.CREATED_FROM_ENTITY))
+        _columnsLocalScrobbles.put("rawArtist", TableInfo.Column("rawArtist", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY))
+        _columnsLocalScrobbles.put("rawTrack", TableInfo.Column("rawTrack", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY))
+        _columnsLocalScrobbles.put("rawAlbum", TableInfo.Column("rawAlbum", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY))
+        _columnsLocalScrobbles.put("sourceApp", TableInfo.Column("sourceApp", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY))
+        _columnsLocalScrobbles.put("playedAt", TableInfo.Column("playedAt", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY))
+        _columnsLocalScrobbles.put("durationMs", TableInfo.Column("durationMs", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY))
+        _columnsLocalScrobbles.put("isNowPlaying", TableInfo.Column("isNowPlaying", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY))
+        val _foreignKeysLocalScrobbles: MutableSet<TableInfo.ForeignKey> = mutableSetOf()
+        val _indicesLocalScrobbles: MutableSet<TableInfo.Index> = mutableSetOf()
+        _indicesLocalScrobbles.add(TableInfo.Index("index_local_scrobbles_userId_playedAt", false, listOf("userId", "playedAt"), listOf("ASC", "ASC")))
+        _indicesLocalScrobbles.add(TableInfo.Index("index_local_scrobbles_userId_artistName_trackName", false, listOf("userId", "artistName", "trackName"), listOf("ASC", "ASC", "ASC")))
+        val _infoLocalScrobbles: TableInfo = TableInfo("local_scrobbles", _columnsLocalScrobbles, _foreignKeysLocalScrobbles, _indicesLocalScrobbles)
+        val _existingLocalScrobbles: TableInfo = read(connection, "local_scrobbles")
+        if (!_infoLocalScrobbles.equals(_existingLocalScrobbles)) {
+          return RoomOpenDelegate.ValidationResult(false, """
+              |local_scrobbles(com.jfcardenas.musicwall.data.local.db.entity.LocalScrobbleEntity).
+              | Expected:
+              |""".trimMargin() + _infoLocalScrobbles + """
+              |
+              | Found:
+              |""".trimMargin() + _existingLocalScrobbles)
+        }
+        val _columnsLfMatchCache: MutableMap<String, TableInfo.Column> = mutableMapOf()
+        _columnsLfMatchCache.put("cacheKey", TableInfo.Column("cacheKey", "TEXT", true, 1, null, TableInfo.CREATED_FROM_ENTITY))
+        _columnsLfMatchCache.put("artistName", TableInfo.Column("artistName", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY))
+        _columnsLfMatchCache.put("trackName", TableInfo.Column("trackName", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY))
+        _columnsLfMatchCache.put("albumName", TableInfo.Column("albumName", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY))
+        _columnsLfMatchCache.put("imageUrl", TableInfo.Column("imageUrl", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY))
+        _columnsLfMatchCache.put("artistMbid", TableInfo.Column("artistMbid", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY))
+        _columnsLfMatchCache.put("trackMbid", TableInfo.Column("trackMbid", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY))
+        _columnsLfMatchCache.put("albumMbid", TableInfo.Column("albumMbid", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY))
+        _columnsLfMatchCache.put("matchConfidence", TableInfo.Column("matchConfidence", "REAL", true, 0, null, TableInfo.CREATED_FROM_ENTITY))
+        _columnsLfMatchCache.put("cachedAt", TableInfo.Column("cachedAt", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY))
+        val _foreignKeysLfMatchCache: MutableSet<TableInfo.ForeignKey> = mutableSetOf()
+        val _indicesLfMatchCache: MutableSet<TableInfo.Index> = mutableSetOf()
+        val _infoLfMatchCache: TableInfo = TableInfo("lf_match_cache", _columnsLfMatchCache, _foreignKeysLfMatchCache, _indicesLfMatchCache)
+        val _existingLfMatchCache: TableInfo = read(connection, "lf_match_cache")
+        if (!_infoLfMatchCache.equals(_existingLfMatchCache)) {
+          return RoomOpenDelegate.ValidationResult(false, """
+              |lf_match_cache(com.jfcardenas.musicwall.data.local.db.entity.LfMatchCacheEntity).
+              | Expected:
+              |""".trimMargin() + _infoLfMatchCache + """
+              |
+              | Found:
+              |""".trimMargin() + _existingLfMatchCache)
+        }
         return RoomOpenDelegate.ValidationResult(true, null)
       }
     }
@@ -221,11 +322,11 @@ public class MusicWallDatabase_Impl : MusicWallDatabase() {
   protected override fun createInvalidationTracker(): InvalidationTracker {
     val _shadowTablesMap: MutableMap<String, String> = mutableMapOf()
     val _viewTables: MutableMap<String, Set<String>> = mutableMapOf()
-    return InvalidationTracker(this, _shadowTablesMap, _viewTables, "albums", "artists", "tracks", "mural_history", "favorite_albums")
+    return InvalidationTracker(this, _shadowTablesMap, _viewTables, "albums", "artists", "tracks", "mural_history", "favorite_albums", "vetoed_albums", "local_scrobbles", "lf_match_cache")
   }
 
   public override fun clearAllTables() {
-    super.performClear(false, "albums", "artists", "tracks", "mural_history", "favorite_albums")
+    super.performClear(false, "albums", "artists", "tracks", "mural_history", "favorite_albums", "vetoed_albums", "local_scrobbles", "lf_match_cache")
   }
 
   protected override fun getRequiredTypeConverterClasses(): Map<KClass<*>, List<KClass<*>>> {
@@ -235,6 +336,9 @@ public class MusicWallDatabase_Impl : MusicWallDatabase() {
     _typeConvertersMap.put(TrackDao::class, TrackDao_Impl.getRequiredConverters())
     _typeConvertersMap.put(MuralDao::class, MuralDao_Impl.getRequiredConverters())
     _typeConvertersMap.put(FavoriteAlbumDao::class, FavoriteAlbumDao_Impl.getRequiredConverters())
+    _typeConvertersMap.put(VetoedAlbumDao::class, VetoedAlbumDao_Impl.getRequiredConverters())
+    _typeConvertersMap.put(LocalScrobbleDao::class, LocalScrobbleDao_Impl.getRequiredConverters())
+    _typeConvertersMap.put(LfMatchCacheDao::class, LfMatchCacheDao_Impl.getRequiredConverters())
     return _typeConvertersMap
   }
 
@@ -257,4 +361,10 @@ public class MusicWallDatabase_Impl : MusicWallDatabase() {
   public override fun muralDao(): MuralDao = _muralDao.value
 
   public override fun favoriteAlbumDao(): FavoriteAlbumDao = _favoriteAlbumDao.value
+
+  public override fun vetoedAlbumDao(): VetoedAlbumDao = _vetoedAlbumDao.value
+
+  public override fun localScrobbleDao(): LocalScrobbleDao = _localScrobbleDao.value
+
+  public override fun lfMatchCacheDao(): LfMatchCacheDao = _lfMatchCacheDao.value
 }

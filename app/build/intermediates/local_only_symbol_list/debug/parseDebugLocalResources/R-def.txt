@@ -45,6 +45,9 @@ string error_generic
 string error_network
 string error_user_not_found
 string hint_username
+string scrobble_channel_name
+string scrobble_notification_body
+string scrobble_notification_title
 string settings_title
 string verifying
 style Theme.MusicWall

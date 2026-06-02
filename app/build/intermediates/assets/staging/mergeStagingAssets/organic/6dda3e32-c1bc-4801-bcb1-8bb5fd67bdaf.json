@@ -1,0 +1,23 @@
+{
+  "id": "6dda3e32-c1bc-4801-bcb1-8bb5fd67bdaf",
+  "genre": "bano_bar_lima",
+  "mood": "dive_bar_walls",
+  "totalSlots": 9,
+  "slots": [
+    { "id": 1, "x": 0.1352, "y": 0.1974, "width": 0.2139, "height": 0.1448, "rotation": 0.0, "lightingZone": [120, 90, 40] },
+    { "id": 2, "x": 0.4019, "y": 0.1948, "width": 0.2176, "height": 0.1474, "rotation": 0.0, "lightingZone": [115, 86, 38] },
+    { "id": 3, "x": 0.6759, "y": 0.1964, "width": 0.2157, "height": 0.1458, "rotation": 0.0, "lightingZone": [108, 81, 35] },
+    { "id": 4, "x": 0.1352, "y": 0.3651, "width": 0.2139, "height": 0.1438, "rotation": 0.0, "lightingZone": [112, 84, 37] },
+    { "id": 5, "x": 0.4019, "y": 0.3661, "width": 0.2176, "height": 0.1427, "rotation": 0.0, "lightingZone": [108, 80, 35] },
+    { "id": 6, "x": 0.6694, "y": 0.3651, "width": 0.2222, "height": 0.1438, "rotation": 0.0, "lightingZone": [102, 76, 33] },
+    { "id": 7, "x": 0.1352, "y": 0.5302, "width": 0.2139, "height": 0.1411, "rotation": 0.0, "lightingZone": [100, 74, 32] },
+    { "id": 8, "x": 0.4019, "y": 0.5302, "width": 0.2176, "height": 0.1411, "rotation": 0.0, "lightingZone": [96, 72, 31] },
+    { "id": 9, "x": 0.6741, "y": 0.5302, "width": 0.2176, "height": 0.1411, "rotation": 0.0, "lightingZone": [92, 69, 30] }
+  ],
+  "lightingMap": {
+    "type": "gradient",
+    "mainLightColor": "#C86020",
+    "ambientColor": "#1A0E06",
+    "shadowDirection": "bottom-right"
+  }
+}

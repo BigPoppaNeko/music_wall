@@ -35,10 +35,10 @@ import java.io.File
 private data class BuildStage(val icon: String, val message: String)
 
 private val BUILD_STAGES = listOf(
-    BuildStage("⚙", "Analizando tu música y encontrando su esencia..."),
-    BuildStage("◎", "Buscando colores, texturas y recuerdos visuales..."),
-    BuildStage("▦", "Organizando tus álbumes en composición..."),
-    BuildStage("✦", "Añadiendo detalles finales del mural..."),
+    BuildStage("⚙", "Escuchando el archivo como quien interroga al destino..."),
+    BuildStage("◎", "Separando azar, memoria y color en la misma mesa..."),
+    BuildStage("▦", "Dando forma visual a lo que todavía no tiene nombre..."),
+    BuildStage("✦", "Dejando que el mural decida su último silencio..."),
 )
 
 private enum class ScreenState { LOADING, DONE, ERROR }

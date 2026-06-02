@@ -1,6 +1,6 @@
 -- Merging decision tree log ---
 provider#androidx.startup.InitializationProvider
-INJECTED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:62:9-71:20
+INJECTED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:84:9-93:20
 MERGED from [androidx.work:work-runtime:2.9.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\b0a719a4bb5fb2958a080e642a8b6aca\transformed\work-runtime-2.9.1\AndroidManifest.xml:29:9-37:20
 MERGED from [androidx.work:work-runtime:2.9.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\b0a719a4bb5fb2958a080e642a8b6aca\transformed\work-runtime-2.9.1\AndroidManifest.xml:29:9-37:20
 MERGED from [androidx.emoji2:emoji2:1.4.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\f650ecd9b0271537a617f4762b8f5a6f\transformed\emoji2-1.4.0\AndroidManifest.xml:24:9-32:20
@@ -12,38 +12,36 @@ MERGED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\jfcar\.g
 MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\17832c18f6d14c6bd2155a2850e922f8\transformed\startup-runtime-1.1.1\AndroidManifest.xml:26:9-30:34
 MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\17832c18f6d14c6bd2155a2850e922f8\transformed\startup-runtime-1.1.1\AndroidManifest.xml:26:9-30:34
 	tools:node
-		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:66:13-31
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:88:13-31
 	android:authorities
 		INJECTED from D:\Github\music_wall\app\src\main\AndroidManifest.xml
-		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:64:13-68
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:86:13-68
 	android:exported
-		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:65:13-37
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:87:13-37
 	android:name
-		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:63:13-67
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:85:13-67
 provider#androidx.core.content.FileProvider
-INJECTED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:73:9-81:20
+INJECTED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:95:9-103:20
 	android:grantUriPermissions
-		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:77:13-47
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:99:13-47
 	android:authorities
 		INJECTED from D:\Github\music_wall\app\src\main\AndroidManifest.xml
-		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:75:13-64
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:97:13-64
 	android:exported
-		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:76:13-37
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:98:13-37
 	android:name
-		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:74:13-62
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:96:13-62
 manifest
-ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:2:1-84:12
-INJECTED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:2:1-84:12
-INJECTED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:2:1-84:12
-INJECTED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:2:1-84:12
+ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:2:1-106:12
+INJECTED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:2:1-106:12
+INJECTED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:2:1-106:12
+INJECTED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:2:1-106:12
 MERGED from [com.google.android.material:material:1.12.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\afacf25e39a7a8ff5c5160f218388842\transformed\material-1.12.0\AndroidManifest.xml:17:1-24:12
 MERGED from [io.coil-kt:coil-compose:2.7.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\8f37febabfbbf0f502b48315b623579b\transformed\coil-compose-2.7.0\AndroidManifest.xml:2:1-7:12
 MERGED from [io.coil-kt:coil:2.7.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\a1482e84053fe46db0d6b571028e2998\transformed\coil-2.7.0\AndroidManifest.xml:2:1-7:12
 MERGED from [io.coil-kt:coil-compose-base:2.7.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\4ddf429e0636c2760008e59eed82cfde\transformed\coil-compose-base-2.7.0\AndroidManifest.xml:2:1-7:12
 MERGED from [io.coil-kt:coil-base:2.7.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\cf07375a744b60b3194f31667a5d5187\transformed\coil-base-2.7.0\AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.appcompat:appcompat-resources:1.7.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\602759a63d4ee7fc62fe9898ae304de4\transformed\appcompat-resources-1.7.0\AndroidManifest.xml:2:1-7:12
-MERGED from [androidx.preference:preference-ktx:1.2.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\61d1374206a0b17ac1d090d8cc429185\transformed\preference-ktx-1.2.1\AndroidManifest.xml:17:1-24:12
-MERGED from [androidx.preference:preference:1.2.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\1207287a6a0d030dbb9f3b40d3da243d\transformed\preference-1.2.1\AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.constraintlayout:constraintlayout:2.0.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\1726985ce01e9b23fa03fd3f32b20a55\transformed\constraintlayout-2.0.1\AndroidManifest.xml:2:1-11:12
 MERGED from [androidx.appcompat:appcompat:1.7.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\8ee93ef23074bc330226a083db096a5b\transformed\appcompat-1.7.0\AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.hilt:hilt-navigation-compose:1.2.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\24f9507b347208c48c6e74e8c7517caa\transformed\hilt-navigation-compose-1.2.0\AndroidManifest.xml:2:1-7:12
@@ -55,10 +53,8 @@ MERGED from [androidx.navigation:navigation-runtime-ktx:2.8.4] C:\Users\jfcar\.g
 MERGED from [androidx.navigation:navigation-compose:2.8.4] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\62573e3782de25059ddca5331bf82c54\transformed\navigation-compose-2.8.4\AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.hilt:hilt-work:1.3.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\d818e57de81a7fcb11f06edc63aaca92\transformed\hilt-work-1.3.0\AndroidManifest.xml:17:1-22:12
 MERGED from [com.google.dagger:hilt-android:2.59.2] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\2751c180a2e7709707ad2af397b5fa0e\transformed\hilt-android-2.59.2\AndroidManifest.xml:16:1-19:12
-MERGED from [androidx.fragment:fragment-ktx:1.3.6] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\d0476d5d5e85d6ec3046c42b3015d48d\transformed\fragment-ktx-1.3.6\AndroidManifest.xml:17:1-24:12
-MERGED from [androidx.viewpager2:viewpager2:1.0.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\00dbec152c8ad39ee89220fff35bb86b\transformed\viewpager2-1.0.0\AndroidManifest.xml:17:1-24:12
-MERGED from [androidx.fragment:fragment:1.5.4] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\a819688c5b4e38bd6b2baef4e857095a\transformed\fragment-1.5.4\AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.compose.material3:material3-android:1.3.2] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\b37e65b189a2b9f9bb499b1d491691be\transformed\material3-release\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.compose.material:material-icons-core-android:1.7.8] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\d836b260af7202b52bbbb38396e950f1\transformed\material-icons-core-release\AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.compose.material:material-android:1.8.2] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\c2e637b0039dda3eb4584cd304a1c7a1\transformed\material-release\AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.compose.animation:animation-core-android:1.8.2] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\33310686cc4b1b68300a4f4cd276fe81\transformed\animation-core-release\AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.compose.material:material-ripple-android:1.8.2] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\d652b6197d388a36f6be6f3cd581ab93\transformed\material-ripple-release\AndroidManifest.xml:2:1-7:12
@@ -74,13 +70,22 @@ MERGED from [androidx.compose.ui:ui-tooling-preview-android:1.8.2] C:\Users\jfca
 MERGED from [androidx.compose.ui:ui-tooling-android:1.8.2] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\b24d533d4e166de783034d0405940f54\transformed\ui-tooling-release\AndroidManifest.xml:17:1-28:12
 MERGED from [androidx.compose.ui:ui-graphics-android:1.8.2] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\e3a279df1e198e032bb8dfce46c00a29\transformed\ui-graphics-release\AndroidManifest.xml:2:1-7:12
 MERGED from [com.google.accompanist:accompanist-drawablepainter:0.32.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\2c68bdd1c47224f62fd34361f43a0ee7\transformed\accompanist-drawablepainter-0.32.0\AndroidManifest.xml:17:1-23:12
-MERGED from [androidx.compose.material:material-icons-extended-android:1.7.8] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\d555247c77ba33f781846ff947a42409\transformed\material-icons-extended-release\AndroidManifest.xml:2:1-7:12
-MERGED from [androidx.compose.material:material-icons-core-android:1.7.8] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\d836b260af7202b52bbbb38396e950f1\transformed\material-icons-core-release\AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.palette:palette:1.0.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\dd69b49e7930269af34a73fdfe1b5410\transformed\palette-1.0.0\AndroidManifest.xml:17:1-22:12
-MERGED from [androidx.slidingpanelayout:slidingpanelayout:1.2.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\96636bd21911336a2de34030d52f6635\transformed\slidingpanelayout-1.2.0\AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.transition:transition:1.5.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\cf2421d8cd5138b325af22a92fda234e\transformed\transition-1.5.0\AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.dynamicanimation:dynamicanimation:1.0.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\b579989a648cdfa92640b27666f2f970\transformed\dynamicanimation-1.0.0\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.legacy:legacy-support-core-utils:1.0.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\67008ca18d740d20156b9f5f65307ac8\transformed\legacy-support-core-utils-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.viewpager2:viewpager2:1.0.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\00dbec152c8ad39ee89220fff35bb86b\transformed\viewpager2-1.0.0\AndroidManifest.xml:17:1-24:12
+MERGED from [com.google.android.libraries.identity.googleid:googleid:1.1.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\1d877f894ae93283a9aa67d26da1b811\transformed\googleid-1.1.1\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.credentials:credentials:1.3.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\344c63371feeba232473bbb07c51f68c\transformed\credentials-1.3.0\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.credentials:credentials-play-services-auth:1.3.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\247010fa857f55461c3f100c23a28e61\transformed\credentials-play-services-auth-1.3.0\AndroidManifest.xml:17:1-44:12
+MERGED from [com.google.android.gms:play-services-auth:21.1.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\0a3966fa3ba0ca76709ba81f608dc8a9\transformed\play-services-auth-21.1.1\AndroidManifest.xml:17:1-40:12
+MERGED from [com.google.android.gms:play-services-fido:21.0.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\4a0dfbb76fb3db7ee3e95008f8885095\transformed\play-services-fido-21.0.0\AndroidManifest.xml:2:1-10:12
+MERGED from [com.google.android.gms:play-services-auth-api-phone:18.0.2] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\1f58e7c0ee8334a6c2c65970129c2ca1\transformed\play-services-auth-api-phone-18.0.2\AndroidManifest.xml:2:1-7:12
+MERGED from [com.google.android.gms:play-services-auth-base:18.0.10] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\2858b3fae7dcd10d5e8ee5f976542b45\transformed\play-services-auth-base-18.0.10\AndroidManifest.xml:2:1-7:12
+MERGED from [com.google.android.gms:play-services-base:18.3.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\511db24da8dec02bc78582d866b53dd8\transformed\play-services-base-18.3.0\AndroidManifest.xml:16:1-24:12
+MERGED from [com.google.android.gms:play-services-tasks:18.1.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\181dcc8e76f8ecc35cf4df6c54af97cd\transformed\play-services-tasks-18.1.0\AndroidManifest.xml:2:1-6:12
+MERGED from [com.google.android.gms:play-services-basement:18.3.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\9e0029f075f8a4782ae86f267f11b90c\transformed\play-services-basement-18.3.0\AndroidManifest.xml:16:1-26:12
+MERGED from [androidx.fragment:fragment:1.5.7] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\3dbb365ba1696c48ebf0c4e96776f9cb\transformed\fragment-1.5.7\AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.loader:loader:1.0.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\0b637da532626a43f633dd48f627bd61\transformed\loader-1.0.0\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.work:work-runtime-ktx:2.9.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\71d1a69f500b790e86a70782fa4b8968\transformed\work-runtime-ktx-2.9.1\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.work:work-runtime:2.9.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\b0a719a4bb5fb2958a080e642a8b6aca\transformed\work-runtime-2.9.1\AndroidManifest.xml:17:1-145:12
@@ -92,10 +97,9 @@ MERGED from [androidx.drawerlayout:drawerlayout:1.1.1] C:\Users\jfcar\.gradle\ca
 MERGED from [androidx.coordinatorlayout:coordinatorlayout:1.1.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\5d58dc3af84b172ff1e4875bcebfd03e\transformed\coordinatorlayout-1.1.0\AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.vectordrawable:vectordrawable-animated:1.1.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\e8fb4d9ee2329d84e02204e5a4cd2422\transformed\vectordrawable-animated-1.1.0\AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.vectordrawable:vectordrawable:1.1.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\8753dabb0ca011b41ecb3b3a7328d381\transformed\vectordrawable-1.1.0\AndroidManifest.xml:17:1-24:12
-MERGED from [androidx.viewpager:viewpager:1.0.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\ae91c3a416a9a1d459d1ef1887e6ee0c\transformed\viewpager-1.0.0\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.recyclerview:recyclerview:1.1.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\851a099b096fd5783ebd5cf8fe2c1248\transformed\recyclerview-1.1.0\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.viewpager:viewpager:1.0.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\ae91c3a416a9a1d459d1ef1887e6ee0c\transformed\viewpager-1.0.0\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.customview:customview:1.1.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\462f7424318101b4401c56bef4fe46ea\transformed\customview-1.1.0\AndroidManifest.xml:17:1-24:12
-MERGED from [androidx.window:window:1.0.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\35f3a2a67195c539df7666c5b2fef363\transformed\window-1.0.0\AndroidManifest.xml:17:1-33:12
 MERGED from [androidx.autofill:autofill:1.0.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\d11285524c1154d9008032cdf0d0a7fe\transformed\autofill-1.0.0\AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.graphics:graphics-path:1.0.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\333e948e01a84ab8c9ecc2843699b7ee\transformed\graphics-path-1.0.1\AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.core:core:1.13.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\c41101d134364398bfdf3efc6d7ce9ad\transformed\core-1.13.1\AndroidManifest.xml:17:1-30:12
@@ -153,37 +157,61 @@ uses-permission#android.permission.INTERNET
 ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:5:5-67
 	android:name
 		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:5:22-64
+uses-permission#android.permission.POST_NOTIFICATIONS
+ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:6:5-77
+	android:name
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:6:22-74
+uses-permission#android.permission.FOREGROUND_SERVICE
+ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:7:5-77
+MERGED from [androidx.work:work-runtime:2.9.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\b0a719a4bb5fb2958a080e642a8b6aca\transformed\work-runtime-2.9.1\AndroidManifest.xml:26:5-77
+MERGED from [androidx.work:work-runtime:2.9.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\b0a719a4bb5fb2958a080e642a8b6aca\transformed\work-runtime-2.9.1\AndroidManifest.xml:26:5-77
+	android:name
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:7:22-74
+uses-permission#android.permission.FOREGROUND_SERVICE_SPECIAL_USE
+ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:8:5-89
+	android:name
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:8:22-86
 uses-permission#android.permission.ACCESS_NETWORK_STATE
-ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:6:5-79
+ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:9:5-79
 MERGED from [androidx.work:work-runtime:2.9.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\b0a719a4bb5fb2958a080e642a8b6aca\transformed\work-runtime-2.9.1\AndroidManifest.xml:24:5-79
 MERGED from [androidx.work:work-runtime:2.9.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\b0a719a4bb5fb2958a080e642a8b6aca\transformed\work-runtime-2.9.1\AndroidManifest.xml:24:5-79
 	android:name
-		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:6:22-76
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:9:22-76
 uses-permission#android.permission.SET_WALLPAPER
-ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:7:5-72
+ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:10:5-72
 	android:name
-		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:7:22-69
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:10:22-69
 uses-feature#android.software.live_wallpaper
-ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:8:5-92
+ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:11:5-92
 	android:required
-		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:8:66-89
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:11:66-89
 	android:name
-		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:8:19-65
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:11:19-65
 application
-ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:10:5-83:19
-INJECTED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:10:5-83:19
+ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:13:5-105:19
+INJECTED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:13:5-105:19
 MERGED from [com.google.android.material:material:1.12.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\afacf25e39a7a8ff5c5160f218388842\transformed\material-1.12.0\AndroidManifest.xml:22:5-20
 MERGED from [com.google.android.material:material:1.12.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\afacf25e39a7a8ff5c5160f218388842\transformed\material-1.12.0\AndroidManifest.xml:22:5-20
 MERGED from [androidx.constraintlayout:constraintlayout:2.0.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\1726985ce01e9b23fa03fd3f32b20a55\transformed\constraintlayout-2.0.1\AndroidManifest.xml:9:5-20
 MERGED from [androidx.constraintlayout:constraintlayout:2.0.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\1726985ce01e9b23fa03fd3f32b20a55\transformed\constraintlayout-2.0.1\AndroidManifest.xml:9:5-20
 MERGED from [androidx.compose.ui:ui-tooling-android:1.8.2] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\b24d533d4e166de783034d0405940f54\transformed\ui-tooling-release\AndroidManifest.xml:22:5-26:19
 MERGED from [androidx.compose.ui:ui-tooling-android:1.8.2] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\b24d533d4e166de783034d0405940f54\transformed\ui-tooling-release\AndroidManifest.xml:22:5-26:19
+MERGED from [androidx.credentials:credentials-play-services-auth:1.3.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\247010fa857f55461c3f100c23a28e61\transformed\credentials-play-services-auth-1.3.0\AndroidManifest.xml:23:5-42:19
+MERGED from [androidx.credentials:credentials-play-services-auth:1.3.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\247010fa857f55461c3f100c23a28e61\transformed\credentials-play-services-auth-1.3.0\AndroidManifest.xml:23:5-42:19
+MERGED from [com.google.android.gms:play-services-auth:21.1.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\0a3966fa3ba0ca76709ba81f608dc8a9\transformed\play-services-auth-21.1.1\AndroidManifest.xml:22:5-38:19
+MERGED from [com.google.android.gms:play-services-auth:21.1.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\0a3966fa3ba0ca76709ba81f608dc8a9\transformed\play-services-auth-21.1.1\AndroidManifest.xml:22:5-38:19
+MERGED from [com.google.android.gms:play-services-fido:21.0.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\4a0dfbb76fb3db7ee3e95008f8885095\transformed\play-services-fido-21.0.0\AndroidManifest.xml:7:5-8:19
+MERGED from [com.google.android.gms:play-services-fido:21.0.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\4a0dfbb76fb3db7ee3e95008f8885095\transformed\play-services-fido-21.0.0\AndroidManifest.xml:7:5-8:19
+MERGED from [com.google.android.gms:play-services-base:18.3.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\511db24da8dec02bc78582d866b53dd8\transformed\play-services-base-18.3.0\AndroidManifest.xml:19:5-23:19
+MERGED from [com.google.android.gms:play-services-base:18.3.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\511db24da8dec02bc78582d866b53dd8\transformed\play-services-base-18.3.0\AndroidManifest.xml:19:5-23:19
+MERGED from [com.google.android.gms:play-services-tasks:18.1.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\181dcc8e76f8ecc35cf4df6c54af97cd\transformed\play-services-tasks-18.1.0\AndroidManifest.xml:5:5-20
+MERGED from [com.google.android.gms:play-services-tasks:18.1.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\181dcc8e76f8ecc35cf4df6c54af97cd\transformed\play-services-tasks-18.1.0\AndroidManifest.xml:5:5-20
+MERGED from [com.google.android.gms:play-services-basement:18.3.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\9e0029f075f8a4782ae86f267f11b90c\transformed\play-services-basement-18.3.0\AndroidManifest.xml:20:5-24:19
+MERGED from [com.google.android.gms:play-services-basement:18.3.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\9e0029f075f8a4782ae86f267f11b90c\transformed\play-services-basement-18.3.0\AndroidManifest.xml:20:5-24:19
 MERGED from [androidx.work:work-runtime:2.9.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\b0a719a4bb5fb2958a080e642a8b6aca\transformed\work-runtime-2.9.1\AndroidManifest.xml:28:5-143:19
 MERGED from [androidx.work:work-runtime:2.9.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\b0a719a4bb5fb2958a080e642a8b6aca\transformed\work-runtime-2.9.1\AndroidManifest.xml:28:5-143:19
 MERGED from [androidx.emoji2:emoji2:1.4.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\f650ecd9b0271537a617f4762b8f5a6f\transformed\emoji2-1.4.0\AndroidManifest.xml:23:5-33:19
 MERGED from [androidx.emoji2:emoji2:1.4.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\f650ecd9b0271537a617f4762b8f5a6f\transformed\emoji2-1.4.0\AndroidManifest.xml:23:5-33:19
-MERGED from [androidx.window:window:1.0.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\35f3a2a67195c539df7666c5b2fef363\transformed\window-1.0.0\AndroidManifest.xml:24:5-31:19
-MERGED from [androidx.window:window:1.0.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\35f3a2a67195c539df7666c5b2fef363\transformed\window-1.0.0\AndroidManifest.xml:24:5-31:19
 MERGED from [androidx.core:core:1.13.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\c41101d134364398bfdf3efc6d7ce9ad\transformed\core-1.13.1\AndroidManifest.xml:28:5-89
 MERGED from [androidx.core:core:1.13.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\c41101d134364398bfdf3efc6d7ce9ad\transformed\core-1.13.1\AndroidManifest.xml:28:5-89
 MERGED from [androidx.lifecycle:lifecycle-process:2.8.7] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\cd7d205300eaaab855f0cbc186e32b0d\transformed\lifecycle-process-2.8.7\AndroidManifest.xml:23:5-33:19
@@ -201,100 +229,130 @@ MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\jfcar\.gradle\cach
 	android:appComponentFactory
 		ADDED from [androidx.core:core:1.13.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\c41101d134364398bfdf3efc6d7ce9ad\transformed\core-1.13.1\AndroidManifest.xml:28:18-86
 	android:supportsRtl
-		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:15:9-35
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:18:9-35
 	android:label
-		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:12:9-41
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:15:9-41
 	android:roundIcon
-		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:14:9-54
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:17:9-54
 	android:icon
-		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:13:9-43
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:16:9-43
+	android:allowBackup
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:19:9-36
 	android:theme
-		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:16:9-47
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:20:9-47
 	android:name
-		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:11:9-37
-service#com.jfcardenas.musicwall.service.CollageWallpaper
-ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:18:9-29:19
-	android:label
-		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:20:13-45
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:14:9-37
+service#com.jfcardenas.musicwall.service.NowPlayingListenerService
+ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:22:9-29:19
 	android:exported
-		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:22:13-36
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:24:13-36
 	android:permission
-		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:21:13-67
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:25:13-87
 	android:name
-		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:19:13-53
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:23:13-62
+intent-filter#action:name:android.service.notification.NotificationListenerService
+ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:26:13-28:29
+action#android.service.notification.NotificationListenerService
+ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:27:17-99
+	android:name
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:27:25-96
+service#com.jfcardenas.musicwall.service.ScrobbleForegroundService
+ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:31:9-38:19
+	android:exported
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:33:13-37
+	android:foregroundServiceType
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:34:13-55
+	android:name
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:32:13-62
+property#android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE
+ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:35:13-37:83
+	android:value
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:37:17-80
+	android:name
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:36:17-76
+service#com.jfcardenas.musicwall.service.CollageWallpaper
+ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:40:9-51:19
+	android:label
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:42:13-45
+	android:exported
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:44:13-36
+	android:permission
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:43:13-67
+	android:name
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:41:13-53
 intent-filter#action:name:android.service.wallpaper.WallpaperService
-ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:23:13-25:29
+ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:45:13-47:29
 action#android.service.wallpaper.WallpaperService
-ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:24:17-85
+ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:46:17-85
 	android:name
-		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:24:25-82
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:46:25-82
 meta-data#android.service.wallpaper
-ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:26:13-28:53
+ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:48:13-50:53
 	android:resource
-		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:28:17-50
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:50:17-50
 	android:name
-		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:27:17-57
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:49:17-57
 activity#com.jfcardenas.musicwall.OnboardingActivity
-ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:31:9-40:20
+ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:53:9-62:20
 	android:label
-		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:33:13-45
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:55:13-45
 	android:windowSoftInputMode
-		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:35:13-55
-	android:exported
-		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:34:13-36
-	android:name
-		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:32:13-47
-intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
-ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:36:13-39:29
-action#android.intent.action.MAIN
-ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:37:17-69
-	android:name
-		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:37:25-66
-category#android.intent.category.LAUNCHER
-ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:38:17-77
-	android:name
-		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:38:27-74
-activity#com.jfcardenas.musicwall.MainActivity
-ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:42:9-45:40
-	android:label
-		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:44:13-45
-	android:exported
-		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:45:13-37
-	android:name
-		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:43:13-41
-activity#com.jfcardenas.musicwall.features.connect.ConnectActivity
-ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:47:9-51:58
-	android:label
-		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:49:13-45
-	android:windowSoftInputMode
-		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:51:13-55
-	android:exported
-		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:50:13-37
-	android:name
-		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:48:13-61
-activity#com.jfcardenas.musicwall.settings.WallpaperSettingsActivity
-ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:53:9-56:39
-	android:label
-		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:55:13-51
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:57:13-55
 	android:exported
 		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:56:13-36
 	android:name
-		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:54:13-63
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:54:13-47
+intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
+ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:58:13-61:29
+action#android.intent.action.MAIN
+ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:59:17-69
+	android:name
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:59:25-66
+category#android.intent.category.LAUNCHER
+ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:60:17-77
+	android:name
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:60:27-74
+activity#com.jfcardenas.musicwall.MainActivity
+ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:64:9-67:40
+	android:label
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:66:13-45
+	android:exported
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:67:13-37
+	android:name
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:65:13-41
+activity#com.jfcardenas.musicwall.features.connect.ConnectActivity
+ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:69:9-73:58
+	android:label
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:71:13-45
+	android:windowSoftInputMode
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:73:13-55
+	android:exported
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:72:13-37
+	android:name
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:70:13-61
+activity#com.jfcardenas.musicwall.settings.WallpaperSettingsActivity
+ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:75:9-78:39
+	android:label
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:77:13-51
+	android:exported
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:78:13-36
+	android:name
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:76:13-63
 meta-data#androidx.work.WorkManagerInitializer
-ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:67:13-70:39
+ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:89:13-92:39
 REJECTED from [androidx.work:work-runtime:2.9.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\b0a719a4bb5fb2958a080e642a8b6aca\transformed\work-runtime-2.9.1\AndroidManifest.xml:34:13-36:52
 	tools:node
-		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:70:17-36
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:92:17-36
 	android:value
-		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:69:17-49
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:91:17-49
 	android:name
-		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:68:17-68
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:90:17-68
 meta-data#android.support.FILE_PROVIDER_PATHS
-ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:78:13-80:54
+ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:100:13-102:54
 	android:resource
-		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:80:17-51
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:102:17-51
 	android:name
-		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:79:17-67
+		ADDED from D:\Github\music_wall\app\src\main\AndroidManifest.xml:101:17-67
 uses-sdk
 INJECTED from D:\Github\music_wall\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from D:\Github\music_wall\app\src\main\AndroidManifest.xml
@@ -311,10 +369,6 @@ MERGED from [io.coil-kt:coil-base:2.7.0] C:\Users\jfcar\.gradle\caches\9.4.1\tra
 MERGED from [io.coil-kt:coil-base:2.7.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\cf07375a744b60b3194f31667a5d5187\transformed\coil-base-2.7.0\AndroidManifest.xml:5:5-44
 MERGED from [androidx.appcompat:appcompat-resources:1.7.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\602759a63d4ee7fc62fe9898ae304de4\transformed\appcompat-resources-1.7.0\AndroidManifest.xml:5:5-44
 MERGED from [androidx.appcompat:appcompat-resources:1.7.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\602759a63d4ee7fc62fe9898ae304de4\transformed\appcompat-resources-1.7.0\AndroidManifest.xml:5:5-44
-MERGED from [androidx.preference:preference-ktx:1.2.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\61d1374206a0b17ac1d090d8cc429185\transformed\preference-ktx-1.2.1\AndroidManifest.xml:20:5-22:41
-MERGED from [androidx.preference:preference-ktx:1.2.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\61d1374206a0b17ac1d090d8cc429185\transformed\preference-ktx-1.2.1\AndroidManifest.xml:20:5-22:41
-MERGED from [androidx.preference:preference:1.2.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\1207287a6a0d030dbb9f3b40d3da243d\transformed\preference-1.2.1\AndroidManifest.xml:20:5-22:41
-MERGED from [androidx.preference:preference:1.2.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\1207287a6a0d030dbb9f3b40d3da243d\transformed\preference-1.2.1\AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.constraintlayout:constraintlayout:2.0.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\1726985ce01e9b23fa03fd3f32b20a55\transformed\constraintlayout-2.0.1\AndroidManifest.xml:5:5-7:41
 MERGED from [androidx.constraintlayout:constraintlayout:2.0.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\1726985ce01e9b23fa03fd3f32b20a55\transformed\constraintlayout-2.0.1\AndroidManifest.xml:5:5-7:41
 MERGED from [androidx.appcompat:appcompat:1.7.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\8ee93ef23074bc330226a083db096a5b\transformed\appcompat-1.7.0\AndroidManifest.xml:5:5-44
@@ -337,14 +391,10 @@ MERGED from [androidx.hilt:hilt-work:1.3.0] C:\Users\jfcar\.gradle\caches\9.4.1\
 MERGED from [androidx.hilt:hilt-work:1.3.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\d818e57de81a7fcb11f06edc63aaca92\transformed\hilt-work-1.3.0\AndroidManifest.xml:20:5-44
 MERGED from [com.google.dagger:hilt-android:2.59.2] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\2751c180a2e7709707ad2af397b5fa0e\transformed\hilt-android-2.59.2\AndroidManifest.xml:18:3-42
 MERGED from [com.google.dagger:hilt-android:2.59.2] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\2751c180a2e7709707ad2af397b5fa0e\transformed\hilt-android-2.59.2\AndroidManifest.xml:18:3-42
-MERGED from [androidx.fragment:fragment-ktx:1.3.6] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\d0476d5d5e85d6ec3046c42b3015d48d\transformed\fragment-ktx-1.3.6\AndroidManifest.xml:20:5-22:41
-MERGED from [androidx.fragment:fragment-ktx:1.3.6] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\d0476d5d5e85d6ec3046c42b3015d48d\transformed\fragment-ktx-1.3.6\AndroidManifest.xml:20:5-22:41
-MERGED from [androidx.viewpager2:viewpager2:1.0.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\00dbec152c8ad39ee89220fff35bb86b\transformed\viewpager2-1.0.0\AndroidManifest.xml:20:5-22:41
-MERGED from [androidx.viewpager2:viewpager2:1.0.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\00dbec152c8ad39ee89220fff35bb86b\transformed\viewpager2-1.0.0\AndroidManifest.xml:20:5-22:41
-MERGED from [androidx.fragment:fragment:1.5.4] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\a819688c5b4e38bd6b2baef4e857095a\transformed\fragment-1.5.4\AndroidManifest.xml:20:5-22:41
-MERGED from [androidx.fragment:fragment:1.5.4] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\a819688c5b4e38bd6b2baef4e857095a\transformed\fragment-1.5.4\AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.compose.material3:material3-android:1.3.2] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\b37e65b189a2b9f9bb499b1d491691be\transformed\material3-release\AndroidManifest.xml:20:5-44
 MERGED from [androidx.compose.material3:material3-android:1.3.2] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\b37e65b189a2b9f9bb499b1d491691be\transformed\material3-release\AndroidManifest.xml:20:5-44
+MERGED from [androidx.compose.material:material-icons-core-android:1.7.8] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\d836b260af7202b52bbbb38396e950f1\transformed\material-icons-core-release\AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.material:material-icons-core-android:1.7.8] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\d836b260af7202b52bbbb38396e950f1\transformed\material-icons-core-release\AndroidManifest.xml:5:5-44
 MERGED from [androidx.compose.material:material-android:1.8.2] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\c2e637b0039dda3eb4584cd304a1c7a1\transformed\material-release\AndroidManifest.xml:5:5-44
 MERGED from [androidx.compose.material:material-android:1.8.2] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\c2e637b0039dda3eb4584cd304a1c7a1\transformed\material-release\AndroidManifest.xml:5:5-44
 MERGED from [androidx.compose.animation:animation-core-android:1.8.2] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\33310686cc4b1b68300a4f4cd276fe81\transformed\animation-core-release\AndroidManifest.xml:5:5-44
@@ -375,20 +425,38 @@ MERGED from [androidx.compose.ui:ui-graphics-android:1.8.2] C:\Users\jfcar\.grad
 MERGED from [androidx.compose.ui:ui-graphics-android:1.8.2] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\e3a279df1e198e032bb8dfce46c00a29\transformed\ui-graphics-release\AndroidManifest.xml:5:5-44
 MERGED from [com.google.accompanist:accompanist-drawablepainter:0.32.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\2c68bdd1c47224f62fd34361f43a0ee7\transformed\accompanist-drawablepainter-0.32.0\AndroidManifest.xml:21:5-44
 MERGED from [com.google.accompanist:accompanist-drawablepainter:0.32.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\2c68bdd1c47224f62fd34361f43a0ee7\transformed\accompanist-drawablepainter-0.32.0\AndroidManifest.xml:21:5-44
-MERGED from [androidx.compose.material:material-icons-extended-android:1.7.8] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\d555247c77ba33f781846ff947a42409\transformed\material-icons-extended-release\AndroidManifest.xml:5:5-44
-MERGED from [androidx.compose.material:material-icons-extended-android:1.7.8] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\d555247c77ba33f781846ff947a42409\transformed\material-icons-extended-release\AndroidManifest.xml:5:5-44
-MERGED from [androidx.compose.material:material-icons-core-android:1.7.8] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\d836b260af7202b52bbbb38396e950f1\transformed\material-icons-core-release\AndroidManifest.xml:5:5-44
-MERGED from [androidx.compose.material:material-icons-core-android:1.7.8] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\d836b260af7202b52bbbb38396e950f1\transformed\material-icons-core-release\AndroidManifest.xml:5:5-44
 MERGED from [androidx.palette:palette:1.0.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\dd69b49e7930269af34a73fdfe1b5410\transformed\palette-1.0.0\AndroidManifest.xml:20:5-44
 MERGED from [androidx.palette:palette:1.0.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\dd69b49e7930269af34a73fdfe1b5410\transformed\palette-1.0.0\AndroidManifest.xml:20:5-44
-MERGED from [androidx.slidingpanelayout:slidingpanelayout:1.2.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\96636bd21911336a2de34030d52f6635\transformed\slidingpanelayout-1.2.0\AndroidManifest.xml:20:5-22:41
-MERGED from [androidx.slidingpanelayout:slidingpanelayout:1.2.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\96636bd21911336a2de34030d52f6635\transformed\slidingpanelayout-1.2.0\AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.transition:transition:1.5.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\cf2421d8cd5138b325af22a92fda234e\transformed\transition-1.5.0\AndroidManifest.xml:5:5-44
 MERGED from [androidx.transition:transition:1.5.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\cf2421d8cd5138b325af22a92fda234e\transformed\transition-1.5.0\AndroidManifest.xml:5:5-44
 MERGED from [androidx.dynamicanimation:dynamicanimation:1.0.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\b579989a648cdfa92640b27666f2f970\transformed\dynamicanimation-1.0.0\AndroidManifest.xml:20:5-44
 MERGED from [androidx.dynamicanimation:dynamicanimation:1.0.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\b579989a648cdfa92640b27666f2f970\transformed\dynamicanimation-1.0.0\AndroidManifest.xml:20:5-44
 MERGED from [androidx.legacy:legacy-support-core-utils:1.0.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\67008ca18d740d20156b9f5f65307ac8\transformed\legacy-support-core-utils-1.0.0\AndroidManifest.xml:20:5-44
 MERGED from [androidx.legacy:legacy-support-core-utils:1.0.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\67008ca18d740d20156b9f5f65307ac8\transformed\legacy-support-core-utils-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.viewpager2:viewpager2:1.0.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\00dbec152c8ad39ee89220fff35bb86b\transformed\viewpager2-1.0.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.viewpager2:viewpager2:1.0.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\00dbec152c8ad39ee89220fff35bb86b\transformed\viewpager2-1.0.0\AndroidManifest.xml:20:5-22:41
+MERGED from [com.google.android.libraries.identity.googleid:googleid:1.1.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\1d877f894ae93283a9aa67d26da1b811\transformed\googleid-1.1.1\AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.libraries.identity.googleid:googleid:1.1.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\1d877f894ae93283a9aa67d26da1b811\transformed\googleid-1.1.1\AndroidManifest.xml:5:5-44
+MERGED from [androidx.credentials:credentials:1.3.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\344c63371feeba232473bbb07c51f68c\transformed\credentials-1.3.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.credentials:credentials:1.3.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\344c63371feeba232473bbb07c51f68c\transformed\credentials-1.3.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.credentials:credentials-play-services-auth:1.3.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\247010fa857f55461c3f100c23a28e61\transformed\credentials-play-services-auth-1.3.0\AndroidManifest.xml:21:5-44
+MERGED from [androidx.credentials:credentials-play-services-auth:1.3.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\247010fa857f55461c3f100c23a28e61\transformed\credentials-play-services-auth-1.3.0\AndroidManifest.xml:21:5-44
+MERGED from [com.google.android.gms:play-services-auth:21.1.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\0a3966fa3ba0ca76709ba81f608dc8a9\transformed\play-services-auth-21.1.1\AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.gms:play-services-auth:21.1.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\0a3966fa3ba0ca76709ba81f608dc8a9\transformed\play-services-auth-21.1.1\AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.gms:play-services-fido:21.0.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\4a0dfbb76fb3db7ee3e95008f8885095\transformed\play-services-fido-21.0.0\AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-fido:21.0.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\4a0dfbb76fb3db7ee3e95008f8885095\transformed\play-services-fido-21.0.0\AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-auth-api-phone:18.0.2] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\1f58e7c0ee8334a6c2c65970129c2ca1\transformed\play-services-auth-api-phone-18.0.2\AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-auth-api-phone:18.0.2] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\1f58e7c0ee8334a6c2c65970129c2ca1\transformed\play-services-auth-api-phone-18.0.2\AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-auth-base:18.0.10] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\2858b3fae7dcd10d5e8ee5f976542b45\transformed\play-services-auth-base-18.0.10\AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-auth-base:18.0.10] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\2858b3fae7dcd10d5e8ee5f976542b45\transformed\play-services-auth-base-18.0.10\AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-base:18.3.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\511db24da8dec02bc78582d866b53dd8\transformed\play-services-base-18.3.0\AndroidManifest.xml:18:5-43
+MERGED from [com.google.android.gms:play-services-base:18.3.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\511db24da8dec02bc78582d866b53dd8\transformed\play-services-base-18.3.0\AndroidManifest.xml:18:5-43
+MERGED from [com.google.android.gms:play-services-tasks:18.1.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\181dcc8e76f8ecc35cf4df6c54af97cd\transformed\play-services-tasks-18.1.0\AndroidManifest.xml:4:5-43
+MERGED from [com.google.android.gms:play-services-tasks:18.1.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\181dcc8e76f8ecc35cf4df6c54af97cd\transformed\play-services-tasks-18.1.0\AndroidManifest.xml:4:5-43
+MERGED from [com.google.android.gms:play-services-basement:18.3.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\9e0029f075f8a4782ae86f267f11b90c\transformed\play-services-basement-18.3.0\AndroidManifest.xml:18:5-43
+MERGED from [com.google.android.gms:play-services-basement:18.3.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\9e0029f075f8a4782ae86f267f11b90c\transformed\play-services-basement-18.3.0\AndroidManifest.xml:18:5-43
+MERGED from [androidx.fragment:fragment:1.5.7] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\3dbb365ba1696c48ebf0c4e96776f9cb\transformed\fragment-1.5.7\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.fragment:fragment:1.5.7] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\3dbb365ba1696c48ebf0c4e96776f9cb\transformed\fragment-1.5.7\AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.loader:loader:1.0.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\0b637da532626a43f633dd48f627bd61\transformed\loader-1.0.0\AndroidManifest.xml:20:5-44
 MERGED from [androidx.loader:loader:1.0.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\0b637da532626a43f633dd48f627bd61\transformed\loader-1.0.0\AndroidManifest.xml:20:5-44
 MERGED from [androidx.work:work-runtime-ktx:2.9.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\71d1a69f500b790e86a70782fa4b8968\transformed\work-runtime-ktx-2.9.1\AndroidManifest.xml:20:5-44
@@ -411,14 +479,12 @@ MERGED from [androidx.vectordrawable:vectordrawable-animated:1.1.0] C:\Users\jfc
 MERGED from [androidx.vectordrawable:vectordrawable-animated:1.1.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\e8fb4d9ee2329d84e02204e5a4cd2422\transformed\vectordrawable-animated-1.1.0\AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.vectordrawable:vectordrawable:1.1.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\8753dabb0ca011b41ecb3b3a7328d381\transformed\vectordrawable-1.1.0\AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.vectordrawable:vectordrawable:1.1.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\8753dabb0ca011b41ecb3b3a7328d381\transformed\vectordrawable-1.1.0\AndroidManifest.xml:20:5-22:41
-MERGED from [androidx.viewpager:viewpager:1.0.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\ae91c3a416a9a1d459d1ef1887e6ee0c\transformed\viewpager-1.0.0\AndroidManifest.xml:20:5-44
-MERGED from [androidx.viewpager:viewpager:1.0.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\ae91c3a416a9a1d459d1ef1887e6ee0c\transformed\viewpager-1.0.0\AndroidManifest.xml:20:5-44
 MERGED from [androidx.recyclerview:recyclerview:1.1.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\851a099b096fd5783ebd5cf8fe2c1248\transformed\recyclerview-1.1.0\AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.recyclerview:recyclerview:1.1.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\851a099b096fd5783ebd5cf8fe2c1248\transformed\recyclerview-1.1.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.viewpager:viewpager:1.0.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\ae91c3a416a9a1d459d1ef1887e6ee0c\transformed\viewpager-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.viewpager:viewpager:1.0.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\ae91c3a416a9a1d459d1ef1887e6ee0c\transformed\viewpager-1.0.0\AndroidManifest.xml:20:5-44
 MERGED from [androidx.customview:customview:1.1.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\462f7424318101b4401c56bef4fe46ea\transformed\customview-1.1.0\AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.customview:customview:1.1.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\462f7424318101b4401c56bef4fe46ea\transformed\customview-1.1.0\AndroidManifest.xml:20:5-22:41
-MERGED from [androidx.window:window:1.0.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\35f3a2a67195c539df7666c5b2fef363\transformed\window-1.0.0\AndroidManifest.xml:20:5-22:41
-MERGED from [androidx.window:window:1.0.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\35f3a2a67195c539df7666c5b2fef363\transformed\window-1.0.0\AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.autofill:autofill:1.0.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\d11285524c1154d9008032cdf0d0a7fe\transformed\autofill-1.0.0\AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.autofill:autofill:1.0.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\d11285524c1154d9008032cdf0d0a7fe\transformed\autofill-1.0.0\AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.graphics:graphics-path:1.0.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\333e948e01a84ab8c9ecc2843699b7ee\transformed\graphics-path-1.0.1\AndroidManifest.xml:5:5-44
@@ -515,6 +581,70 @@ ADDED from [androidx.compose.ui:ui-tooling-android:1.8.2] C:\Users\jfcar\.gradle
 		ADDED from [androidx.compose.ui:ui-tooling-android:1.8.2] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\b24d533d4e166de783034d0405940f54\transformed\ui-tooling-release\AndroidManifest.xml:25:13-36
 	android:name
 		ADDED from [androidx.compose.ui:ui-tooling-android:1.8.2] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\b24d533d4e166de783034d0405940f54\transformed\ui-tooling-release\AndroidManifest.xml:24:13-71
+service#androidx.credentials.playservices.CredentialProviderMetadataHolder
+ADDED from [androidx.credentials:credentials-play-services-auth:1.3.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\247010fa857f55461c3f100c23a28e61\transformed\credentials-play-services-auth-1.3.0\AndroidManifest.xml:24:9-32:19
+	android:enabled
+		ADDED from [androidx.credentials:credentials-play-services-auth:1.3.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\247010fa857f55461c3f100c23a28e61\transformed\credentials-play-services-auth-1.3.0\AndroidManifest.xml:26:13-35
+	android:exported
+		ADDED from [androidx.credentials:credentials-play-services-auth:1.3.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\247010fa857f55461c3f100c23a28e61\transformed\credentials-play-services-auth-1.3.0\AndroidManifest.xml:27:13-37
+	tools:ignore
+		ADDED from [androidx.credentials:credentials-play-services-auth:1.3.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\247010fa857f55461c3f100c23a28e61\transformed\credentials-play-services-auth-1.3.0\AndroidManifest.xml:28:13-60
+	android:name
+		ADDED from [androidx.credentials:credentials-play-services-auth:1.3.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\247010fa857f55461c3f100c23a28e61\transformed\credentials-play-services-auth-1.3.0\AndroidManifest.xml:25:13-94
+meta-data#androidx.credentials.CREDENTIAL_PROVIDER_KEY
+ADDED from [androidx.credentials:credentials-play-services-auth:1.3.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\247010fa857f55461c3f100c23a28e61\transformed\credentials-play-services-auth-1.3.0\AndroidManifest.xml:29:13-31:104
+	android:value
+		ADDED from [androidx.credentials:credentials-play-services-auth:1.3.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\247010fa857f55461c3f100c23a28e61\transformed\credentials-play-services-auth-1.3.0\AndroidManifest.xml:31:17-101
+	android:name
+		ADDED from [androidx.credentials:credentials-play-services-auth:1.3.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\247010fa857f55461c3f100c23a28e61\transformed\credentials-play-services-auth-1.3.0\AndroidManifest.xml:30:17-76
+activity#androidx.credentials.playservices.HiddenActivity
+ADDED from [androidx.credentials:credentials-play-services-auth:1.3.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\247010fa857f55461c3f100c23a28e61\transformed\credentials-play-services-auth-1.3.0\AndroidManifest.xml:34:9-41:20
+	android:fitsSystemWindows
+		ADDED from [androidx.credentials:credentials-play-services-auth:1.3.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\247010fa857f55461c3f100c23a28e61\transformed\credentials-play-services-auth-1.3.0\AndroidManifest.xml:39:13-45
+	android:enabled
+		ADDED from [androidx.credentials:credentials-play-services-auth:1.3.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\247010fa857f55461c3f100c23a28e61\transformed\credentials-play-services-auth-1.3.0\AndroidManifest.xml:37:13-35
+	android:exported
+		ADDED from [androidx.credentials:credentials-play-services-auth:1.3.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\247010fa857f55461c3f100c23a28e61\transformed\credentials-play-services-auth-1.3.0\AndroidManifest.xml:38:13-37
+	android:configChanges
+		ADDED from [androidx.credentials:credentials-play-services-auth:1.3.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\247010fa857f55461c3f100c23a28e61\transformed\credentials-play-services-auth-1.3.0\AndroidManifest.xml:36:13-87
+	android:theme
+		ADDED from [androidx.credentials:credentials-play-services-auth:1.3.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\247010fa857f55461c3f100c23a28e61\transformed\credentials-play-services-auth-1.3.0\AndroidManifest.xml:40:13-48
+	android:name
+		ADDED from [androidx.credentials:credentials-play-services-auth:1.3.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\247010fa857f55461c3f100c23a28e61\transformed\credentials-play-services-auth-1.3.0\AndroidManifest.xml:35:13-76
+activity#com.google.android.gms.auth.api.signin.internal.SignInHubActivity
+ADDED from [com.google.android.gms:play-services-auth:21.1.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\0a3966fa3ba0ca76709ba81f608dc8a9\transformed\play-services-auth-21.1.1\AndroidManifest.xml:23:9-27:75
+	android:excludeFromRecents
+		ADDED from [com.google.android.gms:play-services-auth:21.1.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\0a3966fa3ba0ca76709ba81f608dc8a9\transformed\play-services-auth-21.1.1\AndroidManifest.xml:25:13-46
+	android:exported
+		ADDED from [com.google.android.gms:play-services-auth:21.1.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\0a3966fa3ba0ca76709ba81f608dc8a9\transformed\play-services-auth-21.1.1\AndroidManifest.xml:26:13-37
+	android:theme
+		ADDED from [com.google.android.gms:play-services-auth:21.1.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\0a3966fa3ba0ca76709ba81f608dc8a9\transformed\play-services-auth-21.1.1\AndroidManifest.xml:27:13-72
+	android:name
+		ADDED from [com.google.android.gms:play-services-auth:21.1.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\0a3966fa3ba0ca76709ba81f608dc8a9\transformed\play-services-auth-21.1.1\AndroidManifest.xml:24:13-93
+service#com.google.android.gms.auth.api.signin.RevocationBoundService
+ADDED from [com.google.android.gms:play-services-auth:21.1.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\0a3966fa3ba0ca76709ba81f608dc8a9\transformed\play-services-auth-21.1.1\AndroidManifest.xml:33:9-37:51
+	android:exported
+		ADDED from [com.google.android.gms:play-services-auth:21.1.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\0a3966fa3ba0ca76709ba81f608dc8a9\transformed\play-services-auth-21.1.1\AndroidManifest.xml:35:13-36
+	android:visibleToInstantApps
+		ADDED from [com.google.android.gms:play-services-auth:21.1.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\0a3966fa3ba0ca76709ba81f608dc8a9\transformed\play-services-auth-21.1.1\AndroidManifest.xml:37:13-48
+	android:permission
+		ADDED from [com.google.android.gms:play-services-auth:21.1.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\0a3966fa3ba0ca76709ba81f608dc8a9\transformed\play-services-auth-21.1.1\AndroidManifest.xml:36:13-107
+	android:name
+		ADDED from [com.google.android.gms:play-services-auth:21.1.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\0a3966fa3ba0ca76709ba81f608dc8a9\transformed\play-services-auth-21.1.1\AndroidManifest.xml:34:13-89
+activity#com.google.android.gms.common.api.GoogleApiActivity
+ADDED from [com.google.android.gms:play-services-base:18.3.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\511db24da8dec02bc78582d866b53dd8\transformed\play-services-base-18.3.0\AndroidManifest.xml:20:9-22:45
+	android:exported
+		ADDED from [com.google.android.gms:play-services-base:18.3.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\511db24da8dec02bc78582d866b53dd8\transformed\play-services-base-18.3.0\AndroidManifest.xml:22:19-43
+	android:theme
+		ADDED from [com.google.android.gms:play-services-base:18.3.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\511db24da8dec02bc78582d866b53dd8\transformed\play-services-base-18.3.0\AndroidManifest.xml:21:19-78
+	android:name
+		ADDED from [com.google.android.gms:play-services-base:18.3.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\511db24da8dec02bc78582d866b53dd8\transformed\play-services-base-18.3.0\AndroidManifest.xml:20:19-85
+meta-data#com.google.android.gms.version
+ADDED from [com.google.android.gms:play-services-basement:18.3.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\9e0029f075f8a4782ae86f267f11b90c\transformed\play-services-basement-18.3.0\AndroidManifest.xml:21:9-23:69
+	android:value
+		ADDED from [com.google.android.gms:play-services-basement:18.3.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\9e0029f075f8a4782ae86f267f11b90c\transformed\play-services-basement-18.3.0\AndroidManifest.xml:23:13-66
+	android:name
+		ADDED from [com.google.android.gms:play-services-basement:18.3.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\9e0029f075f8a4782ae86f267f11b90c\transformed\play-services-basement-18.3.0\AndroidManifest.xml:22:13-58
 uses-permission#android.permission.WAKE_LOCK
 ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\b0a719a4bb5fb2958a080e642a8b6aca\transformed\work-runtime-2.9.1\AndroidManifest.xml:23:5-68
 	android:name
@@ -523,10 +653,6 @@ uses-permission#android.permission.RECEIVE_BOOT_COMPLETED
 ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\b0a719a4bb5fb2958a080e642a8b6aca\transformed\work-runtime-2.9.1\AndroidManifest.xml:25:5-81
 	android:name
 		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\b0a719a4bb5fb2958a080e642a8b6aca\transformed\work-runtime-2.9.1\AndroidManifest.xml:25:22-78
-uses-permission#android.permission.FOREGROUND_SERVICE
-ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\b0a719a4bb5fb2958a080e642a8b6aca\transformed\work-runtime-2.9.1\AndroidManifest.xml:26:5-77
-	android:name
-		ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\b0a719a4bb5fb2958a080e642a8b6aca\transformed\work-runtime-2.9.1\AndroidManifest.xml:26:22-74
 service#androidx.work.impl.background.systemalarm.SystemAlarmService
 ADDED from [androidx.work:work-runtime:2.9.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\b0a719a4bb5fb2958a080e642a8b6aca\transformed\work-runtime-2.9.1\AndroidManifest.xml:39:9-45:35
 	android:enabled
@@ -735,18 +861,6 @@ ADDED from [androidx.emoji2:emoji2:1.4.0] C:\Users\jfcar\.gradle\caches\9.4.1\tr
 		ADDED from [androidx.emoji2:emoji2:1.4.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\f650ecd9b0271537a617f4762b8f5a6f\transformed\emoji2-1.4.0\AndroidManifest.xml:31:17-49
 	android:name
 		ADDED from [androidx.emoji2:emoji2:1.4.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\f650ecd9b0271537a617f4762b8f5a6f\transformed\emoji2-1.4.0\AndroidManifest.xml:30:17-75
-uses-library#androidx.window.extensions
-ADDED from [androidx.window:window:1.0.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\35f3a2a67195c539df7666c5b2fef363\transformed\window-1.0.0\AndroidManifest.xml:25:9-27:40
-	android:required
-		ADDED from [androidx.window:window:1.0.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\35f3a2a67195c539df7666c5b2fef363\transformed\window-1.0.0\AndroidManifest.xml:27:13-37
-	android:name
-		ADDED from [androidx.window:window:1.0.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\35f3a2a67195c539df7666c5b2fef363\transformed\window-1.0.0\AndroidManifest.xml:26:13-54
-uses-library#androidx.window.sidecar
-ADDED from [androidx.window:window:1.0.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\35f3a2a67195c539df7666c5b2fef363\transformed\window-1.0.0\AndroidManifest.xml:28:9-30:40
-	android:required
-		ADDED from [androidx.window:window:1.0.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\35f3a2a67195c539df7666c5b2fef363\transformed\window-1.0.0\AndroidManifest.xml:30:13-37
-	android:name
-		ADDED from [androidx.window:window:1.0.0] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\35f3a2a67195c539df7666c5b2fef363\transformed\window-1.0.0\AndroidManifest.xml:29:13-51
 permission#${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
 ADDED from [androidx.core:core:1.13.1] C:\Users\jfcar\.gradle\caches\9.4.1\transforms\c41101d134364398bfdf3efc6d7ce9ad\transformed\core-1.13.1\AndroidManifest.xml:22:5-24:47
 	android:protectionLevel

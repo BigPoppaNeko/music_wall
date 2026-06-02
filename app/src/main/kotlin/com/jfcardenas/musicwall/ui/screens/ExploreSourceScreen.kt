@@ -49,6 +49,8 @@ private val SUGGESTED_ARTISTS = listOf(
     StaticItem("Pink Floyd",        "Progressive Rock",  Color(0xFF5C1A6B)),
     StaticItem("Portishead",        "Trip Hop",          Color(0xFF1A3A3A)),
     StaticItem("Massive Attack",    "Trip Hop",          Color(0xFF2A1A3A)),
+    StaticItem("The Notorious B.I.G.", "Hip Hop",        Color(0xFF3A2A1A)),
+    StaticItem("Yma Sumac",         "Voz exótica",       Color(0xFF6B3A1A)),
     StaticItem("Nick Cave",         "Art Rock",          Color(0xFF3A2A1A)),
     StaticItem("Nujabes",           "Hip Hop Jazz",      Color(0xFF1A5C3A)),
     StaticItem("Boards of Canada",  "Electronic",        Color(0xFF1A3A1A)),
@@ -129,7 +131,7 @@ fun ExploreSourceScreen(
             TABS.forEachIndexed { i, label ->
                 Tab(
                     selected = selectedTab == i,
-                    onClick  = { selectedTab = i; search = "" },
+                    onClick  = { selectedTab = i; search = ""; selected.clear() },
                     text = {
                         Text(
                             text       = label,
@@ -179,7 +181,7 @@ fun ExploreSourceScreen(
                         horizontalArrangement = Arrangement.spacedBy(16.dp),
                         modifier = Modifier.padding(bottom = 20.dp),
                     ) {
-                        items(RECENT_ARTISTS) { artist ->
+                        items(RECENT_ARTISTS, key = { it.name }) { artist ->
                             RecentAvatar(name = artist.name, bgColor = artist.bgColor)
                         }
                     }
@@ -204,7 +206,7 @@ fun ExploreSourceScreen(
                                 modifier = Modifier.padding(bottom = 4.dp),
                             )
                         }
-                        items(searchState.items) { result ->
+                        items(searchState.items, key = { "${it.name}:${it.subtitle}" }) { result ->
                             ApiResultRow(
                                 result     = result,
                                 isSelected = result.name in selected,
@@ -240,7 +242,7 @@ fun ExploreSourceScreen(
                         modifier = Modifier.padding(bottom = 4.dp),
                     )
                 }
-                items(staticSuggestions) { item ->
+                items(staticSuggestions, key = { it.name }) { item ->
                     StaticSuggestionRow(
                         item       = item,
                         isSelected = item.name in selected,
@@ -263,14 +265,21 @@ fun ExploreSourceScreen(
                 .padding(bottom = 24.dp),
         ) {
             Button(
-                onClick  = onContinue,
-                enabled  = selected.isNotEmpty(),
+                onClick  = {
+                    viewModel.saveSelectedArtists(selected)
+                    onContinue()
+                },
+                enabled  = selectedTab == 0 && selected.isNotEmpty(),
                 modifier = Modifier.fillMaxWidth().height(56.dp),
                 shape    = RoundedCornerShape(28.dp),
                 colors   = ButtonDefaults.buttonColors(containerColor = Purple),
             ) {
                 Text(
-                    text       = if (selected.isEmpty()) "Continuar" else "Continuar (${selected.size} seleccionados)",
+                    text       = when {
+                        selectedTab != 0 -> "Elige artistas para continuar"
+                        selected.isEmpty() -> "Continuar"
+                        else -> "Continuar (${selected.size} seleccionados)"
+                    },
                     fontSize   = 17.sp,
                     fontWeight = FontWeight.SemiBold,
                     color      = Color.White,

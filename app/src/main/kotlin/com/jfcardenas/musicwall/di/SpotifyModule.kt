@@ -6,6 +6,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import okhttp3.OkHttpClient
 import javax.inject.Singleton
 
 @Module
@@ -14,5 +15,6 @@ object SpotifyModule {
 
     @Provides
     @Singleton
-    fun provideSpotifyOEmbedService(): SpotifyOEmbedService = createSpotifyOEmbedService()
+    fun provideSpotifyOEmbedService(httpClient: OkHttpClient): SpotifyOEmbedService =
+        createSpotifyOEmbedService(httpClient)
 }

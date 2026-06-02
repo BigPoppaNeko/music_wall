@@ -1,22 +1,19 @@
 package com.jfcardenas.musicwall.ui.screens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -36,128 +33,101 @@ fun PreviewScreen(
     onShare: () -> Unit,
     vm: PreviewViewModel = hiltViewModel(),
 ) {
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Background)
             .statusBarsPadding(),
     ) {
-        // Top bar
+        val path = vm.collagePath
+        if (path != null) {
+            AsyncImage(
+                model = File(path),
+                contentDescription = "Tu mural",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize(),
+            )
+        } else {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Brush.verticalGradient(styleGradient(styleId))),
+                contentAlignment = Alignment.Center,
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(styleEmoji(styleId), fontSize = 56.sp)
+                    Spacer(Modifier.height(12.dp))
+                    Text(
+                        text = styleName(styleId),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color.White.copy(alpha = 0.78f),
+                    )
+                }
+            }
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(140.dp)
+                .align(Alignment.TopCenter)
+                .background(Brush.verticalGradient(listOf(Color.Black.copy(alpha = 0.62f), Color.Transparent)))
+        )
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(210.dp)
+                .align(Alignment.BottomCenter)
+                .background(Brush.verticalGradient(listOf(Color.Transparent, Color.Black.copy(alpha = 0.74f))))
+        )
+
         Row(
             modifier = Modifier
+                .align(Alignment.TopStart)
                 .fillMaxWidth()
                 .padding(horizontal = 4.dp, vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             IconButton(onClick = onBack) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver", tint = TextPrimary)
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver", tint = Color.White)
             }
             Column {
                 Text(
-                    text = "Tu mural está listo",
+                    text = "Aleatorio infinito",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
+                    color = Color.White,
                 )
                 Text(
-                    text = "Así se verá tu wallpaper.",
+                    text = "La escena vuelve a nacer con cada dado.",
                     style = MaterialTheme.typography.bodySmall,
-                    color = TextSecondary,
+                    color = Color.White.copy(alpha = 0.68f),
                 )
             }
         }
 
-        // Wallpaper preview inside a phone-frame box
-        Box(
+        DiceButton(
+            onClick = onRegenerate,
             modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
-                .padding(horizontal = 40.dp, vertical = 12.dp),
-            contentAlignment = Alignment.Center,
-        ) {
-            // Phone frame
-            Box(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .aspectRatio(9f / 19.5f)
-                    .border(2.dp, CardBorder, RoundedCornerShape(28.dp))
-                    .clip(RoundedCornerShape(28.dp))
-                    .background(Card),
-            ) {
-                val path = vm.collagePath
-                if (path != null) {
-                    AsyncImage(
-                        model = File(path),
-                        contentDescription = "Tu mural",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize(),
-                    )
-                } else {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(Brush.verticalGradient(styleGradient(styleId))),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(styleEmoji(styleId), fontSize = 48.sp)
-                            Spacer(Modifier.height(12.dp))
-                            Text(
-                                text = styleName(styleId),
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                color = Color.White.copy(alpha = 0.7f),
-                            )
-                        }
-                    }
-                }
-
-                // Status bar scrim
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(28.dp)
-                        .background(
-                            Brush.verticalGradient(
-                                listOf(Color.Black.copy(alpha = 0.4f), Color.Transparent)
-                            )
-                        )
-                )
-            }
-        }
-
-        // Quote
-        Text(
-            text = "\"El alma se tiñe del color de sus pensamientos.\"\n— Marco Aurelio",
-            style = MaterialTheme.typography.bodySmall,
-            fontStyle = FontStyle.Italic,
-            textAlign = TextAlign.Center,
-            color = TextMuted,
-            modifier = Modifier.padding(horizontal = 32.dp, vertical = 6.dp),
+                .align(Alignment.CenterEnd)
+                .padding(end = 16.dp),
         )
 
-        // Action bar
         Row(
             modifier = Modifier
+                .align(Alignment.BottomCenter)
                 .fillMaxWidth()
                 .navigationBarsPadding()
                 .padding(horizontal = 24.dp, vertical = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            // Regenerar
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.width(68.dp),
-            ) {
-                IconButton(onClick = onRegenerate) {
-                    Icon(Icons.Default.Refresh, contentDescription = "Regenerar", tint = TextSecondary)
-                }
-                Text(text = "Regenerar", fontSize = 11.sp, color = TextSecondary, textAlign = TextAlign.Center)
-            }
-
-            // Aplicar wallpaper
             Button(
-                onClick = { vm.applyWallpaper() },
+                onClick = {
+                    vm.applyWallpaper()
+                    onApply()
+                },
                 modifier = Modifier
                     .weight(1f)
                     .height(52.dp),
@@ -172,16 +142,30 @@ fun PreviewScreen(
                 )
             }
 
-            // Compartir
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.width(68.dp),
             ) {
                 IconButton(onClick = { vm.shareWallpaper() }) {
-                    Icon(Icons.Default.Share, contentDescription = "Compartir", tint = TextSecondary)
+                    Icon(Icons.Default.Share, contentDescription = "Compartir", tint = Color.White.copy(alpha = 0.78f))
                 }
-                Text(text = "Compartir", fontSize = 11.sp, color = TextSecondary, textAlign = TextAlign.Center)
+                Text(text = "Compartir", fontSize = 11.sp, color = Color.White.copy(alpha = 0.78f), textAlign = TextAlign.Center)
             }
+        }
+    }
+}
+
+@Composable
+private fun DiceButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
+    Surface(
+        onClick = onClick,
+        modifier = modifier.size(58.dp),
+        shape = RoundedCornerShape(20.dp),
+        color = Color.Black.copy(alpha = 0.58f),
+        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.22f)),
+    ) {
+        Box(contentAlignment = Alignment.Center) {
+            Text("🎲", fontSize = 28.sp)
         }
     }
 }

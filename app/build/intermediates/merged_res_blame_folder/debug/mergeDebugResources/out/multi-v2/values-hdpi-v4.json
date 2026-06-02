@@ -4,7 +4,7 @@
             "outputFile": "com.jfcardenas.musicwall.app-mergeDebugResources-77:/values-hdpi-v4/values-hdpi-v4.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\jfcar\\.gradle\\caches\\9.4.1\\transforms\\8ee93ef23074bc330226a083db096a5b\\transformed\\appcompat-1.7.0\\res\\values-hdpi-v4\\values-hdpi-v4.xml",
+                    "source": "C:\\Users\\jfcar\\AppData\\Local\\Temp\\cursor-sandbox-cache\\4e196acd611faceef85230a402c48dd3\\gradle\\caches\\9.4.1\\transforms\\8ee93ef23074bc330226a083db096a5b\\transformed\\appcompat-1.7.0\\res\\values-hdpi-v4\\values-hdpi-v4.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",

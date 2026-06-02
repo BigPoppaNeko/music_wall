@@ -1,16 +1,27 @@
 package com.jfcardenas.musicwall.ui.navigation
 
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import androidx.navigation.navArgument
+import com.jfcardenas.musicwall.auth.UserSessionEntryPoint
 import com.jfcardenas.musicwall.ui.screens.*
+import com.jfcardenas.musicwall.ui.viewmodel.CoverInteractionViewModel
+import com.jfcardenas.musicwall.ui.viewmodel.OnboardingViewModel
+import dagger.hilt.android.EntryPointAccessors
 
 private object Route {
     const val SPLASH  = "splash"
     const val SOURCE  = "source"
+    const val SCROBBLE_SETUP = "scrobble_setup"
     const val SOURCE_LASTFM  = "source/lastfm"
     const val SOURCE_SPOTIFY = "source/spotify"
     const val SOURCE_EXPLORE = "source/explore"
@@ -25,6 +36,30 @@ private object Route {
 @Composable
 fun MusicWallNav(onOnboardingComplete: () -> Unit = {}) {
     val nav = rememberNavController()
+    val activity = LocalContext.current as ComponentActivity
+    val coverVm: CoverInteractionViewModel = hiltViewModel(viewModelStoreOwner = activity)
+    val onboardingVm: OnboardingViewModel = hiltViewModel()
+    val userSession = remember {
+        EntryPointAccessors.fromApplication(
+            activity.applicationContext,
+            UserSessionEntryPoint::class.java,
+        ).userSessionRepository()
+    }
+
+    // MVP portadas: tras elegir fuente, ir directo a Inicio (murales/scrobble quedan en app principal).
+    val finishOnboarding: () -> Unit = {
+        onboardingVm.completeOnboarding()
+        onOnboardingComplete()
+    }
+
+    val backStack by nav.currentBackStackEntryAsState()
+    val onboardingRoute = backStack?.destination?.route
+
+    BackHandler(
+        enabled = onboardingRoute != null && onboardingRoute != Route.SPLASH,
+    ) {
+        nav.popBackStack()
+    }
 
     NavHost(
         navController = nav,
@@ -49,34 +84,49 @@ fun MusicWallNav(onOnboardingComplete: () -> Unit = {}) {
                         MusicSource.LASTFM  -> nav.navigate(Route.SOURCE_LASTFM)
                         MusicSource.SPOTIFY -> nav.navigate(Route.SOURCE_SPOTIFY)
                         MusicSource.EXPLORE -> nav.navigate(Route.SOURCE_EXPLORE)
+                        else -> Unit
                     }
                 },
+                onGoogleSignedIn = { finishOnboarding() },
+                onLocalSelected = {
+                    userSession.saveLocalUser()
+                    finishOnboarding()
+                },
+            )
+        }
+
+        composable(Route.SCROBBLE_SETUP) {
+            ScrobbleSetupScreen(
+                onBack = { nav.popBackStack() },
+                onContinue = { finishOnboarding() },
             )
         }
 
         composable(Route.SOURCE_LASTFM) {
             LastFmSourceScreen(
                 onBack      = { nav.popBackStack() },
-                onConnected = { nav.navigate(Route.STYLE) { popUpTo(Route.SOURCE) } },
+                onConnected = { finishOnboarding() },
             )
         }
 
         composable(Route.SOURCE_SPOTIFY) {
             SpotifySourceScreen(
                 onBack              = { nav.popBackStack() },
-                onPlaylistSelected  = { nav.navigate(Route.STYLE) { popUpTo(Route.SOURCE) } },
+                onPlaylistSelected  = { finishOnboarding() },
             )
         }
 
         composable(Route.SOURCE_EXPLORE) {
             ExploreSourceScreen(
                 onBack     = { nav.popBackStack() },
-                onContinue = { nav.navigate(Route.STYLE) { popUpTo(Route.SOURCE) } },
+                onContinue = { finishOnboarding() },
             )
         }
 
+        // Rutas legacy (murales en onboarding) — conservadas por si se reactivan sin romper deep links.
         composable(Route.STYLE) {
             MuralesScreen(
+                coverVm          = coverVm,
                 onBack           = { nav.popBackStack() },
                 onSelectRenderer = { styleId ->
                     nav.navigate(Route.generating(styleId))
@@ -113,7 +163,7 @@ fun MusicWallNav(onOnboardingComplete: () -> Unit = {}) {
                         popUpTo(Route.PREVIEW) { inclusive = true }
                     }
                 },
-                onApply  = { onOnboardingComplete() },
+                onApply  = { finishOnboarding() },
                 onShare  = {},
             )
         }

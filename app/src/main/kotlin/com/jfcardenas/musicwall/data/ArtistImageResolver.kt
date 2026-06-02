@@ -15,9 +15,11 @@ private const val TAG = "ArtistImageResolver"
 
 // Last.fm removed artist images in 2022; this resolves them via the iTunes Search API.
 @Singleton
-class ArtistImageResolver @Inject constructor() {
+class ArtistImageResolver @Inject constructor(
+    httpClient: OkHttpClient,
+) {
 
-    private val client = OkHttpClient.Builder()
+    private val client = httpClient.newBuilder()
         .connectTimeout(5, TimeUnit.SECONDS)
         .readTimeout(8, TimeUnit.SECONDS)
         .build()

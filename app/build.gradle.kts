@@ -12,6 +12,8 @@ val localProps = Properties().apply {
     rootProject.file("local.properties").takeIf { it.exists() }?.inputStream()?.use { load(it) }
 }
 
+val hasReleaseKeystore = localProps.getProperty("RELEASE_STORE_FILE")?.isNotBlank() == true
+
 android {
     namespace = "com.jfcardenas.musicwall"
     compileSdk = 35
@@ -24,7 +26,18 @@ android {
         versionName = "1.0"
 
         buildConfigField("String", "LASTFM_API_KEY", "\"${localProps.getProperty("LASTFM_API_KEY", "")}\"")
-        buildConfigField("String", "LASTFM_SHARED_SECRET", "\"${localProps.getProperty("LASTFM_SHARED_SECRET", "")}\"")
+        buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"${localProps.getProperty("GOOGLE_WEB_CLIENT_ID", "")}\"")
+    }
+
+    signingConfigs {
+        if (hasReleaseKeystore) {
+            create("release") {
+                storeFile = rootProject.file(localProps.getProperty("RELEASE_STORE_FILE")!!)
+                storePassword = localProps.getProperty("RELEASE_STORE_PASSWORD", "")
+                keyAlias = localProps.getProperty("RELEASE_KEY_ALIAS", "")
+                keyPassword = localProps.getProperty("RELEASE_KEY_PASSWORD", "")
+            }
+        }
     }
 
     buildTypes {
@@ -32,10 +45,19 @@ android {
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            if (hasReleaseKeystore) {
+                signingConfig = signingConfigs.getByName("release")
+            }
         }
         debug {
             isMinifyEnabled = false
             applicationIdSuffix = ".debug"
+        }
+        create("staging") {
+            initWith(getByName("debug"))
+            applicationIdSuffix = ".staging"
+            versionNameSuffix = "-staging"
+            matchingFallbacks += listOf("debug")
         }
     }
 
@@ -50,13 +72,17 @@ android {
         buildConfig = true
         compose = true
     }
+
+    bundle {
+        abi { enableSplit = true }
+        density { enableSplit = true }
+    }
 }
 
 dependencies {
     // AndroidX Core
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.appcompat:appcompat:1.7.0")
-    implementation("androidx.preference:preference-ktx:1.2.1")
     implementation("com.google.android.material:material:1.12.0")
 
     // Coroutines
@@ -96,11 +122,16 @@ dependencies {
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
-    implementation("androidx.compose.material:material-icons-extended")
+    implementation("androidx.compose.material:material-icons-core")
     implementation("androidx.activity:activity-compose:1.10.1")
     implementation("androidx.navigation:navigation-compose:2.8.4")
     implementation("io.coil-kt:coil-compose:2.7.0")
     debugImplementation("androidx.compose.ui:ui-tooling")
+
+    // Google Sign-In (Credential Manager)
+    implementation("androidx.credentials:credentials:1.3.0")
+    implementation("androidx.credentials:credentials-play-services-auth:1.3.0")
+    implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
 
     // Google Play Billing — añadir en Fase 3 con versión verificada
     // implementation("com.android.billingclient:billing-ktx:X.X.X")

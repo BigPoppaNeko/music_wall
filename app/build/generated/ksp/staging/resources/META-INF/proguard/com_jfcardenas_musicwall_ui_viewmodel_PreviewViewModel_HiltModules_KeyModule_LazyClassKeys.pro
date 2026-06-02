@@ -1,0 +1,1 @@
+-keep,allowobfuscation,allowshrinking class com.jfcardenas.musicwall.ui.viewmodel.PreviewViewModel

@@ -15,4 +15,8 @@
     <string name="error_generic">Error al verificar. Inténtalo de nuevo</string>
     <string name="connected_as">Conectado como</string>
     <string name="change_account">Cambiar cuenta</string>
+
+    <string name="scrobble_channel_name">Escucha activa</string>
+    <string name="scrobble_notification_title">Music Wall</string>
+    <string name="scrobble_notification_body">Detectando tu Now Playing</string>
 </resources>

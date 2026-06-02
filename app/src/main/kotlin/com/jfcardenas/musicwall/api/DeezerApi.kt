@@ -1,6 +1,7 @@
 package com.jfcardenas.musicwall.api
 
 import com.google.gson.annotations.SerializedName
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
@@ -42,9 +43,10 @@ data class DeezerAlbum(
     @SerializedName("cover_medium") val coverMedium: String?,
 )
 
-internal fun createDeezerService(): DeezerService =
+internal fun createDeezerService(httpClient: OkHttpClient): DeezerService =
     Retrofit.Builder()
         .baseUrl("https://api.deezer.com/")
+        .client(httpClient)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
         .create(DeezerService::class.java)

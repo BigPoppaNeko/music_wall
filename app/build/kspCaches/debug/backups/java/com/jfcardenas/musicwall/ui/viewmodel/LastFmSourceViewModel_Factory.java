@@ -1,7 +1,7 @@
 package com.jfcardenas.musicwall.ui.viewmodel;
 
-import android.content.Context;
 import com.jfcardenas.musicwall.api.LastFmService;
+import com.jfcardenas.musicwall.data.UserSettingsRepository;
 import dagger.internal.DaggerGenerated;
 import dagger.internal.Factory;
 import dagger.internal.Provider;
@@ -10,7 +10,7 @@ import dagger.internal.ScopeMetadata;
 import javax.annotation.processing.Generated;
 
 @ScopeMetadata
-@QualifierMetadata("dagger.hilt.android.qualifiers.ApplicationContext")
+@QualifierMetadata
 @DaggerGenerated
 @Generated(
     value = "dagger.internal.codegen.ComponentProcessor",
@@ -28,25 +28,26 @@ import javax.annotation.processing.Generated;
 public final class LastFmSourceViewModel_Factory implements Factory<LastFmSourceViewModel> {
   private final Provider<LastFmService> lastFmServiceProvider;
 
-  private final Provider<Context> contextProvider;
+  private final Provider<UserSettingsRepository> settingsProvider;
 
   private LastFmSourceViewModel_Factory(Provider<LastFmService> lastFmServiceProvider,
-      Provider<Context> contextProvider) {
+      Provider<UserSettingsRepository> settingsProvider) {
     this.lastFmServiceProvider = lastFmServiceProvider;
-    this.contextProvider = contextProvider;
+    this.settingsProvider = settingsProvider;
   }
 
   @Override
   public LastFmSourceViewModel get() {
-    return newInstance(lastFmServiceProvider.get(), contextProvider.get());
+    return newInstance(lastFmServiceProvider.get(), settingsProvider.get());
   }
 
   public static LastFmSourceViewModel_Factory create(Provider<LastFmService> lastFmServiceProvider,
-      Provider<Context> contextProvider) {
-    return new LastFmSourceViewModel_Factory(lastFmServiceProvider, contextProvider);
+      Provider<UserSettingsRepository> settingsProvider) {
+    return new LastFmSourceViewModel_Factory(lastFmServiceProvider, settingsProvider);
   }
 
-  public static LastFmSourceViewModel newInstance(LastFmService lastFmService, Context context) {
-    return new LastFmSourceViewModel(lastFmService, context);
+  public static LastFmSourceViewModel newInstance(LastFmService lastFmService,
+      UserSettingsRepository settings) {
+    return new LastFmSourceViewModel(lastFmService, settings);
   }
 }

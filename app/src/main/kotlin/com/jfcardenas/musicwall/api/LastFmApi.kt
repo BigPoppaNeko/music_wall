@@ -1,18 +1,17 @@
 package com.jfcardenas.musicwall.api
 
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.google.gson.JsonSyntaxException
 import com.jfcardenas.musicwall.BuildConfig
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Response
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
 import java.io.IOException
-import java.util.concurrent.TimeUnit
 
 interface LastFmService {
     @GET(".")
@@ -20,7 +19,8 @@ interface LastFmService {
         @Query("method") method: String = "user.gettopalbums",
         @Query("user") user: String,
         @Query("period") period: String,
-        @Query("limit") limit: Int
+        @Query("limit") limit: Int,
+        @Query("page") page: Int = 1,
     ): TopAlbumsResponse
 
     @GET(".")
@@ -74,6 +74,14 @@ interface LastFmService {
     ): AlbumSearchResponse
 
     @GET(".")
+    suspend fun searchTracks(
+        @Query("method") method: String = "track.search",
+        @Query("track") track: String,
+        @Query("artist") artist: String = "",
+        @Query("limit") limit: Int = 5,
+    ): TrackSearchResponse
+
+    @GET(".")
     suspend fun getTrackInfo(
         @Query("method") method: String = "track.getinfo",
         @Query("artist") artist: String,
@@ -94,10 +102,32 @@ interface LastFmService {
     ): UserTopTagsResponse
 
     @GET(".")
+    suspend fun getAlbumInfo(
+        @Query("method") method: String = "album.getinfo",
+        @Query("artist") artist: String,
+        @Query("album") album: String,
+    ): AlbumInfoResponse
+
+    @GET(".")
+    suspend fun getTagTopAlbums(
+        @Query("method") method: String = "tag.gettopalbums",
+        @Query("tag") tag: String,
+        @Query("limit") limit: Int = 12,
+    ): TagTopAlbumsResponse
+
+    @GET(".")
+    suspend fun getTagTopArtists(
+        @Query("method") method: String = "tag.gettopartists",
+        @Query("tag") tag: String,
+        @Query("limit") limit: Int = 5,
+    ): TopArtistsResponse
+
+    @GET(".")
     suspend fun getArtistTopAlbums(
         @Query("method") method: String = "artist.gettopalbums",
         @Query("artist") artist: String,
         @Query("limit") limit: Int = 4,
+        @Query("page") page: Int = 1,
     ): TopAlbumsResponse
 }
 
@@ -141,22 +171,19 @@ private class LastFmErrorInterceptor : Interceptor {
     }
 }
 
-internal fun createLastFmService(): LastFmService {
-    val logging = HttpLoggingInterceptor().apply {
-        level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BASIC
-                else HttpLoggingInterceptor.Level.NONE
-    }
-    val client = OkHttpClient.Builder()
+internal fun createLastFmService(httpClient: OkHttpClient): LastFmService {
+    val gson = GsonBuilder()
+        .registerTypeAdapter(AlbumTracksContainer::class.java, AlbumTracksContainerDeserializer())
+        .registerTypeAdapter(AlbumInfoResponse::class.java, AlbumInfoResponseDeserializer())
+        .create()
+    val client = httpClient.newBuilder()
         .addInterceptor(ApiKeyInterceptor())
         .addInterceptor(LastFmErrorInterceptor())
-        .addInterceptor(logging)
-        .connectTimeout(15, TimeUnit.SECONDS)
-        .readTimeout(30, TimeUnit.SECONDS)
         .build()
     return Retrofit.Builder()
         .baseUrl("https://ws.audioscrobbler.com/2.0/")
         .client(client)
-        .addConverterFactory(GsonConverterFactory.create())
+        .addConverterFactory(GsonConverterFactory.create(gson))
         .build()
         .create(LastFmService::class.java)
 }

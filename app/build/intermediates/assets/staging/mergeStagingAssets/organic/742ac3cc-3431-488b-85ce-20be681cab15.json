@@ -1,0 +1,169 @@
+{
+  "id": "742ac3cc-3431-488b-85ce-20be681cab15",
+  "genre": "jazz",
+  "totalSlots": 12,
+  "slots": [
+    {
+      "id": 1,
+      "x": 0.062,
+      "y": 0.152,
+      "width": 0.2747,
+      "height": 0.1215,
+      "rotation": 0.0,
+      "lightingZone": [
+        47,
+        28,
+        14
+      ]
+    },
+    {
+      "id": 2,
+      "x": 0.3557,
+      "y": 0.152,
+      "width": 0.2747,
+      "height": 0.1215,
+      "rotation": 0.0,
+      "lightingZone": [
+        68,
+        40,
+        18
+      ]
+    },
+    {
+      "id": 3,
+      "x": 0.6493,
+      "y": 0.152,
+      "width": 0.2747,
+      "height": 0.1215,
+      "rotation": 0.0,
+      "lightingZone": [
+        42,
+        24,
+        12
+      ]
+    },
+    {
+      "id": 4,
+      "x": 0.062,
+      "y": 0.2865,
+      "width": 0.2747,
+      "height": 0.1215,
+      "rotation": 0.0,
+      "lightingZone": [
+        73,
+        42,
+        20
+      ]
+    },
+    {
+      "id": 5,
+      "x": 0.3557,
+      "y": 0.2865,
+      "width": 0.2747,
+      "height": 0.1215,
+      "rotation": 0.0,
+      "lightingZone": [
+        100,
+        58,
+        23
+      ]
+    },
+    {
+      "id": 6,
+      "x": 0.6493,
+      "y": 0.2865,
+      "width": 0.2747,
+      "height": 0.1215,
+      "rotation": 0.0,
+      "lightingZone": [
+        65,
+        38,
+        18
+      ]
+    },
+    {
+      "id": 7,
+      "x": 0.062,
+      "y": 0.421,
+      "width": 0.2747,
+      "height": 0.1215,
+      "rotation": 0.0,
+      "lightingZone": [
+        68,
+        41,
+        20
+      ]
+    },
+    {
+      "id": 8,
+      "x": 0.3557,
+      "y": 0.421,
+      "width": 0.2747,
+      "height": 0.1215,
+      "rotation": 0.0,
+      "lightingZone": [
+        99,
+        58,
+        24
+      ]
+    },
+    {
+      "id": 9,
+      "x": 0.6493,
+      "y": 0.421,
+      "width": 0.2747,
+      "height": 0.1215,
+      "rotation": 0.0,
+      "lightingZone": [
+        66,
+        39,
+        18
+      ]
+    },
+    {
+      "id": 10,
+      "x": 0.062,
+      "y": 0.5555,
+      "width": 0.2747,
+      "height": 0.1215,
+      "rotation": 0.0,
+      "lightingZone": [
+        30,
+        19,
+        12
+      ]
+    },
+    {
+      "id": 11,
+      "x": 0.3557,
+      "y": 0.5555,
+      "width": 0.2747,
+      "height": 0.1215,
+      "rotation": 0.0,
+      "lightingZone": [
+        66,
+        39,
+        18
+      ]
+    },
+    {
+      "id": 12,
+      "x": 0.6493,
+      "y": 0.5555,
+      "width": 0.2747,
+      "height": 0.1215,
+      "rotation": 0.0,
+      "lightingZone": [
+        54,
+        32,
+        17
+      ]
+    }
+  ],
+  "lightingMap": {
+    "type": "gradient",
+    "mainLightColor": "#C87820",
+    "ambientColor": "#1A0E06",
+    "shadowDirection": "bottom"
+  }
+}

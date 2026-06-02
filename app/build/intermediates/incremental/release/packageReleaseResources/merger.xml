@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merger version="3"><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="main$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="D:\Github\music_wall\app\src\main\res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="main" generated-set="main$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~:!&lt;dir>navigation"><source path="D:\Github\music_wall\app\src\main\res"><file name="ic_launcher_foreground" path="D:\Github\music_wall\app\src\main\res\drawable\ic_launcher_foreground.xml" qualifiers="" type="drawable"/><file name="ic_veto" path="D:\Github\music_wall\app\src\main\res\drawable\ic_veto.xml" qualifiers="" type="drawable"/><file name="activity_connect" path="D:\Github\music_wall\app\src\main\res\layout\activity_connect.xml" qualifiers="" type="layout"/><file name="activity_settings" path="D:\Github\music_wall\app\src\main\res\layout\activity_settings.xml" qualifiers="" type="layout"/><file name="dropdown_item" path="D:\Github\music_wall\app\src\main\res\layout\dropdown_item.xml" qualifiers="" type="layout"/><file name="ic_launcher" path="D:\Github\music_wall\app\src\main\res\mipmap-anydpi-v26\ic_launcher.xml" qualifiers="anydpi-v26" type="mipmap"/><file name="ic_launcher_round" path="D:\Github\music_wall\app\src\main\res\mipmap-anydpi-v26\ic_launcher_round.xml" qualifiers="anydpi-v26" type="mipmap"/><file path="D:\Github\music_wall\app\src\main\res\values\arrays.xml" qualifiers=""><string-array name="image_kind_entries">
+        <item>Álbumes</item>
+        <item>Artistas</item>
+        <item>Canciones</item>
+        <item>Favoritas</item>
+        <item>Esta semana</item>
+    </string-array><string-array name="image_kind_values">
+        <item>ALBUMS</item>
+        <item>ARTISTS</item>
+        <item>TRACKS</item>
+        <item>LOVED</item>
+        <item>WEEKLY_ALBUMS</item>
+    </string-array><string-array name="period_entries">
+        <item>Última semana</item>
+        <item>Último mes</item>
+        <item>3 meses</item>
+        <item>6 meses</item>
+        <item>12 meses</item>
+        <item>General</item>
+    </string-array><string-array name="period_values">
+        <item>7day</item>
+        <item>1month</item>
+        <item>3month</item>
+        <item>6month</item>
+        <item>12month</item>
+        <item>overall</item>
+    </string-array><string-array name="limit_entries">
+        <item>10 imágenes</item>
+        <item>25 imágenes</item>
+        <item>50 imágenes</item>
+    </string-array><string-array name="limit_values">
+        <item>10</item>
+        <item>25</item>
+        <item>50</item>
+    </string-array></file><file path="D:\Github\music_wall\app\src\main\res\values\colors.xml" qualifiers=""><color name="ic_launcher_background">#191414</color></file><file path="D:\Github\music_wall\app\src\main\res\values\strings.xml" qualifiers=""><string name="app_name">Music Wall</string><string name="settings_title">Configuración</string><string name="connect_subtitle">Tu historial musical, convertido en arte</string><string name="hint_username">Usuario de Last.fm</string><string name="btn_connect">Verificar y conectar</string><string name="create_account">¿No tienes cuenta? Regístrate en last.fm →</string><string name="verifying">Verificando usuario…</string><string name="error_empty_username">Escribe tu usuario de Last.fm</string><string name="error_user_not_found">Usuario no encontrado en Last.fm</string><string name="error_network">Sin conexión. Comprueba tu red</string><string name="error_generic">Error al verificar. Inténtalo de nuevo</string><string name="connected_as">Conectado como</string><string name="change_account">Cambiar cuenta</string><string name="scrobble_channel_name">Escucha activa</string><string name="scrobble_notification_title">Music Wall</string><string name="scrobble_notification_body">Detectando tu Now Playing</string></file><file path="D:\Github\music_wall\app\src\main\res\values\themes.xml" qualifiers=""><style name="Theme.MusicWall" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">#D51007</item>
+        <item name="colorPrimaryContainer">#4A0501</item>
+        <item name="colorOnPrimaryContainer">#FFBAB6</item>
+        <item name="colorSecondary">#D51007</item>
+        <item name="colorSurface">#1E1E1E</item>
+        <item name="colorSurfaceVariant">#2A2A2A</item>
+        <item name="android:colorBackground">#191414</item>
+        <item name="colorOnSurface">#FFFFFF</item>
+        <item name="colorOnSurfaceVariant">#CCCCCC</item>
+        <item name="android:windowBackground">#191414</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style></file><file name="file_paths" path="D:\Github\music_wall\app\src\main\res\xml\file_paths.xml" qualifiers="" type="xml"/><file name="wallpaper" path="D:\Github\music_wall\app\src\main\res\xml\wallpaper.xml" qualifiers="" type="xml"/></source></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="release$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="D:\Github\music_wall\app\src\release\res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="release" generated-set="release$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~:!&lt;dir>navigation"><source path="D:\Github\music_wall\app\src\release\res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="generated$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="D:\Github\music_wall\app\build\generated\res\resValues\release"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="generated" generated-set="generated$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~:!&lt;dir>navigation"><source path="D:\Github\music_wall\app\build\generated\res\resValues\release"/></dataSet><mergedItems/></merger>

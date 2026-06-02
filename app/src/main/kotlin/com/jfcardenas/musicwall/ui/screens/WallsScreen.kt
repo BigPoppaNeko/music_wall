@@ -13,9 +13,11 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
@@ -30,19 +32,29 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.request.SuccessResult
-import com.jfcardenas.musicwall.ui.model.CURATED_WALLS
+import com.jfcardenas.musicwall.data.CoverImageSizing
+import com.jfcardenas.musicwall.domain.model.MusicImage
+import com.jfcardenas.musicwall.ui.components.InteractiveAlbumCover
 import com.jfcardenas.musicwall.ui.model.STYLE_OPTIONS
 import com.jfcardenas.musicwall.ui.model.StyleOption
 import com.jfcardenas.musicwall.ui.model.WallItem
 import com.jfcardenas.musicwall.ui.theme.*
+import com.jfcardenas.musicwall.ui.model.CURATED_WALLS
+import com.jfcardenas.musicwall.ui.viewmodel.CoverInteractionViewModel
+import com.jfcardenas.musicwall.ui.viewmodel.CoverItem
+import com.jfcardenas.musicwall.ui.viewmodel.WallSceneSetupViewModel
+import com.jfcardenas.musicwall.ui.viewmodel.WallSlot
+import com.jfcardenas.musicwall.ui.viewmodel.WallSlotSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -53,11 +65,13 @@ fun MuralesScreen(
     initialTab: Int = 0,
     onBack: (() -> Unit)? = null,
     onSelectRenderer: (styleId: String) -> Unit,
+    coverVm: CoverInteractionViewModel,
 ) {
     var selectedTab      by remember { mutableStateOf(initialTab) }
     var selectedRenderer by remember { mutableStateOf(STYLE_OPTIONS.first()) }
     var previewWall      by remember { mutableStateOf<WallItem?>(null) }
     var showPeriodSheet  by remember { mutableStateOf(false) }
+    var showRandomSetup  by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -127,7 +141,23 @@ fun MuralesScreen(
         // Content
         Box(modifier = Modifier.weight(1f)) {
             when (selectedTab) {
-                0 -> CuratedWallsPage(onWallClick = { previewWall = it })
+                0 -> if (showRandomSetup) {
+                    WallSceneSetupPage(
+                        coverVm = coverVm,
+                        onBack = { showRandomSetup = false },
+                        onGenerate = {
+                            onSelectRenderer(selectedRenderer.id)
+                        },
+                    )
+                } else {
+                    RendererWallsPage(
+                        selectedRenderer = selectedRenderer,
+                        onSelectRenderer = {
+                            selectedRenderer = it
+                            showRandomSetup = true
+                        },
+                    )
+                }
                 1 -> LabPage(
                     selectedRenderer = selectedRenderer,
                     onSelectRenderer = { selectedRenderer = it },
@@ -155,26 +185,10 @@ fun MuralesScreen(
 // ── Walls tab ──────────────────────────────────────────────────────────────────
 
 @Composable
-private fun CuratedWallsPage(onWallClick: (WallItem) -> Unit) {
-    if (CURATED_WALLS.isEmpty()) {
-        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("✦", fontSize = 36.sp, color = TextMuted)
-                Spacer(Modifier.height(12.dp))
-                Text("Walls en camino", fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = TextSecondary)
-                Spacer(Modifier.height(4.dp))
-                Text(
-                    text      = "Los primeros fondos estarán aquí pronto.",
-                    fontSize  = 12.sp,
-                    color     = TextMuted,
-                    textAlign = TextAlign.Center,
-                    modifier  = Modifier.padding(horizontal = 40.dp),
-                )
-            }
-        }
-        return
-    }
-
+private fun RendererWallsPage(
+    selectedRenderer: StyleOption,
+    onSelectRenderer: (StyleOption) -> Unit,
+) {
     LazyVerticalGrid(
         columns               = GridCells.Fixed(2),
         modifier              = Modifier.fillMaxSize(),
@@ -182,9 +196,331 @@ private fun CuratedWallsPage(onWallClick: (WallItem) -> Unit) {
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalArrangement   = Arrangement.spacedBy(12.dp),
     ) {
-        items(CURATED_WALLS, key = { it.id }) { wall ->
-            CuratedWallCard(wall = wall, onClick = { onWallClick(wall) })
+        items(STYLE_OPTIONS, key = { it.id }) { style ->
+            CompactRendererWallCard(
+                style = style,
+                selected = style.id == selectedRenderer.id,
+                onClick = { onSelectRenderer(style) },
+            )
         }
+    }
+}
+
+@Composable
+private fun CompactRendererWallCard(style: StyleOption, selected: Boolean, onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(178.dp)
+            .clip(RoundedCornerShape(18.dp))
+            .background(
+                Brush.linearGradient(
+                    listOf(style.gradientStart, style.gradientEnd)
+                )
+            )
+            .border(if (selected) 2.dp else 1.dp, if (selected) Purple else CardBorder, RoundedCornerShape(18.dp))
+            .clickable { onClick() },
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Brush.radialGradient(listOf(Purple.copy(alpha = 0.22f), Color.Transparent)))
+        )
+        Column(
+            modifier = Modifier.align(Alignment.BottomStart).padding(16.dp),
+        ) {
+            Text("🎲", fontSize = 26.sp)
+            Spacer(Modifier.height(8.dp))
+            Text(
+                text = style.name,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Black,
+                color = Color.White,
+            )
+            Text(
+                text = "Entrar a la escena y componer slots",
+                fontSize = 11.sp,
+                color = Color.White.copy(alpha = 0.72f),
+            )
+        }
+    }
+}
+
+@Composable
+private fun WallSceneSetupPage(
+    coverVm: CoverInteractionViewModel,
+    onBack: () -> Unit,
+    onGenerate: () -> Unit,
+    vm: WallSceneSetupViewModel = hiltViewModel(),
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = "Componer escena",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = TextPrimary,
+                modifier = Modifier.weight(1f),
+            )
+            TextButton(onClick = onBack) {
+                Text("Walls", color = TextSecondary)
+            }
+        }
+
+        Text(
+            text = "Elige de dónde llenar los huecos. Cada número será un lugar dentro del mural.",
+            fontSize = 12.sp,
+            color = TextSecondary,
+            lineHeight = 17.sp,
+        )
+
+        Spacer(Modifier.height(14.dp))
+
+        SlotSourceSelector(
+            selected = vm.selectedSource,
+            onSelect = vm::selectSource,
+        )
+
+        Spacer(Modifier.height(14.dp))
+
+        SlotAlbumSearch(
+            query = vm.albumSearchQuery,
+            selectedSlot = vm.selectedSlotIndex,
+            results = vm.albumSearchResults,
+            isSearching = vm.isSearching,
+            favoriteKeys = coverVm.favoriteKeys,
+            onQueryChange = vm::searchAlbums,
+            onAlbumClick = { vm.placeAlbum(it) },
+            onShowDetail = { coverVm.openAlbumDetail(it.toCoverItem()) },
+            onRandom = vm::fillRandomAllowRepeats,
+        )
+
+        Spacer(Modifier.height(14.dp))
+
+        if (vm.isLoading) {
+            Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(color = Purple, modifier = Modifier.size(28.dp), strokeWidth = 2.dp)
+            }
+        } else {
+            SlotGrid(
+                slots = vm.slots,
+                selectedSlot = vm.selectedSlotIndex,
+                favoriteKeys = coverVm.favoriteKeys,
+                onSlotClick = vm::selectSlot,
+                onShowDetail = { coverVm.openAlbumDetail(it.toCoverItem()) },
+                modifier = Modifier.weight(1f),
+            )
+        }
+
+        vm.error?.let {
+            Spacer(Modifier.height(8.dp))
+            Text(it, fontSize = 12.sp, color = Color(0xFFFF8A80), textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+        }
+
+        Spacer(Modifier.height(12.dp))
+
+        Button(
+            onClick = {
+                if (vm.persistSelection()) onGenerate()
+            },
+            enabled = !vm.isLoading && vm.slots.count { it.image != null } >= WallSceneSetupViewModel.MIN_READY_SLOTS,
+            modifier = Modifier.fillMaxWidth().height(54.dp),
+            shape = RoundedCornerShape(27.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Purple),
+        ) {
+            Text("Generar con estos slots", color = Color.White, fontWeight = FontWeight.SemiBold)
+        }
+
+        Spacer(Modifier.height(16.dp))
+    }
+}
+
+@Composable
+private fun SlotAlbumSearch(
+    query: String,
+    selectedSlot: Int,
+    results: List<MusicImage>,
+    isSearching: Boolean,
+    favoriteKeys: Set<String>,
+    onQueryChange: (String) -> Unit,
+    onAlbumClick: (MusicImage) -> Unit,
+    onShowDetail: (MusicImage) -> Unit,
+    onRandom: () -> Unit,
+) {
+    Column {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            OutlinedTextField(
+                value = query,
+                onValueChange = onQueryChange,
+                modifier = Modifier.weight(1f),
+                singleLine = true,
+                placeholder = { Text("Buscar disco para slot $selectedSlot", fontSize = 13.sp) },
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Purple,
+                    unfocusedBorderColor = CardBorder,
+                    focusedTextColor = TextPrimary,
+                    unfocusedTextColor = TextPrimary,
+                    cursorColor = Purple,
+                ),
+            )
+            OutlinedButton(
+                onClick = onRandom,
+                shape = RoundedCornerShape(18.dp),
+                border = BorderStroke(1.dp, Purple.copy(alpha = 0.6f)),
+                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 10.dp),
+            ) {
+                Text("🎲", fontSize = 18.sp)
+            }
+        }
+        if (isSearching) {
+            Spacer(Modifier.height(8.dp))
+            LinearProgressIndicator(modifier = Modifier.fillMaxWidth(), color = Purple, trackColor = CardBorder)
+        }
+        if (results.isNotEmpty()) {
+            Spacer(Modifier.height(8.dp))
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                items(results, key = { "${it.artistName}::${it.name}::${it.url}" }) { image ->
+                    Column(modifier = Modifier.width(78.dp)) {
+                        InteractiveAlbumCover(
+                            imageUrl           = image.url,
+                            contentDescription = image.name,
+                            isFavorite         = image.toCoverItem().key in favoriteKeys,
+                            modifier           = Modifier.size(78.dp),
+                            onShowDetail       = { onShowDetail(image) },
+                            onClick            = { onAlbumClick(image) },
+                        )
+                        Spacer(Modifier.height(4.dp))
+                        Text(image.name, fontSize = 10.sp, color = TextPrimary, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SlotSourceSelector(
+    selected: WallSlotSource,
+    onSelect: (WallSlotSource) -> Unit,
+) {
+    val options = listOf(
+        WallSlotSource.MANUAL to "Manual",
+        WallSlotSource.RECENT_FAVORITES to "Favoritas recientes",
+        WallSlotSource.WEEK_TOP to "Top semanal",
+    )
+    LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        items(options, key = { it.first.name }) { (source, label) ->
+            val isSelected = selected == source
+            Surface(
+                onClick = { onSelect(source) },
+                shape = RoundedCornerShape(18.dp),
+                color = if (isSelected) Purple.copy(alpha = 0.26f) else Card,
+                border = BorderStroke(1.dp, if (isSelected) Purple else CardBorder),
+            ) {
+                Text(
+                    text = label,
+                    fontSize = 12.sp,
+                    fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
+                    color = if (isSelected) Purple else TextSecondary,
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun SlotGrid(
+    slots: List<WallSlot>,
+    selectedSlot: Int,
+    favoriteKeys: Set<String>,
+    onSlotClick: (Int) -> Unit,
+    onShowDetail: (MusicImage) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(3),
+        modifier = modifier.fillMaxWidth(),
+        contentPadding = PaddingValues(vertical = 4.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        items(slots, key = { it.index }) { slot ->
+            SlotCard(
+                slot = slot,
+                selected = slot.index == selectedSlot,
+                favoriteKeys = favoriteKeys,
+                onClick = { onSlotClick(slot.index) },
+                onShowDetail = { image -> onShowDetail(image) },
+            )
+        }
+    }
+}
+
+@Composable
+private fun SlotCard(
+    slot: WallSlot,
+    selected: Boolean,
+    favoriteKeys: Set<String>,
+    onClick: () -> Unit,
+    onShowDetail: (MusicImage) -> Unit,
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .aspectRatio(1f)
+            .clip(RoundedCornerShape(14.dp))
+            .background(Card)
+            .border(2.dp, if (selected) Purple else CardBorder, RoundedCornerShape(14.dp)),
+    ) {
+        val image = slot.image
+        if (image != null) {
+            InteractiveAlbumCover(
+                imageUrl           = image.url,
+                contentDescription = image.name,
+                isFavorite         = image.toCoverItem().key in favoriteKeys,
+                modifier           = Modifier.fillMaxSize(),
+                cornerRadius       = 14.dp,
+                onShowDetail       = { onShowDetail(image) },
+                onClick            = onClick,
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.42f)
+                    .align(Alignment.BottomCenter)
+                    .background(Brush.verticalGradient(listOf(Color.Transparent, Color.Black.copy(alpha = 0.72f))))
+            )
+            Text(
+                text = image.name,
+                fontSize = 10.sp,
+                color = Color.White,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.align(Alignment.BottomStart).padding(8.dp),
+            )
+        } else {
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text("Hueco", fontSize = 12.sp, color = TextMuted)
+            }
+        }
+        Text(
+            text = slot.index.toString(),
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.White,
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(7.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .background(Color.Black.copy(alpha = 0.52f))
+                .padding(horizontal = 7.dp, vertical = 3.dp),
+        )
     }
 }
 
@@ -508,7 +844,7 @@ private val PERIOD_OPTIONS = listOf(
     PeriodOption("1month",  "Mensual",    "Lo que sonó este mes"),
     PeriodOption("1day",    "Diario",     "Las últimas 24 horas"),
     PeriodOption("overall", "Histórico",  "Tus favoritos de siempre"),
-    PeriodOption("random",  "Aleatorio",  "Sorpréndeme con mi archivo"),
+    PeriodOption("random",  "Aleatorio",  "Portadas al azar de todo tu archivo histórico"),
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -619,6 +955,7 @@ private suspend fun applyWallpaper(context: Context, url: String) = withContext(
     val imageLoader = ImageLoader(context)
     val request = ImageRequest.Builder(context)
         .data(url)
+        .size(CoverImageSizing.fullWallpaperSize(context))
         .allowHardware(false)
         .build()
     val drawable = (imageLoader.execute(request) as SuccessResult).drawable
@@ -637,3 +974,18 @@ private suspend fun applyWallpaper(context: Context, url: String) = withContext(
     }
     WallpaperManager.getInstance(context).setBitmap(bitmap)
 }
+
+private fun MusicImage.toCoverItem() = CoverItem(
+    imageUrl = url,
+    albumName = name,
+    artistName = artistName,
+)
+
+private fun CoverItem.toMusicImage() = MusicImage(
+    url = imageUrl,
+    name = albumName,
+    artistName = artistName,
+    rank = 0,
+    kind = MusicImage.Kind.ALBUM,
+)
+

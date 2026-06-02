@@ -17,10 +17,23 @@ class OnboardingActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Si ya hay cuenta conectada, ir directo al main app
+        // Si ya hay sesión activa, ir directo al main app
         val prefs    = getSharedPreferences(CollageWallpaper.PREFS_NAME, MODE_PRIVATE)
-        val username = prefs.getString(CollageWallpaper.PREF_USERNAME, "") ?: ""
-        if (username.isNotEmpty()) {
+        val onboardingComplete = prefs.getBoolean(CollageWallpaper.PREF_ONBOARDING_COMPLETE, false)
+        val userId = prefs.getString(CollageWallpaper.PREF_USER_ID, "") ?: ""
+        val legacyUsername = prefs.getString(CollageWallpaper.PREF_USERNAME, "") ?: ""
+        if (!onboardingComplete && legacyUsername.isNotEmpty() && userId.isEmpty()) {
+            prefs.edit()
+                .putBoolean(CollageWallpaper.PREF_ONBOARDING_COMPLETE, true)
+                .putString(CollageWallpaper.PREF_USER_ID, "lastfm_$legacyUsername")
+                .putString(CollageWallpaper.PREF_USER_NAME, legacyUsername)
+                .putString(CollageWallpaper.PREF_AUTH_PROVIDER, CollageWallpaper.PREF_SOURCE_LASTFM)
+                .apply()
+        }
+        if (prefs.getBoolean(CollageWallpaper.PREF_ONBOARDING_COMPLETE, false) &&
+            (prefs.getString(CollageWallpaper.PREF_USER_ID, "")?.isNotEmpty() == true ||
+                prefs.getString(CollageWallpaper.PREF_USERNAME, "")?.isNotEmpty() == true)
+        ) {
             startActivity(Intent(this, MainActivity::class.java))
             finish()
             return

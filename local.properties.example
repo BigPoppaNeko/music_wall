@@ -4,10 +4,22 @@
 # Android SDK path
 sdk.dir=/path/to/android/sdk
 
-# Last.fm API credentials — https://www.last.fm/api/account/create
+# Last.fm API key (public client key — required for portadas / discovery)
+# https://www.last.fm/api/account/create
 LASTFM_API_KEY=your_api_key_here
-LASTFM_SHARED_SECRET=your_shared_secret_here
 
-# Spotify API credentials — https://developer.spotify.com/dashboard → Create app
-SPOTIFY_CLIENT_ID=your_client_id_here
-SPOTIFY_CLIENT_SECRET=your_client_secret_here
+# Google Sign-In — OAuth 2.0 Web client ID (optional for MVP Explorar/Last.fm)
+# Google Cloud Console → Credentials → OAuth 2.0 Client IDs → Web application
+GOOGLE_WEB_CLIENT_ID=your_web_client_id.apps.googleusercontent.com
+
+# Release signing (optional for local debug; required for Play Store upload)
+# RELEASE_STORE_FILE=../keystore/musicwall-release.jks
+# RELEASE_STORE_PASSWORD=
+# RELEASE_KEY_ALIAS=
+# RELEASE_KEY_PASSWORD=
+
+# Firebase Crashlytics (optional): place google-services.json in app/ and add plugins in build.gradle.kts
+
+# Spotify / Fanart — solo herramientas de lab, no necesarios para la app MVP
+# SPOTIFY_CLIENT_ID=
+# SPOTIFY_CLIENT_SECRET=

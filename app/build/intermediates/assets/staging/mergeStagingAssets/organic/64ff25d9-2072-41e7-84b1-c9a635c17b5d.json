@@ -1,0 +1,338 @@
+{
+  "id": "64ff25d9-2072-41e7-84b1-c9a635c17b5d",
+  "genre": "reggaeton",
+  "totalSlots": 25,
+  "slots": [
+    {
+      "id": 1,
+      "x": 0.05,
+      "y": 0.04,
+      "width": 0.116,
+      "height": 0.146,
+      "rotation": 0.0,
+      "lightingZone": [
+        169,
+        86,
+        103
+      ]
+    },
+    {
+      "id": 2,
+      "x": 0.176,
+      "y": 0.04,
+      "width": 0.116,
+      "height": 0.146,
+      "rotation": 0.0,
+      "lightingZone": [
+        178,
+        96,
+        113
+      ]
+    },
+    {
+      "id": 3,
+      "x": 0.302,
+      "y": 0.04,
+      "width": 0.116,
+      "height": 0.146,
+      "rotation": 0.0,
+      "lightingZone": [
+        50,
+        27,
+        37
+      ]
+    },
+    {
+      "id": 4,
+      "x": 0.428,
+      "y": 0.04,
+      "width": 0.116,
+      "height": 0.146,
+      "rotation": 0.0,
+      "lightingZone": [
+        73,
+        29,
+        35
+      ]
+    },
+    {
+      "id": 5,
+      "x": 0.554,
+      "y": 0.04,
+      "width": 0.116,
+      "height": 0.146,
+      "rotation": 0.0,
+      "lightingZone": [
+        54,
+        28,
+        38
+      ]
+    },
+    {
+      "id": 6,
+      "x": 0.05,
+      "y": 0.196,
+      "width": 0.116,
+      "height": 0.146,
+      "rotation": 0.0,
+      "lightingZone": [
+        219,
+        135,
+        101
+      ]
+    },
+    {
+      "id": 7,
+      "x": 0.176,
+      "y": 0.196,
+      "width": 0.116,
+      "height": 0.146,
+      "rotation": 0.0,
+      "lightingZone": [
+        92,
+        54,
+        45
+      ]
+    },
+    {
+      "id": 8,
+      "x": 0.302,
+      "y": 0.196,
+      "width": 0.116,
+      "height": 0.146,
+      "rotation": 0.0,
+      "lightingZone": [
+        79,
+        36,
+        27
+      ]
+    },
+    {
+      "id": 9,
+      "x": 0.428,
+      "y": 0.196,
+      "width": 0.116,
+      "height": 0.146,
+      "rotation": 0.0,
+      "lightingZone": [
+        70,
+        64,
+        58
+      ]
+    },
+    {
+      "id": 10,
+      "x": 0.554,
+      "y": 0.196,
+      "width": 0.116,
+      "height": 0.146,
+      "rotation": 0.0,
+      "lightingZone": [
+        47,
+        30,
+        33
+      ]
+    },
+    {
+      "id": 11,
+      "x": 0.05,
+      "y": 0.352,
+      "width": 0.116,
+      "height": 0.146,
+      "rotation": 0.0,
+      "lightingZone": [
+        135,
+        77,
+        50
+      ]
+    },
+    {
+      "id": 12,
+      "x": 0.176,
+      "y": 0.352,
+      "width": 0.116,
+      "height": 0.146,
+      "rotation": 0.0,
+      "lightingZone": [
+        71,
+        37,
+        22
+      ]
+    },
+    {
+      "id": 13,
+      "x": 0.302,
+      "y": 0.352,
+      "width": 0.116,
+      "height": 0.146,
+      "rotation": 0.0,
+      "lightingZone": [
+        72,
+        42,
+        31
+      ]
+    },
+    {
+      "id": 14,
+      "x": 0.428,
+      "y": 0.352,
+      "width": 0.116,
+      "height": 0.146,
+      "rotation": 0.0,
+      "lightingZone": [
+        78,
+        43,
+        37
+      ]
+    },
+    {
+      "id": 15,
+      "x": 0.554,
+      "y": 0.352,
+      "width": 0.116,
+      "height": 0.146,
+      "rotation": 0.0,
+      "lightingZone": [
+        70,
+        37,
+        27
+      ]
+    },
+    {
+      "id": 16,
+      "x": 0.05,
+      "y": 0.508,
+      "width": 0.116,
+      "height": 0.146,
+      "rotation": 0.0,
+      "lightingZone": [
+        132,
+        68,
+        28
+      ]
+    },
+    {
+      "id": 17,
+      "x": 0.176,
+      "y": 0.508,
+      "width": 0.116,
+      "height": 0.146,
+      "rotation": 0.0,
+      "lightingZone": [
+        74,
+        41,
+        36
+      ]
+    },
+    {
+      "id": 18,
+      "x": 0.302,
+      "y": 0.508,
+      "width": 0.116,
+      "height": 0.146,
+      "rotation": 0.0,
+      "lightingZone": [
+        38,
+        21,
+        24
+      ]
+    },
+    {
+      "id": 19,
+      "x": 0.428,
+      "y": 0.508,
+      "width": 0.116,
+      "height": 0.146,
+      "rotation": 0.0,
+      "lightingZone": [
+        55,
+        26,
+        20
+      ]
+    },
+    {
+      "id": 20,
+      "x": 0.554,
+      "y": 0.508,
+      "width": 0.116,
+      "height": 0.146,
+      "rotation": 0.0,
+      "lightingZone": [
+        55,
+        26,
+        27
+      ]
+    },
+    {
+      "id": 21,
+      "x": 0.05,
+      "y": 0.664,
+      "width": 0.116,
+      "height": 0.146,
+      "rotation": 0.0,
+      "lightingZone": [
+        105,
+        49,
+        26
+      ]
+    },
+    {
+      "id": 22,
+      "x": 0.176,
+      "y": 0.664,
+      "width": 0.116,
+      "height": 0.146,
+      "rotation": 0.0,
+      "lightingZone": [
+        69,
+        32,
+        22
+      ]
+    },
+    {
+      "id": 23,
+      "x": 0.302,
+      "y": 0.664,
+      "width": 0.116,
+      "height": 0.146,
+      "rotation": 0.0,
+      "lightingZone": [
+        45,
+        20,
+        20
+      ]
+    },
+    {
+      "id": 24,
+      "x": 0.428,
+      "y": 0.664,
+      "width": 0.116,
+      "height": 0.146,
+      "rotation": 0.0,
+      "lightingZone": [
+        39,
+        20,
+        21
+      ]
+    },
+    {
+      "id": 25,
+      "x": 0.554,
+      "y": 0.664,
+      "width": 0.116,
+      "height": 0.146,
+      "rotation": 0.0,
+      "lightingZone": [
+        51,
+        27,
+        22
+      ]
+    }
+  ],
+  "lightingMap": {
+    "type": "gradient",
+    "mainLightColor": "#FF6B00",
+    "ambientColor": "#1A0800",
+    "shadowDirection": "top-left"
+  }
+}
