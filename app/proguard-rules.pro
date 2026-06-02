@@ -26,14 +26,19 @@
 -keep class * implements com.google.gson.JsonDeserializer
 
 # ── Obfuscate BuildConfig fields (API keys) ──────────────────────────────────
-# R8 will rename LASTFM_API_KEY and LASTFM_SHARED_SECRET field names,
-# making static analysis harder without disabling BuildConfig entirely.
-# For production, move API calls to a backend proxy.
+# R8 may rename field identifiers; values remain in DEX — use backend proxy at scale.
 -keepclassmembers class com.jfcardenas.musicwall.BuildConfig {
     public static final String APPLICATION_ID;
     public static final boolean DEBUG;
     public static final int VERSION_CODE;
     public static final String VERSION_NAME;
+}
+
+# ── Strip verbose logs in release ─────────────────────────────────────────────
+-assumenosideeffects class android.util.Log {
+    public static int v(...);
+    public static int d(...);
+    public static int i(...);
 }
 
 # ── WorkManager ───────────────────────────────────────────────────────────────

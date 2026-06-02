@@ -33,7 +33,8 @@ import com.jfcardenas.musicwall.R
 import com.jfcardenas.musicwall.data.NetworkResult
 import com.jfcardenas.musicwall.domain.model.MusicImage
 import com.jfcardenas.musicwall.domain.usecase.GetMusicImagesUseCase
-import com.jfcardenas.musicwall.features.connect.ConnectActivity
+import com.jfcardenas.musicwall.MainActivity
+import com.jfcardenas.musicwall.data.CoverImageSizing
 import com.jfcardenas.musicwall.features.wallpaper.renderer.RenderItem
 import com.jfcardenas.musicwall.features.wallpaper.renderer.WallpaperRendererFactory
 import com.jfcardenas.musicwall.service.CollageWallpaper
@@ -103,7 +104,14 @@ class WallpaperSettingsActivity : AppCompatActivity() {
         loadPrefs()
 
         btnGenerate.setOnClickListener { generate() }
-        btnChangeAccount.setOnClickListener { startActivity(Intent(this, ConnectActivity::class.java)) }
+        btnChangeAccount.setOnClickListener {
+            startActivity(
+                Intent(this, MainActivity::class.java).apply {
+                    putExtra(MainActivity.EXTRA_OPEN_ROUTE, "source/lastfm")
+                    addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+                },
+            )
+        }
         btnApplyWallpaper.setOnClickListener { openWallpaperPicker() }
 
         etUsername.setOnEditorActionListener { _, actionId, _ ->
@@ -245,7 +253,11 @@ class WallpaperSettingsActivity : AppCompatActivity() {
         repeat(3) { attempt ->
             try {
                 val bmp = (imageLoader.execute(
-                    ImageRequest.Builder(this).data(url).allowHardware(false).build()
+                    ImageRequest.Builder(this)
+                        .data(url)
+                        .size(CoverImageSizing.collageTileSize(this))
+                        .allowHardware(false)
+                        .build()
                 ).drawable as? BitmapDrawable)?.bitmap
                 if (bmp != null) return bmp
             } catch (e: Exception) {

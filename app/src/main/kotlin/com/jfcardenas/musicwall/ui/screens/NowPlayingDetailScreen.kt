@@ -12,8 +12,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -31,23 +29,35 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.jfcardenas.musicwall.api.MasterVersion
 import com.jfcardenas.musicwall.data.CoverSearchState
+import com.jfcardenas.musicwall.ui.components.InteractiveAlbumCover
 import com.jfcardenas.musicwall.ui.components.LayeredAlbumCover
 import com.jfcardenas.musicwall.ui.theme.*
+import com.jfcardenas.musicwall.ui.viewmodel.CoverInteractionViewModel
+import com.jfcardenas.musicwall.ui.viewmodel.CoverItem
 import com.jfcardenas.musicwall.ui.viewmodel.NowPlayingDetailViewModel
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NowPlayingDetailScreen(
     artist: String,
     trackName: String,
+    albumHint: String = "",
     onBack: () -> Unit,
+    coverVm: CoverInteractionViewModel,
     vm: NowPlayingDetailViewModel = hiltViewModel(),
 ) {
     val state = vm.uiState
     var showVersionsSheet by remember { mutableStateOf(false) }
+    val albumTitle = state.albumTitle ?: albumHint.ifBlank { trackName }
+    val coverItem = remember(state.albumImageUrl, albumTitle, artist) {
+        CoverItem(
+            imageUrl = state.albumImageUrl.orEmpty(),
+            albumName = albumTitle,
+            artistName = artist,
+        )
+    }
 
-    LaunchedEffect(artist, trackName) {
-        vm.load(artist = artist, track = trackName)
+    LaunchedEffect(artist, trackName, albumHint) {
+        vm.load(artist = artist, track = trackName, albumHint = albumHint)
     }
 
     if (showVersionsSheet && state.versions.isNotEmpty()) {
@@ -88,27 +98,32 @@ fun NowPlayingDetailScreen(
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f),
             )
-            if (state.albumTitle != null) {
-                IconButton(onClick = { vm.toggleFavorite() }) {
-                    Icon(
-                        imageVector = if (state.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                        contentDescription = if (state.isFavorite) "Quitar de favoritas" else "Guardar en favoritas",
-                        tint = if (state.isFavorite) Color(0xFFE05C6A) else TextSecondary,
-                    )
-                }
-            }
         }
 
         Spacer(Modifier.height(8.dp))
 
-        LayeredAlbumCover(
-            imageUrl     = state.albumImageUrl,
-            cornerRadius = 16.dp,
-            modifier     = Modifier
-                .padding(horizontal = 48.dp)
-                .fillMaxWidth()
-                .aspectRatio(1f),
-        )
+        if (state.albumImageUrl != null) {
+            InteractiveAlbumCover(
+                imageUrl           = state.albumImageUrl,
+                contentDescription = albumTitle,
+                isFavorite         = coverVm.isFavorite(coverItem.key),
+                modifier           = Modifier
+                    .padding(horizontal = 48.dp)
+                    .fillMaxWidth()
+                    .aspectRatio(1f),
+                cornerRadius       = 16.dp,
+                onShowDetail       = { coverVm.openAlbumDetail(coverItem) },
+            )
+        } else {
+            LayeredAlbumCover(
+                imageUrl     = null,
+                cornerRadius = 16.dp,
+                modifier     = Modifier
+                    .padding(horizontal = 48.dp)
+                    .fillMaxWidth()
+                    .aspectRatio(1f),
+            )
+        }
 
         // Botón fallback de portada
         when {
@@ -173,17 +188,41 @@ fun NowPlayingDetailScreen(
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
         ) {
-            SectionHeader(icon = "🎵", title = "Letra")
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                SectionHeader(icon = "🎵", title = "Letra")
+                if (state.lyricsSource == "LRCLib" && state.lyrics != null) {
+                    Spacer(Modifier.width(8.dp))
+                    SourceChip("LRCLib")
+                }
+            }
             Spacer(Modifier.height(12.dp))
             when {
-                state.isLoadingLyrics     -> LoadingCenter()
-                state.lyricsError != null -> ErrorText(state.lyricsError)
-                state.lyrics != null      -> Text(
+                state.isLoadingLyrics -> LoadingCenter()
+                state.lyrics != null -> Text(
                     text = state.lyrics,
                     fontSize = 13.sp,
                     color = TextSecondary,
                     lineHeight = 22.sp,
                 )
+                state.lyricsFallback == CoverSearchState.Searching -> LoadingCenter()
+                else -> {
+                    ErrorText(state.lyricsError ?: "Letra no encontrada")
+                    if (state.lyricsFallback == CoverSearchState.Idle) {
+                        Spacer(Modifier.height(10.dp))
+                        OutlinedButton(
+                            onClick = { vm.fetchLyricsFallback() },
+                            modifier = Modifier.align(Alignment.CenterHorizontally),
+                            shape = RoundedCornerShape(20.dp),
+                            border = androidx.compose.foundation.BorderStroke(1.dp, CardBorder),
+                        ) {
+                            Text(
+                                "Buscar letra en otra fuente ↗",
+                                fontSize = 12.sp,
+                                color = TextSecondary,
+                            )
+                        }
+                    }
+                }
             }
         }
 
@@ -325,7 +364,7 @@ private fun VersionsSheet(
                 .fillMaxWidth()
                 .heightIn(max = 520.dp),
         ) {
-            items(versions) { version -> VersionCell(version) }
+            items(versions, key = { it.id }) { version -> VersionCell(version) }
         }
         Spacer(Modifier.navigationBarsPadding())
     }

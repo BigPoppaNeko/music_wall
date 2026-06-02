@@ -23,16 +23,21 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.jfcardenas.musicwall.BuildConfig
-import com.jfcardenas.musicwall.service.CollageWallpaper
 import com.jfcardenas.musicwall.ui.theme.*
 import com.jfcardenas.musicwall.ui.viewmodel.HomeViewModel
+import com.jfcardenas.musicwall.ui.viewmodel.SettingsViewModel
 
 @Composable
-fun SettingsScreen(homeViewModel: HomeViewModel = hiltViewModel()) {
+fun SettingsScreen(
+    onConnectLastFm: () -> Unit = {},
+    onConnectSpotify: () -> Unit = {},
+    onExplore: () -> Unit = {},
+    homeViewModel: HomeViewModel = hiltViewModel(),
+    settingsViewModel: SettingsViewModel = hiltViewModel(),
+) {
     val context = LocalContext.current
-    val prefs = remember { context.getSharedPreferences(CollageWallpaper.PREFS_NAME, Context.MODE_PRIVATE) }
-    var username by remember { mutableStateOf(prefs.getString(CollageWallpaper.PREF_USERNAME, "") ?: "") }
-    var autoChange by remember { mutableStateOf(true) }
+    val username = settingsViewModel.lastFmUsername.ifBlank { homeViewModel.uiState.username }
+    val autoChange = settingsViewModel.autoChange
     val avatarUrl = homeViewModel.uiState.avatarUrl
 
     LazyColumn(
@@ -70,10 +75,35 @@ fun SettingsScreen(homeViewModel: HomeViewModel = hiltViewModel()) {
                     trailing = {
                         Switch(
                             checked = autoChange,
-                            onCheckedChange = { autoChange = it },
+                            onCheckedChange = { settingsViewModel.setAutoChange(context, it) },
                             colors = SwitchDefaults.colors(checkedThumbColor = Color.White, checkedTrackColor = Purple),
                         )
                     },
+                )
+            }
+        }
+
+        item {
+            SettingsCard {
+                SettingsRow(
+                    title = "Conectar Last.fm",
+                    subtitle = "Historial, scrobbles y top semanal",
+                    trailing = { Text("›", fontSize = 20.sp, color = TextSecondary) },
+                    onClick = onConnectLastFm,
+                )
+                HorizontalDivider(color = CardBorder, thickness = 0.5.dp)
+                SettingsRow(
+                    title = "Conectar Spotify",
+                    subtitle = "Playlists públicas",
+                    trailing = { Text("›", fontSize = 20.sp, color = TextSecondary) },
+                    onClick = onConnectSpotify,
+                )
+                HorizontalDivider(color = CardBorder, thickness = 0.5.dp)
+                SettingsRow(
+                    title = "Explorar artistas y discos",
+                    subtitle = "Curar fuentes manuales",
+                    trailing = { Text("›", fontSize = 20.sp, color = TextSecondary) },
+                    onClick = onExplore,
                 )
             }
         }
@@ -121,9 +151,8 @@ fun SettingsScreen(homeViewModel: HomeViewModel = hiltViewModel()) {
                         }
                         TextButton(
                             onClick = {
-                                prefs.edit().remove(CollageWallpaper.PREF_USERNAME).apply()
-                                username = ""
-                                restartToOnboarding(context)
+                                settingsViewModel.disconnectLastFm()
+                                homeViewModel.refresh()
                             },
                         ) {
                             Text("Desconectar", color = MaterialTheme.colorScheme.error, fontSize = 13.sp)

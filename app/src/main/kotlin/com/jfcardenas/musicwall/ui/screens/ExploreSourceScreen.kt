@@ -1,6 +1,5 @@
 package com.jfcardenas.musicwall.ui.screens
 
-import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -23,14 +22,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
-import com.jfcardenas.musicwall.service.CollageWallpaper
 import com.jfcardenas.musicwall.ui.theme.*
 import com.jfcardenas.musicwall.ui.viewmodel.ExploreViewModel
 import kotlin.math.abs
@@ -96,7 +93,6 @@ fun ExploreSourceScreen(
     var selectedTab by remember { mutableStateOf(0) }
     var search by remember { mutableStateOf("") }
     val selected = remember { mutableStateListOf<String>() }
-    val context = LocalContext.current
 
     LaunchedEffect(search, selectedTab) {
         viewModel.search(search, selectedTab)
@@ -185,7 +181,7 @@ fun ExploreSourceScreen(
                         horizontalArrangement = Arrangement.spacedBy(16.dp),
                         modifier = Modifier.padding(bottom = 20.dp),
                     ) {
-                        items(RECENT_ARTISTS) { artist ->
+                        items(RECENT_ARTISTS, key = { it.name }) { artist ->
                             RecentAvatar(name = artist.name, bgColor = artist.bgColor)
                         }
                     }
@@ -210,7 +206,7 @@ fun ExploreSourceScreen(
                                 modifier = Modifier.padding(bottom = 4.dp),
                             )
                         }
-                        items(searchState.items) { result ->
+                        items(searchState.items, key = { "${it.name}:${it.subtitle}" }) { result ->
                             ApiResultRow(
                                 result     = result,
                                 isSelected = result.name in selected,
@@ -246,7 +242,7 @@ fun ExploreSourceScreen(
                         modifier = Modifier.padding(bottom = 4.dp),
                     )
                 }
-                items(staticSuggestions) { item ->
+                items(staticSuggestions, key = { it.name }) { item ->
                     StaticSuggestionRow(
                         item       = item,
                         isSelected = item.name in selected,
@@ -270,7 +266,7 @@ fun ExploreSourceScreen(
         ) {
             Button(
                 onClick  = {
-                    saveExploreArtists(context, selected)
+                    viewModel.saveSelectedArtists(selected)
                     onContinue()
                 },
                 enabled  = selectedTab == 0 && selected.isNotEmpty(),
@@ -291,16 +287,6 @@ fun ExploreSourceScreen(
             }
         }
     }
-}
-
-private fun saveExploreArtists(context: Context, artists: Collection<String>) {
-    context.getSharedPreferences(CollageWallpaper.PREFS_NAME, Context.MODE_PRIVATE)
-        .edit()
-        .putString(CollageWallpaper.PREF_SOURCE, CollageWallpaper.PREF_SOURCE_EXPLORE_ARTISTS)
-        .putString(CollageWallpaper.PREF_IMAGE_KIND, "ALBUMS")
-        .putString(CollageWallpaper.PREF_PERIOD, "random")
-        .putStringSet(CollageWallpaper.PREF_EXPLORE_ARTISTS, artists.map { it.trim() }.filter { it.isNotEmpty() }.toSet())
-        .apply()
 }
 
 @Composable

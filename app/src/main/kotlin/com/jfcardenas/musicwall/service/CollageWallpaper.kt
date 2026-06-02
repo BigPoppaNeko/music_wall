@@ -10,8 +10,8 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import coil.ImageLoader
 import coil.request.ImageRequest
-import coil.size.Size
 import dagger.hilt.android.AndroidEntryPoint
+import com.jfcardenas.musicwall.data.CoverImageSizing
 import com.jfcardenas.musicwall.data.ErrorType
 import com.jfcardenas.musicwall.data.NetworkResult
 import com.jfcardenas.musicwall.domain.usecase.GetMusicImagesUseCase
@@ -29,15 +29,25 @@ class CollageWallpaper : WallpaperService() {
     companion object {
         const val PREFS_NAME        = "music_wall_prefs"
         const val PREF_USERNAME     = "lastfm_username"
+        const val PREF_USER_ID      = "user_id"
+        const val PREF_USER_NAME    = "user_display_name"
+        const val PREF_USER_EMAIL   = "user_email"
+        const val PREF_AUTH_PROVIDER = "auth_provider"
+        const val PREF_ONBOARDING_COMPLETE = "onboarding_complete"
         const val PREF_SOURCE       = "music_source"
         const val PREF_SOURCE_LASTFM = "lastfm"
+        const val PREF_SOURCE_LOCAL  = "local_scrobbler"
+        const val PREF_SOURCE_GOOGLE = "google"
         const val PREF_SOURCE_EXPLORE_ARTISTS = "explore_artists"
+        const val PREF_SOURCE_SELECTED_SLOTS = "selected_slots"
         const val PREF_EXPLORE_ARTISTS = "explore_artist_names"
+        const val PREF_SELECTED_SLOT_IMAGES = "selected_slot_images"
         const val PREF_IMAGE_KIND   = "image_kind"
         const val PREF_PERIOD       = "period"
         const val PREF_LIMIT        = "limit"
         const val PREF_COLLAGE_PATH  = "collage_path"
         const val PREF_REFRESH_COUNT = "refresh_count"
+        const val PREF_AUTO_WALLPAPER_REFRESH = "auto_wallpaper_refresh"
         const val ACTION_REFRESH     = "com.jfcardenas.musicwall.action.REFRESH"
         private const val TAG       = "MusicWall"
         private const val MIN_IMAGES = 4
@@ -64,7 +74,7 @@ class CollageWallpaper : WallpaperService() {
             IntentFilter(ACTION_REFRESH),
             ContextCompat.RECEIVER_NOT_EXPORTED
         )
-        WallpaperRefreshWorker.schedule(this)
+        WallpaperRefreshWorker.scheduleIfEnabled(this)
     }
 
     override fun onDestroy() {
@@ -96,7 +106,7 @@ class CollageWallpaper : WallpaperService() {
             try {
                 val request = ImageRequest.Builder(applicationContext)
                     .data(url)
-                    .size(Size.ORIGINAL)
+                    .size(CoverImageSizing.collageTileSize(applicationContext))
                     .allowHardware(false)
                     .build()
                 val bmp = (imageLoader.execute(request).drawable

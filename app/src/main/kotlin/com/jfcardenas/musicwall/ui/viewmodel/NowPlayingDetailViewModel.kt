@@ -7,11 +7,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jfcardenas.musicwall.api.DiscogsService
 import com.jfcardenas.musicwall.api.LastFmService
+import com.jfcardenas.musicwall.api.LrcLibResult
+import com.jfcardenas.musicwall.api.LrcLibService
 import com.jfcardenas.musicwall.api.LyricsService
 import com.jfcardenas.musicwall.api.MasterVersion
 import com.jfcardenas.musicwall.api.getExtraLargeUrl
 import com.jfcardenas.musicwall.data.CoverFallbackRepository
 import com.jfcardenas.musicwall.data.CoverSearchState
+import com.jfcardenas.musicwall.data.FavoriteKeys
 import com.jfcardenas.musicwall.data.local.db.dao.FavoriteAlbumDao
 import com.jfcardenas.musicwall.data.local.db.entity.FavoriteAlbum
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,6 +25,7 @@ import javax.inject.Inject
 class NowPlayingDetailViewModel @Inject constructor(
     private val lastFmService: LastFmService,
     private val lyricsService: LyricsService,
+    private val lrcLibService: LrcLibService,
     private val discogsService: DiscogsService,
     private val coverFallbackRepo: CoverFallbackRepository,
     private val favoriteDao: FavoriteAlbumDao,
@@ -47,9 +51,11 @@ class NowPlayingDetailViewModel @Inject constructor(
         val coverFallback: CoverSearchState = CoverSearchState.Idle,
         val isFavorite: Boolean = false,
         val lyrics: String? = null,
+        val lyricsSource: String? = null,
         val curiosity: String? = null,
         val curiositySource: String? = null,
         val lyricsError: String? = null,
+        val lyricsFallback: CoverSearchState = CoverSearchState.Idle,
         val curiosityError: String? = null,
         val formatGroups: List<FormatGroup> = emptyList(),
         val totalVersions: Int = 0,
@@ -66,10 +72,12 @@ class NowPlayingDetailViewModel @Inject constructor(
 
     private var currentArtist = ""
     private var currentTrack  = ""
+    private var currentAlbumHint = ""
 
-    fun load(artist: String, track: String) {
+    fun load(artist: String, track: String, albumHint: String = "") {
         currentArtist = artist
         currentTrack  = track
+        currentAlbumHint = albumHint.trim()
         uiState = UiState(isLoadingLyrics = true, isLoadingCuriosity = true, isLoadingVersions = true)
         viewModelScope.launch { fetchLyrics(artist, track) }
         viewModelScope.launch { fetchInfoAndVersions(artist, track) }
@@ -116,15 +124,54 @@ class NowPlayingDetailViewModel @Inject constructor(
         uiState = uiState.copy(isFavorite = fav)
     }
 
+    fun applyCoverSwap(cover: CoverItem) {
+        uiState = uiState.copy(
+            albumImageUrl = cover.imageUrl,
+            albumTitle = cover.albumName,
+        )
+    }
+
+    fun fetchLyricsFallback() {
+        uiState = uiState.copy(lyricsFallback = CoverSearchState.Searching, lyricsError = null)
+        viewModelScope.launch {
+            val lyrics = tryFetchLrcLib(currentArtist, currentTrack)
+                ?: tryFetchLrcLib(currentArtist, cleanTitle(currentTrack))
+                ?: tryFetchLrcLibQuery(currentArtist, currentTrack)
+            uiState = if (lyrics != null) {
+                uiState.copy(
+                    lyrics = lyrics,
+                    lyricsSource = "LRCLib",
+                    lyricsFallback = CoverSearchState.Idle,
+                    lyricsError = null,
+                    isLoadingLyrics = false,
+                )
+            } else {
+                uiState.copy(
+                    lyricsFallback = CoverSearchState.NotFound,
+                    lyricsError = "Letra no encontrada en otras fuentes",
+                )
+            }
+        }
+    }
+
     // ── Letras ────────────────────────────────────────────────────────────────
 
     private suspend fun fetchLyrics(artist: String, track: String) {
         val lyrics = tryFetchLyrics(artist, track)
             ?: tryFetchLyrics(artist, cleanTitle(track))
         uiState = if (lyrics != null) {
-            uiState.copy(isLoadingLyrics = false, lyrics = lyrics)
+            uiState.copy(
+                isLoadingLyrics = false,
+                lyrics = lyrics,
+                lyricsSource = "lyrics.ovh",
+                lyricsFallback = CoverSearchState.Idle,
+            )
         } else {
-            uiState.copy(isLoadingLyrics = false, lyricsError = "Letra no encontrada")
+            uiState.copy(
+                isLoadingLyrics = false,
+                lyricsError = "Letra no encontrada",
+                lyricsFallback = CoverSearchState.Idle,
+            )
         }
     }
 
@@ -132,7 +179,38 @@ class NowPlayingDetailViewModel @Inject constructor(
         try {
             lyricsService.getLyrics(artist = artist, title = track)
                 .lyrics?.trim()?.takeIf { it.isNotBlank() }
-        } catch (e: Exception) { null }
+        } catch (_: Exception) {
+            null
+        }
+
+    private suspend fun tryFetchLrcLib(artist: String, track: String): String? =
+        try {
+            lrcLibService.search(trackName = track, artistName = artist)
+                .firstOrNull()
+                ?.let { pickLrcLyrics(it) }
+        } catch (_: Exception) {
+            null
+        }
+
+    private suspend fun tryFetchLrcLibQuery(artist: String, track: String): String? =
+        try {
+            lrcLibService.searchQuery("$artist $track")
+                .firstOrNull()
+                ?.let { pickLrcLyrics(it) }
+        } catch (_: Exception) {
+            null
+        }
+
+    private fun pickLrcLyrics(result: LrcLibResult): String? =
+        result.plainLyrics?.trim()?.takeIf { it.isNotBlank() }
+            ?: result.syncedLyrics
+                ?.lineSequence()
+                ?.mapNotNull { line ->
+                    Regex("\\]\\s*(.+)$").find(line)?.groupValues?.getOrNull(1)?.trim()
+                }
+                ?.joinToString("\n")
+                ?.trim()
+                ?.takeIf { it.isNotBlank() }
 
     private fun cleanTitle(title: String): String =
         title
@@ -149,13 +227,20 @@ class NowPlayingDetailViewModel @Inject constructor(
                 lastFmService.getTrackInfo(artist = artist, track = track)
             } catch (e: Exception) { null }
 
-            val lastFmUrl = trackInfo?.track?.album?.let { album ->
-                album.images?.getExtraLargeUrl()?.takeIf { it.isNotBlank() }
-                    ?: album.mbid?.takeIf { it.isNotBlank() }
-                        ?.let { "https://coverartarchive.org/release/$it/front-250" }
+            val lastFmAlbumTitle = trackInfo?.track?.album?.title
+            val shouldTrustLastFmAlbum = currentAlbumHint.isBlank() ||
+                currentAlbumHint.equals(lastFmAlbumTitle, ignoreCase = true)
+            val lastFmUrl = if (shouldTrustLastFmAlbum) {
+                trackInfo?.track?.album?.let { album ->
+                    album.images?.getExtraLargeUrl()?.takeIf { it.isNotBlank() }
+                        ?: album.mbid?.takeIf { it.isNotBlank() }
+                            ?.let { "https://coverartarchive.org/release/$it/front-250" }
+                }
+            } else {
+                null
             }
             // Si Last.fm no tiene portada, intentar con el cache persistido
-            val albumNameForLookup = trackInfo?.track?.album?.title
+            val albumNameForLookup = preferredAlbumTitle(lastFmAlbumTitle)
             val cachedUrl = if (lastFmUrl == null && !albumNameForLookup.isNullOrBlank()) {
                 coverFallbackRepo.getCachedUrl(currentArtist, albumNameForLookup)
             } else null
@@ -181,7 +266,7 @@ class NowPlayingDetailViewModel @Inject constructor(
                 }
             }
 
-            val albumTitle = trackInfo?.track?.album?.title
+            val albumTitle = preferredAlbumTitle(lastFmAlbumTitle)
             if (!albumTitle.isNullOrBlank()) {
                 uiState = uiState.copy(albumTitle = albumTitle)
                 checkFavorite(albumTitle)
@@ -248,6 +333,10 @@ class NowPlayingDetailViewModel @Inject constructor(
         }
     }
 
+    private fun preferredAlbumTitle(lastFmAlbum: String?): String? =
+        currentAlbumHint.takeIf { it.isNotBlank() }
+            ?: lastFmAlbum?.takeIf { it.isNotBlank() }
+
     private fun parseFormatType(format: String?): FormatType? {
         if (format == null) return null
         return when {
@@ -266,7 +355,7 @@ class NowPlayingDetailViewModel @Inject constructor(
         }
     }
 
-    private fun favoriteId(artist: String, album: String) = "$artist::$album"
+    private fun favoriteId(artist: String, album: String) = FavoriteKeys.id(artist, album)
 }
 
 private fun String.stripHtml(): String =

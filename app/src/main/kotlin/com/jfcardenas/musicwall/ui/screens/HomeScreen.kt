@@ -3,25 +3,26 @@ package com.jfcardenas.musicwall.ui.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -29,38 +30,108 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import coil.compose.AsyncImage
 import kotlinx.coroutines.delay
 import com.jfcardenas.musicwall.api.Album
 import com.jfcardenas.musicwall.api.RecentTrack
-import com.jfcardenas.musicwall.api.UserTag
+import com.jfcardenas.musicwall.api.browseableGenreTags
 import com.jfcardenas.musicwall.api.getExtraLargeUrl
 import com.jfcardenas.musicwall.data.CoverSearchState
+import com.jfcardenas.musicwall.ui.components.AlbumCoverPreviewOverlay
+import com.jfcardenas.musicwall.ui.components.InteractiveAlbumCover
 import com.jfcardenas.musicwall.ui.components.LayeredAlbumCover
 import com.jfcardenas.musicwall.ui.theme.*
+import com.jfcardenas.musicwall.ui.viewmodel.CoverInteractionViewModel
 import com.jfcardenas.musicwall.ui.viewmodel.CoverItem
 import com.jfcardenas.musicwall.ui.viewmodel.HomeViewModel
 import com.jfcardenas.musicwall.ui.viewmodel.relativeTime
 
+private const val DiscoveryGestureHint = "Doble toque actualizar · triple vetar · mantén portada y canciones"
+private const val GenreGestureHint = "Toque ampliar · doble toque otro género · mantén portada y canciones"
+private const val CoverGestureHint = "Mantén portada y canciones"
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
+    coverVm: CoverInteractionViewModel,
     onGoToEstilos: () -> Unit = {},
-    onGoToHistorial: () -> Unit = {},
-    onGoToArtistas: () -> Unit = {},
     onGoToFavoritas: () -> Unit = {},
-    onNowPlayingClick: (artist: String, track: String) -> Unit = { _, _ -> },
+    onNowPlayingClick: (artist: String, track: String, album: String) -> Unit = { _, _, _ -> },
     vm: HomeViewModel = hiltViewModel(),
 ) {
     val state = vm.uiState
-    var showRecentSheet by remember { mutableStateOf(false) }
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val favoriteKeys = coverVm.favoriteKeys
+    var genreRefreshKey by remember { mutableIntStateOf(0) }
+    var manualGenre by remember { mutableStateOf<String?>(null) }
+    var genrePreviewCover by remember { mutableStateOf<CoverItem?>(null) }
 
-    if (showRecentSheet) {
-        ModalBottomSheet(
-            onDismissRequest = { showRecentSheet = false },
-            containerColor   = Color(0xFF1A1A1A),
-        ) {
-            RecentTracksSheet(tracks = state.recentTracks)
+    LaunchedEffect(favoriteKeys) {
+        vm.applyFavoriteKeys(favoriteKeys)
+    }
+
+    DisposableEffect(lifecycleOwner) {
+        var firstResume = true
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                if (firstResume) {
+                    firstResume = false
+                } else {
+                    vm.reloadRecommendationCovers()
+                    genreRefreshKey++
+                }
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+
+    LaunchedEffect(genreRefreshKey) {
+        manualGenre = null
+    }
+
+    val browseableTags = remember(state.topTags) { browseableGenreTags(state.topTags) }
+    val autoGenre = remember(browseableTags, genreRefreshKey) {
+        browseableTags.shuffled().firstOrNull()
+    }
+    val activeGenre = manualGenre ?: autoGenre
+
+    LaunchedEffect(activeGenre, genreRefreshKey, manualGenre) {
+        activeGenre?.let { genre ->
+            vm.loadGenreRecommendations(
+                genre = genre,
+                excludeKeys = favoriteKeys,
+                limit = 16,
+                forceRefresh = manualGenre != null,
+            )
+        }
+    }
+
+    val genreCovers = activeGenre?.lowercase()?.let { state.genreRecommendations[it] }.orEmpty()
+
+    val openCoverDetail: (CoverItem, Boolean) -> Unit = { cover, showVeto ->
+        genrePreviewCover = null
+        coverVm.openCoverOverlay(
+            cover = cover,
+            showVeto = showVeto,
+            onVeto = if (showVeto) {
+                { vetoed -> vm.vetoAndRefreshRecommendations(vetoed) }
+            } else {
+                null
+            },
+            onFavorited = { favorited -> vm.removeFromDiscoveryFeeds(favorited.key) },
+        )
+    }
+
+    val shuffleGenre: () -> Unit = {
+        if (browseableTags.isNotEmpty()) {
+            val next = browseableTags
+                .filterNot { it.equals(activeGenre, ignoreCase = true) }
+                .randomOrNull()
+                ?: browseableTags.random()
+            manualGenre = next
         }
     }
 
@@ -69,6 +140,7 @@ fun HomeScreen(
         onRefresh    = { vm.refresh() },
         modifier     = Modifier.fillMaxSize(),
     ) {
+        Box(Modifier.fillMaxSize()) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -116,118 +188,102 @@ fun HomeScreen(
                     isNowPlaying     = state.isNowPlaying,
                     isLoading        = state.isLoading,
                     error            = state.error,
+                    artistReferences = state.currentArtistCovers,
+                    favoriteKeys     = favoriteKeys,
                     onSearchCover    = { vm.searchCurrentCover() },
+                    onShowDetail = {
+                        state.currentTrack?.let { t ->
+                            val albumName = t.album.name.takeIf { it.isNotBlank() } ?: t.name
+                            openCoverDetail(
+                                CoverItem(
+                                    imageUrl = state.currentTrackCoverUrl.orEmpty(),
+                                    albumName = albumName,
+                                    artistName = t.artist.name,
+                                ),
+                                false,
+                            )
+                        }
+                    },
+                    onShowDetailCover = { openCoverDetail(it, false) },
                     onClick = {
                         state.currentTrack?.let { t ->
-                            onNowPlayingClick(t.artist.name, t.name)
+                            onNowPlayingClick(t.artist.name, t.name, t.album.name)
                         }
                     },
                 )
             }
 
-            // Stats
-            if (state.playcount != "—" || state.artistCount != "—") {
-                item {
-                    StatsCard(
-                        playcount        = state.playcount,
-                        artistCount      = state.artistCount,
-                        onScrobblesClick = { showRecentSheet = true },
-                        onArtistasClick  = onGoToArtistas,
-                    )
-                }
-            }
-
-            // Géneros favoritos
-            if (state.topTags.isNotEmpty()) {
-                item {
-                    GenresCard(tags = state.topTags)
-                }
-            }
-
-            // Top de la semana → crear mural
-            item {
-                WeekAlbumsCard(
-                    albums         = state.weekAlbums,
-                    coverOverrides = state.coverOverrides,
-                    onClick        = onGoToEstilos,
-                    modifier       = Modifier.fillMaxWidth(),
-                )
-            }
-
-            // Recomendaciones basadas en lo que más escuchas
-            if (state.recommendations.isNotEmpty()) {
+            if (state.recommendationCovers.isNotEmpty()) {
                 item {
                     RecommendationsCard(
-                        albums         = state.recommendations,
-                        coverOverrides = state.coverOverrides,
-                        onAlbumClick   = { album ->
-                            onNowPlayingClick(album.artist.name, album.name)
-                        },
+                        covers           = state.recommendationCovers,
+                        favoriteKeys     = favoriteKeys,
+                        isRefreshing     = state.isRefreshingRecommendations,
+                        onRefreshCovers  = { vm.reloadRecommendationCovers() },
+                        onShowDetail     = { openCoverDetail(it, true) },
+                        onVetoCover      = { vm.vetoAndRefreshRecommendations(it) },
                     )
                 }
             }
 
-            // Mis portadas favoritas
             item {
-                QuickAccessCard(
-                    emoji    = "♡",
-                    title    = "Mis portadas",
-                    subtitle = "Las que guardaste",
-                    onClick  = onGoToFavoritas,
-                    modifier = Modifier.fillMaxWidth(),
+                VsCard(
+                    coverA           = state.vsCoverA,
+                    coverB           = state.vsCoverB,
+                    favoriteKeys     = favoriteKeys,
+                    onPick           = { vm.chooseVsWinner(it) },
+                    onShowDetail     = { openCoverDetail(it, false) },
+                    streaks          = state.vsWinStreaks,
+                    winnerKey        = state.lastVsWinnerKey,
                 )
             }
 
-            // VS de portadas — random de toda la DB
-            item {
-                VsCard(coverA = state.vsCoverA, coverB = state.vsCoverB)
+            if (activeGenre != null) {
+                item {
+                    GenreExplorationSection(
+                        activeGenre = activeGenre,
+                        genreCovers = genreCovers,
+                        isLoading = state.loadingGenre == activeGenre.lowercase(),
+                        favoriteKeys = favoriteKeys,
+                        onShuffleGenre = shuffleGenre,
+                        onPreviewCover = { genrePreviewCover = it },
+                        onShowDetail = { openCoverDetail(it, false) },
+                    )
+                }
+            }
+
+            if (state.favoriteCovers.isNotEmpty()) {
+                item {
+                    FavoriteCoversStrip(
+                        covers = state.favoriteCovers,
+                        favoriteKeys = favoriteKeys,
+                        onOpenAll = onGoToFavoritas,
+                        onShowDetail = { openCoverDetail(it, false) },
+                    )
+                }
             }
 
             item { Spacer(Modifier.height(8.dp)) }
         }
-    }
-}
 
-@Composable
-private fun GenresCard(tags: List<UserTag>) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Text(
-            text       = "Tus géneros",
-            fontSize   = 13.sp,
-            fontWeight = FontWeight.SemiBold,
-            color      = TextPrimary,
-            modifier   = Modifier.padding(bottom = 8.dp),
-        )
-        LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            items(tags.take(10)) { tag ->
-                val count = tag.count.toIntOrNull() ?: 0
-                val alpha = if (count > 0) (0.4f + 0.6f * (count.coerceAtMost(100) / 100f)).coerceIn(0.4f, 1f) else 0.6f
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(20.dp))
-                        .background(Purple.copy(alpha = alpha * 0.25f))
-                        .border(1.dp, Purple.copy(alpha = alpha * 0.5f), RoundedCornerShape(20.dp))
-                        .padding(horizontal = 12.dp, vertical = 6.dp),
-                ) {
-                    Text(
-                        text     = tag.name,
-                        fontSize = 12.sp,
-                        color    = Purple.copy(alpha = alpha),
-                        fontWeight = FontWeight.Medium,
-                    )
-                }
-            }
+        genrePreviewCover?.let { cover ->
+            AlbumCoverPreviewOverlay(
+                cover = cover,
+                onDismiss = { genrePreviewCover = null },
+            )
+        }
         }
     }
 }
 
 @Composable
 private fun RecommendationsCard(
-    albums: List<Album>,
-    coverOverrides: Map<String, String>,
-    onAlbumClick: (Album) -> Unit,
+    covers: List<CoverItem>,
+    favoriteKeys: Set<String>,
+    isRefreshing: Boolean,
+    onRefreshCovers: () -> Unit,
+    onShowDetail: (CoverItem) -> Unit,
+    onVetoCover: (CoverItem) -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Row(
@@ -235,7 +291,7 @@ private fun RecommendationsCard(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Column {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text       = "Te puede gustar",
                     fontSize   = 13.sp,
@@ -243,47 +299,39 @@ private fun RecommendationsCard(
                     color      = TextPrimary,
                 )
                 Text(
-                    text     = "Basado en tus artistas del mes",
+                    text     = DiscoveryGestureHint,
                     fontSize = 11.sp,
                     color    = TextSecondary,
+                )
+            }
+            if (isRefreshing) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(14.dp),
+                    color = Purple,
+                    strokeWidth = 1.5.dp,
                 )
             }
         }
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            items(albums) { album ->
-                val key      = "${album.artist.name}::${album.name}".lowercase()
-                val imageUrl = coverOverrides[key] ?: album.images.getExtraLargeUrl()
+            items(covers, key = { it.key }) { coverItem ->
                 Column(
-                    modifier            = Modifier
-                        .width(100.dp)
-                        .clickable { onAlbumClick(album) },
+                    modifier            = Modifier.width(100.dp),
                     horizontalAlignment = Alignment.Start,
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .size(100.dp)
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(Surface),
-                    ) {
-                        if (imageUrl != null) {
-                            AsyncImage(
-                                model              = imageUrl,
-                                contentDescription = null,
-                                contentScale       = ContentScale.Crop,
-                                modifier           = Modifier.fillMaxSize(),
-                            )
-                        } else {
-                            Box(
-                                modifier         = Modifier.fillMaxSize().background(Color(0xFF1A0A2E)),
-                                contentAlignment = Alignment.Center,
-                            ) { Text("♫", fontSize = 22.sp, color = Purple) }
-                        }
-                    }
+                    InteractiveAlbumCover(
+                        imageUrl             = coverItem.imageUrl,
+                        contentDescription   = coverItem.albumName,
+                        isFavorite           = coverItem.key in favoriteKeys,
+                        modifier             = Modifier.size(100.dp),
+                        onShowDetail         = { onShowDetail(coverItem) },
+                        onDoubleTap          = onRefreshCovers,
+                        onTripleTap          = { onVetoCover(coverItem) },
+                    )
                     Spacer(Modifier.height(5.dp))
                     Text(
-                        text     = album.name,
+                        text     = coverItem.albumName,
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Medium,
                         color    = TextPrimary,
@@ -291,7 +339,7 @@ private fun RecommendationsCard(
                         overflow = TextOverflow.Ellipsis,
                     )
                     Text(
-                        text     = album.artist.name,
+                        text     = coverItem.artistName,
                         fontSize = 10.sp,
                         color    = TextSecondary,
                         maxLines = 1,
@@ -304,31 +352,6 @@ private fun RecommendationsCard(
 }
 
 @Composable
-private fun QuickAccessCard(
-    emoji: String,
-    title: String,
-    subtitle: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Box(
-        modifier = modifier
-            .clip(RoundedCornerShape(14.dp))
-            .background(Card)
-            .border(1.dp, CardBorder, RoundedCornerShape(14.dp))
-            .clickable { onClick() }
-            .padding(16.dp),
-    ) {
-        Column {
-            Text(text = emoji, fontSize = 22.sp)
-            Spacer(Modifier.height(8.dp))
-            Text(text = title, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = TextPrimary)
-            Text(text = subtitle, fontSize = 11.sp, color = TextSecondary)
-        }
-    }
-}
-
-@Composable
 private fun NowPlayingCard(
     track: RecentTrack?,
     coverUrl: String?,
@@ -336,7 +359,11 @@ private fun NowPlayingCard(
     isNowPlaying: Boolean,
     isLoading: Boolean,
     error: String?,
+    artistReferences: List<CoverItem>,
+    favoriteKeys: Set<String>,
     onSearchCover: () -> Unit,
+    onShowDetail: () -> Unit,
+    onShowDetailCover: (CoverItem) -> Unit,
     onClick: () -> Unit,
 ) {
     Box(
@@ -401,7 +428,11 @@ private fun NowPlayingCard(
                         coverUrl         = coverUrl,
                         coverSearchState = coverSearchState,
                         isNowPlaying     = isNowPlaying,
+                        artistReferences = artistReferences,
+                        favoriteKeys     = favoriteKeys,
                         onSearchCover    = onSearchCover,
+                        onShowDetail     = onShowDetail,
+                        onShowDetailCover = onShowDetailCover,
                     )
                 }
                 else -> {
@@ -422,15 +453,32 @@ private fun TrackContent(
     coverUrl: String?,
     coverSearchState: CoverSearchState,
     isNowPlaying: Boolean,
+    artistReferences: List<CoverItem>,
+    favoriteKeys: Set<String>,
     onSearchCover: () -> Unit,
+    onShowDetail: () -> Unit,
+    onShowDetailCover: (CoverItem) -> Unit,
 ) {
+    val albumName = track.album.name.takeIf { it.isNotBlank() } ?: track.name
+    val coverKey = "${track.artist.name}::${albumName}".lowercase()
     Row(verticalAlignment = Alignment.CenterVertically) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        LayeredAlbumCover(
-            imageUrl     = coverUrl,
-            cornerRadius = 10.dp,
-            modifier     = Modifier.size(80.dp),
-        )
+            if (coverUrl != null) {
+                InteractiveAlbumCover(
+                    imageUrl           = coverUrl,
+                    contentDescription = albumName,
+                    isFavorite         = coverKey in favoriteKeys,
+                    modifier           = Modifier.size(80.dp),
+                    cornerRadius       = 10.dp,
+                    onShowDetail       = onShowDetail,
+                )
+            } else {
+                LayeredAlbumCover(
+                    imageUrl     = null,
+                    cornerRadius = 10.dp,
+                    modifier     = Modifier.size(80.dp),
+                )
+            }
         when (coverSearchState) {
             CoverSearchState.Idle -> if (coverUrl == null) {
                 Spacer(Modifier.height(4.dp))
@@ -482,6 +530,22 @@ private fun TrackContent(
                 )
             }
         }
+
+        if (artistReferences.isNotEmpty()) {
+            Spacer(Modifier.width(10.dp))
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                artistReferences.take(2).forEach { cover ->
+                    InteractiveAlbumCover(
+                        imageUrl           = cover.imageUrl,
+                        contentDescription = cover.albumName,
+                        isFavorite         = cover.key in favoriteKeys,
+                        modifier           = Modifier.size(42.dp),
+                        cornerRadius       = 7.dp,
+                        onShowDetail       = { onShowDetailCover(cover) },
+                    )
+                }
+            }
+        }
     }
 
     Spacer(Modifier.height(12.dp))
@@ -502,255 +566,14 @@ private fun TrackContent(
 }
 
 @Composable
-private fun StatsCard(
-    playcount: String,
-    artistCount: String,
-    onScrobblesClick: () -> Unit,
-    onArtistasClick: () -> Unit,
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        StatBox(
-            label    = "Scrobbles",
-            value    = formatNumber(playcount),
-            modifier = Modifier.weight(1f),
-            onClick  = onScrobblesClick,
-        )
-        StatBox(
-            label    = "Artistas",
-            value    = formatNumber(artistCount),
-            modifier = Modifier.weight(1f),
-            onClick  = onArtistasClick,
-        )
-        StatBox(
-            label    = "Murales",
-            value    = "—",
-            modifier = Modifier.weight(1f),
-        )
-    }
-}
-
-@Composable
-private fun StatBox(label: String, value: String, modifier: Modifier = Modifier, onClick: (() -> Unit)? = null) {
-    Box(
-        modifier = modifier
-            .clip(RoundedCornerShape(14.dp))
-            .then(if (onClick != null) Modifier.clickable { onClick() } else Modifier)
-            .background(Card)
-            .border(1.dp, CardBorder, RoundedCornerShape(14.dp))
-            .padding(vertical = 16.dp),
-        contentAlignment = Alignment.Center,
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                text       = value,
-                fontSize   = 22.sp,
-                fontWeight = FontWeight.Bold,
-                color      = TextPrimary,
-            )
-            Spacer(Modifier.height(2.dp))
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(3.dp)) {
-                Text(
-                    text     = label,
-                    fontSize = 11.sp,
-                    color    = TextSecondary,
-                )
-                if (onClick != null) {
-                    Text(text = "›", fontSize = 11.sp, color = TextMuted)
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun RecentTracksSheet(tracks: List<RecentTrack>) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Text(
-            text       = "Últimas canciones",
-            fontSize   = 16.sp,
-            fontWeight = FontWeight.Bold,
-            color      = TextPrimary,
-            modifier   = Modifier.padding(horizontal = 24.dp, vertical = 16.dp),
-        )
-        if (tracks.isEmpty()) {
-            Box(
-                modifier            = Modifier.fillMaxWidth().padding(vertical = 32.dp),
-                contentAlignment    = Alignment.Center,
-            ) {
-                Text("Sin historial reciente", color = TextSecondary, fontSize = 14.sp)
-            }
-        } else {
-            LazyColumn(
-                contentPadding      = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
-                verticalArrangement = Arrangement.spacedBy(2.dp),
-            ) {
-                items(tracks) { track -> RecentTrackRow(track) }
-                item { Spacer(Modifier.navigationBarsPadding()) }
-            }
-        }
-    }
-}
-
-@Composable
-private fun RecentTrackRow(track: RecentTrack) {
-    val isNowPlaying = track.attr?.nowplaying == "true"
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(10.dp))
-            .background(if (isNowPlaying) Card else Color.Transparent)
-            .padding(horizontal = 8.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        val imageUrl = track.images.getExtraLargeUrl()
-        Box(
-            modifier = Modifier
-                .size(44.dp)
-                .clip(RoundedCornerShape(6.dp))
-                .background(Surface),
-        ) {
-            if (imageUrl != null) {
-                AsyncImage(
-                    model            = imageUrl,
-                    contentDescription = null,
-                    contentScale     = ContentScale.Crop,
-                    modifier         = Modifier.fillMaxSize(),
-                )
-            } else {
-                Box(
-                    modifier         = Modifier.fillMaxSize().background(Color(0xFF1A0A2E)),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text("♫", fontSize = 16.sp, color = Purple)
-                }
-            }
-        }
-        Spacer(Modifier.width(12.dp))
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text     = track.name,
-                fontSize = 14.sp,
-                fontWeight = if (isNowPlaying) FontWeight.SemiBold else FontWeight.Normal,
-                color    = TextPrimary,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-            val subtitle = buildString {
-                append(track.artist.name)
-                if (track.album.name.isNotBlank()) append(" · ${track.album.name}")
-            }
-            Text(
-                text     = subtitle,
-                fontSize = 12.sp,
-                color    = TextSecondary,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-        }
-        Spacer(Modifier.width(8.dp))
-        if (isNowPlaying) {
-            Box(modifier = Modifier.size(6.dp).background(Color(0xFF1DB954), CircleShape))
-        } else {
-            Text(
-                text     = relativeTime(track.date?.uts),
-                fontSize = 10.sp,
-                color    = TextMuted,
-            )
-        }
-    }
-}
-
-@Composable
-private fun WeekAlbumsCard(
-    albums: List<Album>,
-    coverOverrides: Map<String, String>,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    val padded: List<Album?> = (albums.take(8) + List(8) { null as Album? }).take(8)
-    Box(
-        modifier = modifier
-            .clip(RoundedCornerShape(14.dp))
-            .background(Card)
-            .border(1.dp, CardBorder, RoundedCornerShape(14.dp))
-            .clickable { onClick() },
-    ) {
-        Column(modifier = Modifier.padding(12.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Column {
-                    Text("Crear mural", fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = TextPrimary)
-                    Text("Tus top esta semana", fontSize = 11.sp, color = TextSecondary)
-                }
-                Text("›", fontSize = 18.sp, color = TextMuted)
-            }
-            Spacer(Modifier.height(10.dp))
-            padded.chunked(4).forEachIndexed { rowIdx, row ->
-                if (rowIdx > 0) Spacer(Modifier.height(4.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                ) {
-                    row.forEachIndexed { colIdx, album ->
-                        val key      = album?.let { "${it.artist.name}::${it.name}".lowercase() }
-                        val imageUrl = key?.let { coverOverrides[it] } ?: album?.images?.getExtraLargeUrl()
-                        AlbumThumb(
-                            imageUrl = imageUrl,
-                            index    = rowIdx * 4 + colIdx,
-                            modifier = Modifier.weight(1f).height(64.dp),
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun AlbumThumb(imageUrl: String?, index: Int = 0, modifier: Modifier = Modifier) {
-    var visible by remember(imageUrl) { mutableStateOf(false) }
-    LaunchedEffect(imageUrl) {
-        visible = false
-        delay(index * 45L)
-        visible = true
-    }
-    val scale by animateFloatAsState(
-        targetValue    = if (visible) 1f else 0.72f,
-        animationSpec  = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMediumLow),
-        label          = "thumb_scale",
-    )
-    val alpha by animateFloatAsState(
-        targetValue   = if (visible) 1f else 0f,
-        animationSpec = tween(160),
-        label         = "thumb_alpha",
-    )
-    Box(
-        modifier = modifier
-            .graphicsLayer { scaleX = scale; scaleY = scale; this.alpha = alpha }
-            .clip(RoundedCornerShape(6.dp))
-            .background(Surface),
-    ) {
-        if (imageUrl != null) {
-            AsyncImage(
-                model = imageUrl,
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize(),
-            )
-        }
-    }
-}
-
-@Composable
 private fun VsCard(
     coverA: CoverItem?,
     coverB: CoverItem?,
+    favoriteKeys: Set<String>,
+    onPick: (CoverItem) -> Unit,
+    onShowDetail: (CoverItem) -> Unit,
+    streaks: Map<String, Int>,
+    winnerKey: String?,
     modifier: Modifier = Modifier,
 ) {
     if (coverA == null || coverB == null) return
@@ -775,35 +598,116 @@ private fun VsCard(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                VsCoverItem(cover = coverA, modifier = Modifier.weight(1f))
+                VsCoverItem(
+                    cover = coverA,
+                    onPick = { onPick(coverA) },
+                    onShowDetail = { onShowDetail(coverA) },
+                    streak = streaks[coverA.key] ?: 0,
+                    isWinner = winnerKey == coverA.key,
+                    isFavorited = coverA.key in favoriteKeys,
+                    modifier = Modifier.weight(1f),
+                )
                 Text(
                     text = "VS",
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
                     color = TextSecondary,
                 )
-                VsCoverItem(cover = coverB, modifier = Modifier.weight(1f))
+                VsCoverItem(
+                    cover = coverB,
+                    onPick = { onPick(coverB) },
+                    onShowDetail = { onShowDetail(coverB) },
+                    streak = streaks[coverB.key] ?: 0,
+                    isWinner = winnerKey == coverB.key,
+                    isFavorited = coverB.key in favoriteKeys,
+                    modifier = Modifier.weight(1f),
+                )
             }
         }
     }
 }
 
 @Composable
-private fun VsCoverItem(cover: CoverItem, modifier: Modifier = Modifier) {
+private fun VsCoverItem(
+    cover: CoverItem,
+    onPick: () -> Unit,
+    onShowDetail: () -> Unit,
+    streak: Int,
+    isWinner: Boolean,
+    isFavorited: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    val winnerScale by animateFloatAsState(
+        targetValue = if (isWinner) 1.04f else 1f,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMedium),
+        label = "winner_scale",
+    )
+    val lmlScale by animateFloatAsState(
+        targetValue = if (isWinner) 1f else 0.65f,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMedium),
+        label = "winner_lml_scale",
+    )
+    val lmlAlpha by animateFloatAsState(
+        targetValue = if (streak > 0) 1f else 0f,
+        animationSpec = tween(160),
+        label = "winner_lml_alpha",
+    )
+    val streakColor = when {
+        streak >= 10 -> Color(0xFFFFD166)
+        streak >= 5  -> Color(0xFFFF4D8D)
+        streak >= 3  -> Purple
+        else         -> Purple.copy(alpha = 0.9f)
+    }
+    val lmlText = when {
+        streak >= 10 -> "🤘🔥"
+        streak >= 5  -> "🤘⚡"
+        else         -> "🤘"
+    }
+    val lmlFontSize = when {
+        streak >= 10 -> 24.sp
+        streak >= 5  -> 23.sp
+        streak >= 3  -> 22.sp
+        else         -> 20.sp
+    }
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(1f)
+                .graphicsLayer {
+                    scaleX = winnerScale
+                    scaleY = winnerScale
+                }
                 .clip(RoundedCornerShape(10.dp))
                 .background(Surface),
         ) {
-            AsyncImage(
-                model = cover.imageUrl,
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize(),
+            InteractiveAlbumCover(
+                imageUrl           = cover.imageUrl,
+                contentDescription = cover.albumName,
+                isFavorite         = isFavorited,
+                modifier           = Modifier.fillMaxSize(),
+                onShowDetail       = onShowDetail,
+                onClick            = onPick,
             )
+        }
+        if (streak > 0) {
+            Spacer(Modifier.height(5.dp))
+            Row(
+                modifier = Modifier
+                    .graphicsLayer {
+                        alpha = lmlAlpha
+                        scaleX = lmlScale
+                        scaleY = lmlScale
+                    }
+                    .clip(RoundedCornerShape(14.dp))
+                    .border(1.dp, streakColor.copy(alpha = 0.7f), RoundedCornerShape(14.dp))
+                    .padding(horizontal = 8.dp, vertical = 3.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                Text(text = lmlText, fontSize = lmlFontSize, color = streakColor)
+                Text("x$streak", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = TextSecondary)
+            }
         }
         Spacer(Modifier.height(6.dp))
         Text(
@@ -825,6 +729,154 @@ private fun VsCoverItem(cover: CoverItem, modifier: Modifier = Modifier) {
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth(),
         )
+    }
+}
+
+@Composable
+private fun GenreExplorationSection(
+    activeGenre: String,
+    genreCovers: List<CoverItem>,
+    isLoading: Boolean,
+    favoriteKeys: Set<String>,
+    onShuffleGenre: () -> Unit,
+    onPreviewCover: (CoverItem) -> Unit,
+    onShowDetail: (CoverItem) -> Unit,
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column {
+                Text(
+                    text = "Explorando $activeGenre",
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = TextPrimary,
+                )
+                Text(
+                    text = GenreGestureHint,
+                    fontSize = 11.sp,
+                    color = TextSecondary,
+                )
+            }
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(16.dp),
+                    color = Purple,
+                    strokeWidth = 2.dp,
+                )
+            }
+        }
+        Spacer(Modifier.height(8.dp))
+        HomeGenreCovers(
+            covers = genreCovers,
+            favoriteKeys = favoriteKeys,
+            onShuffleGenre = onShuffleGenre,
+            onPreviewCover = onPreviewCover,
+            onShowDetail = onShowDetail,
+        )
+    }
+}
+
+@Composable
+private fun HomeGenreCovers(
+    covers: List<CoverItem>,
+    favoriteKeys: Set<String>,
+    onShuffleGenre: () -> Unit,
+    onPreviewCover: (CoverItem) -> Unit,
+    onShowDetail: (CoverItem) -> Unit,
+) {
+    val visibleCovers = remember(covers, favoriteKeys) {
+        covers.filter { it.key !in favoriteKeys }.distinctBy { it.key }.take(8)
+    }
+
+    if (visibleCovers.isEmpty()) {
+        Text(
+            text = "Sin portadas para este género · doble toque para cambiar",
+            fontSize = 12.sp,
+            color = TextSecondary,
+            modifier = Modifier.pointerInput(Unit) {
+                detectTapGestures(onDoubleTap = { onShuffleGenre() })
+            },
+        )
+        return
+    }
+
+    LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        items(visibleCovers, key = { it.key }) { coverItem ->
+            Column(
+                modifier = Modifier.width(100.dp),
+                horizontalAlignment = Alignment.Start,
+            ) {
+                InteractiveAlbumCover(
+                    imageUrl           = coverItem.imageUrl,
+                    contentDescription = coverItem.albumName,
+                    isFavorite         = coverItem.key in favoriteKeys,
+                    modifier           = Modifier.size(100.dp),
+                    onShowDetail       = { onShowDetail(coverItem) },
+                    onClick            = { onPreviewCover(coverItem) },
+                    onDoubleTap        = onShuffleGenre,
+                )
+                Spacer(Modifier.height(5.dp))
+                Text(
+                    text = coverItem.albumName,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = TextPrimary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Text(
+                    text = coverItem.artistName,
+                    fontSize = 10.sp,
+                    color = TextSecondary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun FavoriteCoversStrip(
+    covers: List<CoverItem>,
+    favoriteKeys: Set<String>,
+    onOpenAll: () -> Unit,
+    onShowDetail: (CoverItem) -> Unit,
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column {
+                Text("Favoritas", fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = TextPrimary)
+                Text(CoverGestureHint, fontSize = 11.sp, color = TextSecondary)
+            }
+            Text(
+                text = "Ver todas",
+                fontSize = 12.sp,
+                color = Purple,
+                modifier = Modifier.clickable { onOpenAll() },
+            )
+        }
+        LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            items(covers, key = { it.key }) { cover ->
+                InteractiveAlbumCover(
+                    imageUrl           = cover.imageUrl,
+                    contentDescription = cover.albumName,
+                    isFavorite         = cover.key in favoriteKeys,
+                    modifier           = Modifier.size(76.dp),
+                    cornerRadius       = 12.dp,
+                    onShowDetail       = { onShowDetail(cover) },
+                    onClick            = { onOpenAll() },
+                )
+            }
+        }
     }
 }
 
@@ -852,8 +904,8 @@ private fun SkullTimer(
     )
 
     Text(
-        text     = "🤘",
-        fontSize = 17.sp,
+        text     = "🥁↻🥁",
+        fontSize = 16.sp,
         modifier = Modifier
             .graphicsLayer {
                 scaleX = scale
@@ -863,13 +915,4 @@ private fun SkullTimer(
             .clickable { onRefresh(); key++ }
             .padding(horizontal = 4.dp, vertical = 2.dp),
     )
-}
-
-private fun formatNumber(raw: String): String {
-    val n = raw.toLongOrNull() ?: return raw
-    return when {
-        n >= 1_000_000 -> "${n / 1_000_000}M"
-        n >= 1_000     -> "${n / 1_000}K"
-        else           -> n.toString()
-    }
 }

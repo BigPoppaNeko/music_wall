@@ -32,6 +32,22 @@ class WallpaperRefreshWorker @AssistedInject constructor(
         private const val TAG = "WallpaperRefreshWorker"
         private const val WORK_NAME = "wallpaper_periodic_refresh"
 
+        fun isEnabled(context: Context): Boolean =
+            context.getSharedPreferences(CollageWallpaper.PREFS_NAME, Context.MODE_PRIVATE)
+                .getBoolean(CollageWallpaper.PREF_AUTO_WALLPAPER_REFRESH, true)
+
+        fun scheduleIfEnabled(context: Context, intervalHours: Long = 24) {
+            if (isEnabled(context)) schedule(context, intervalHours) else cancel(context)
+        }
+
+        fun setEnabled(context: Context, enabled: Boolean, intervalHours: Long = 24) {
+            context.getSharedPreferences(CollageWallpaper.PREFS_NAME, Context.MODE_PRIVATE)
+                .edit()
+                .putBoolean(CollageWallpaper.PREF_AUTO_WALLPAPER_REFRESH, enabled)
+                .apply()
+            if (enabled) schedule(context, intervalHours) else cancel(context)
+        }
+
         fun schedule(context: Context, intervalHours: Long = 24) {
             val request = PeriodicWorkRequestBuilder<WallpaperRefreshWorker>(
                 repeatInterval = intervalHours,
@@ -46,7 +62,7 @@ class WallpaperRefreshWorker @AssistedInject constructor(
 
             WorkManager.getInstance(context).enqueueUniquePeriodicWork(
                 WORK_NAME,
-                ExistingPeriodicWorkPolicy.KEEP,
+                ExistingPeriodicWorkPolicy.UPDATE,
                 request
             )
             Log.d(TAG, "Scheduled periodic refresh every ${intervalHours}h")
@@ -54,6 +70,7 @@ class WallpaperRefreshWorker @AssistedInject constructor(
 
         fun cancel(context: Context) {
             WorkManager.getInstance(context).cancelUniqueWork(WORK_NAME)
+            Log.d(TAG, "Cancelled periodic refresh")
         }
     }
 }

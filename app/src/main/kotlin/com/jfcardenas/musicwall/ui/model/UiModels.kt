@@ -89,27 +89,83 @@ val CURATED_WALLS: List<WallItem> = listOf(
 
 val LOADING_QUOTES = listOf(
     Quote(
-        text = "\"La música es el arte más directo,\nentra por el oído y va al corazón.\"",
-        author = "MAGDALENA MARTÍNEZ"
-    ),
-    Quote(
-        text = "\"No busques encontrarte en la música.\nPermite que la música te encuentre a ti.\"",
-        author = "RUMI"
-    ),
-    Quote(
         text = "\"Sin música, la vida sería un error.\"",
-        author = "NIETZSCHE"
+        author = "FRIEDRICH NIETZSCHE"
     ),
     Quote(
-        text = "\"Donde termina el lenguaje,\ncomienza la música.\"",
-        author = "E.T.A. HOFFMANN"
+        text = "\"La música es un ejercicio oculto de metafísica\nen el que el espíritu no sabe que está filosofando.\"",
+        author = "ARTHUR SCHOPENHAUER"
     ),
     Quote(
-        text = "\"Hay una grieta en todo.\nAsí es como entra la luz.\"",
-        author = "LEONARD COHEN"
+        text = "\"La música expresa la esencia\nmás íntima del mundo.\"",
+        author = "ARTHUR SCHOPENHAUER"
     ),
     Quote(
-        text = "\"El alma se tiñe del color\nde sus pensamientos.\"",
-        author = "MARCO AURELIO"
+        text = "\"La música es una revelación más alta\nque toda sabiduría y filosofía.\"",
+        author = "LUDWIG VAN BEETHOVEN"
+    ),
+    Quote(
+        text = "\"La música es el espacio\nentre las notas.\"",
+        author = "CLAUDE DEBUSSY"
+    ),
+    Quote(
+        text = "\"La música es incapaz de expresar\nnada por sí misma.\"",
+        author = "ÍGOR STRAVINSKI"
+    ),
+    Quote(
+        text = "\"La música puede nombrar lo innombrable\ny comunicar lo desconocido.\"",
+        author = "LEONARD BERNSTEIN"
+    ),
+    Quote(
+        text = "\"La música expresa aquello que no puede decirse\ny sobre lo que es imposible permanecer en silencio.\"",
+        author = "VÍCTOR HUGO"
+    ),
+    Quote(
+        text = "\"La música es la taquigrafía\nde la emoción.\"",
+        author = "LEV TOLSTÓI"
+    ),
+    Quote(
+        text = "\"La música da alma al universo, alas a la mente,\nvuelo a la imaginación y vida a todo.\"",
+        author = "PLATÓN"
+    ),
+    Quote(
+        text = "\"Si quieres conocer el estado de una nación,\nescucha su música.\"",
+        author = "CONFUCIO"
+    ),
+    Quote(
+        text = "\"La arquitectura es música congelada.\"",
+        author = "JOHANN WOLFGANG VON GOETHE"
+    ),
+    Quote(
+        text = "\"Donde termina el poder de las palabras\ncomienza el de la música.\"",
+        author = "RICHARD WAGNER"
+    ),
+    Quote(
+        text = "\"La música crea orden\na partir del caos.\"",
+        author = "YEHUDI MENUHIN"
+    ),
+    Quote(
+        text = "\"Todo lo que hacemos\nes música.\"",
+        author = "JOHN CAGE"
+    ),
+    Quote(
+        text = "\"La música no es complicada;\nlas personas son complicadas.\"",
+        author = "THELONIOUS MONK"
+    ),
+    Quote(
+        text = "\"La música es una herramienta\npara dar forma al tiempo.\"",
+        author = "BJÖRK"
+    ),
+    Quote(
+        text = "\"Hablar sobre música es como\nbailar sobre arquitectura.\"",
+        author = "FRANK ZAPPA"
+    ),
+    Quote(
+        text = "\"No toques lo que está ahí;\ntoca lo que no está ahí.\"",
+        author = "MILES DAVIS"
+    ),
+    Quote(
+        text = "\"La música es todo aquello que uno escucha\ncon la intención de escuchar música.\"",
+        author = "BRIAN ENO"
     ),
 )

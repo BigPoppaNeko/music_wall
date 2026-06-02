@@ -7,6 +7,9 @@ import com.jfcardenas.musicwall.data.local.db.dao.ArtistDao
 import com.jfcardenas.musicwall.data.local.db.dao.FavoriteAlbumDao
 import com.jfcardenas.musicwall.data.local.db.dao.MuralDao
 import com.jfcardenas.musicwall.data.local.db.dao.TrackDao
+import com.jfcardenas.musicwall.data.local.db.dao.LfMatchCacheDao
+import com.jfcardenas.musicwall.data.local.db.dao.LocalScrobbleDao
+import com.jfcardenas.musicwall.data.local.db.dao.VetoedAlbumDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -37,4 +40,13 @@ object DatabaseModule {
 
     @Provides
     fun provideFavoriteAlbumDao(db: MusicWallDatabase): FavoriteAlbumDao = db.favoriteAlbumDao()
+
+    @Provides
+    fun provideVetoedAlbumDao(db: MusicWallDatabase): VetoedAlbumDao = db.vetoedAlbumDao()
+
+    @Provides
+    fun provideLocalScrobbleDao(db: MusicWallDatabase): LocalScrobbleDao = db.localScrobbleDao()
+
+    @Provides
+    fun provideLfMatchCacheDao(db: MusicWallDatabase): LfMatchCacheDao = db.lfMatchCacheDao()
 }

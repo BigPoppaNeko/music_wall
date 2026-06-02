@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jfcardenas.musicwall.api.LastFmService
 import com.jfcardenas.musicwall.api.getExtraLargeUrl
+import com.jfcardenas.musicwall.data.UserSettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -16,6 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ExploreViewModel @Inject constructor(
     private val lastFmService: LastFmService,
+    private val settings: UserSettingsRepository,
 ) : ViewModel() {
 
     data class SearchResult(
@@ -78,5 +80,9 @@ class ExploreViewModel @Inject constructor(
             n >= 1_000     -> "${n / 1_000}K oyentes"
             else           -> "$n oyentes"
         }
+    }
+
+    fun saveSelectedArtists(artists: Collection<String>) {
+        settings.saveExploreArtists(artists)
     }
 }
