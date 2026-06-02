@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jfcardenas.musicwall.api.Album
@@ -41,6 +42,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@Immutable
 data class CoverItem(
     val imageUrl: String,
     val albumName: String,
@@ -52,6 +54,7 @@ data class CoverItem(
         get() = "${artistName.trim().lowercase()}::${albumName.trim().lowercase()}"
 }
 
+@Immutable
 data class AlbumInsight(
     val cover: CoverItem,
     val genres: List<String>,
@@ -73,6 +76,7 @@ class HomeViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
 ) : ViewModel() {
 
+    @Immutable
     data class UiState(
         val username: String = "",
         val avatarUrl: String? = null,

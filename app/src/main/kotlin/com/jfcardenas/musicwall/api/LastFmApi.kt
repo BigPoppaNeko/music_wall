@@ -7,13 +7,11 @@ import com.jfcardenas.musicwall.BuildConfig
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Response
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
 import java.io.IOException
-import java.util.concurrent.TimeUnit
 
 interface LastFmService {
     @GET(".")
@@ -173,21 +171,14 @@ private class LastFmErrorInterceptor : Interceptor {
     }
 }
 
-internal fun createLastFmService(): LastFmService {
+internal fun createLastFmService(httpClient: OkHttpClient): LastFmService {
     val gson = GsonBuilder()
         .registerTypeAdapter(AlbumTracksContainer::class.java, AlbumTracksContainerDeserializer())
         .registerTypeAdapter(AlbumInfoResponse::class.java, AlbumInfoResponseDeserializer())
         .create()
-    val logging = HttpLoggingInterceptor().apply {
-        level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BASIC
-                else HttpLoggingInterceptor.Level.NONE
-    }
-    val client = OkHttpClient.Builder()
+    val client = httpClient.newBuilder()
         .addInterceptor(ApiKeyInterceptor())
         .addInterceptor(LastFmErrorInterceptor())
-        .addInterceptor(logging)
-        .connectTimeout(15, TimeUnit.SECONDS)
-        .readTimeout(30, TimeUnit.SECONDS)
         .build()
     return Retrofit.Builder()
         .baseUrl("https://ws.audioscrobbler.com/2.0/")

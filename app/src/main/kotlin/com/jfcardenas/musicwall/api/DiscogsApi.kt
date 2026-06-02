@@ -1,15 +1,12 @@
 package com.jfcardenas.musicwall.api
 
 import com.google.gson.annotations.SerializedName
-import com.jfcardenas.musicwall.BuildConfig
 import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
-import java.util.concurrent.TimeUnit
 
 interface DiscogsService {
     @GET("database/search")
@@ -56,12 +53,8 @@ data class DiscogsPagination(
     val items: Int?,
 )
 
-internal fun createDiscogsService(): DiscogsService {
-    val logging = HttpLoggingInterceptor().apply {
-        level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BASIC
-                else HttpLoggingInterceptor.Level.NONE
-    }
-    val client = OkHttpClient.Builder()
+internal fun createDiscogsService(httpClient: OkHttpClient): DiscogsService {
+    val client = httpClient.newBuilder()
         .addInterceptor { chain ->
             chain.proceed(
                 chain.request().newBuilder()
@@ -69,9 +62,6 @@ internal fun createDiscogsService(): DiscogsService {
                     .build()
             )
         }
-        .addInterceptor(logging)
-        .connectTimeout(15, TimeUnit.SECONDS)
-        .readTimeout(30, TimeUnit.SECONDS)
         .build()
     return Retrofit.Builder()
         .baseUrl("https://api.discogs.com/")

@@ -1,6 +1,7 @@
 package com.jfcardenas.musicwall.api
 
 import com.google.gson.annotations.SerializedName
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
@@ -24,9 +25,10 @@ data class LrcLibResult(
     @SerializedName("syncedLyrics") val syncedLyrics: String?,
 )
 
-internal fun createLrcLibService(): LrcLibService =
+internal fun createLrcLibService(httpClient: OkHttpClient): LrcLibService =
     Retrofit.Builder()
         .baseUrl("https://lrclib.net/")
+        .client(httpClient)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
         .create(LrcLibService::class.java)

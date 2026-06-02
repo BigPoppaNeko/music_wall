@@ -1,5 +1,6 @@
 package com.jfcardenas.musicwall.api
 
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
@@ -18,9 +19,10 @@ data class LyricsResponse(
     val error: String?,
 )
 
-internal fun createLyricsService(): LyricsService =
+internal fun createLyricsService(httpClient: OkHttpClient): LyricsService =
     Retrofit.Builder()
         .baseUrl("https://api.lyrics.ovh/")
+        .client(httpClient)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
         .create(LyricsService::class.java)

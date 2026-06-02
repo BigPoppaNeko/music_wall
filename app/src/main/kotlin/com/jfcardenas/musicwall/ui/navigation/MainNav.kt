@@ -28,6 +28,7 @@ import com.jfcardenas.musicwall.ui.components.MuralesGridIcon
 import com.jfcardenas.musicwall.ui.components.SampleBackground
 import com.jfcardenas.musicwall.ui.screens.*
 import com.jfcardenas.musicwall.ui.theme.*
+import com.jfcardenas.musicwall.ui.viewmodel.ArtistasViewModel
 import com.jfcardenas.musicwall.ui.viewmodel.CoverInteractionViewModel
 import com.jfcardenas.musicwall.ui.viewmodel.HomeViewModel
 import com.jfcardenas.musicwall.ui.viewmodel.SettingsViewModel
@@ -52,6 +53,7 @@ fun MainNav(initialRoute: String? = null) {
     val coverVm: CoverInteractionViewModel = hiltViewModel(viewModelStoreOwner = activity)
     val homeVm: HomeViewModel = hiltViewModel(viewModelStoreOwner = activity)
     val settingsVm: SettingsViewModel = hiltViewModel(viewModelStoreOwner = activity)
+    val artistsVm: ArtistasViewModel = hiltViewModel(viewModelStoreOwner = activity)
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(initialRoute) {
@@ -153,6 +155,7 @@ fun MainNav(initialRoute: String? = null) {
             composable("biblioteca") {
                 ProfileScreen(
                     vm = homeVm,
+                    artistsVm = artistsVm,
                     coverVm = coverVm,
                     onGoToFavoritas = { nav.navigate("favoritas") },
                     onGoToCuenta = {

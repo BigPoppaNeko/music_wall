@@ -53,6 +53,12 @@ android {
             isMinifyEnabled = false
             applicationIdSuffix = ".debug"
         }
+        create("staging") {
+            initWith(getByName("debug"))
+            applicationIdSuffix = ".staging"
+            versionNameSuffix = "-staging"
+            matchingFallbacks += listOf("debug")
+        }
     }
 
     compileOptions {

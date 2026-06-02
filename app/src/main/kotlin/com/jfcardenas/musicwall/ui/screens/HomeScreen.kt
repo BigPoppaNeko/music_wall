@@ -61,7 +61,10 @@ fun HomeScreen(
     onNowPlayingClick: (artist: String, track: String, album: String) -> Unit = { _, _, _ -> },
     vm: HomeViewModel = hiltViewModel(),
 ) {
-    val state = vm.uiState
+    val recommendationCovers by remember { derivedStateOf { vm.uiState.recommendationCovers } }
+    val genreRecommendations by remember { derivedStateOf { vm.uiState.genreRecommendations } }
+    val isLoading by remember { derivedStateOf { vm.uiState.isLoading } }
+    val state by remember { derivedStateOf { vm.uiState } }
     val lifecycleOwner = LocalLifecycleOwner.current
     val favoriteKeys = coverVm.favoriteKeys
     var genreRefreshKey by remember { mutableIntStateOf(0) }
@@ -109,7 +112,11 @@ fun HomeScreen(
         }
     }
 
-    val genreCovers = activeGenre?.lowercase()?.let { state.genreRecommendations[it] }.orEmpty()
+    val genreCovers by remember(activeGenre, genreRecommendations) {
+        derivedStateOf {
+            activeGenre?.lowercase()?.let { genreRecommendations[it] }.orEmpty()
+        }
+    }
 
     val openCoverDetail: (CoverItem, Boolean) -> Unit = { cover, showVeto ->
         genrePreviewCover = null
@@ -136,7 +143,7 @@ fun HomeScreen(
     }
 
     PullToRefreshBox(
-        isRefreshing = state.isLoading,
+        isRefreshing = isLoading,
         onRefresh    = { vm.refresh() },
         modifier     = Modifier.fillMaxSize(),
     ) {
@@ -213,10 +220,10 @@ fun HomeScreen(
                 )
             }
 
-            if (state.recommendationCovers.isNotEmpty()) {
+            if (recommendationCovers.isNotEmpty()) {
                 item {
                     RecommendationsCard(
-                        covers           = state.recommendationCovers,
+                        covers           = recommendationCovers,
                         favoriteKeys     = favoriteKeys,
                         isRefreshing     = state.isRefreshingRecommendations,
                         onRefreshCovers  = { vm.reloadRecommendationCovers() },
