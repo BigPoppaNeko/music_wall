@@ -6,4 +6,4 @@ com.jfcardenas.musicwall.app-packageDebugResources-4 D:\Github\music_wall\app\bu
 com.jfcardenas.musicwall.app-debug-5 D:\Github\music_wall\app\build\intermediates\merged_res\debug\mergeDebugResources
 com.jfcardenas.musicwall.app-debug-6 D:\Github\music_wall\app\src\debug\res
 com.jfcardenas.musicwall.app-main-7 D:\Github\music_wall\app\src\main\res
-gradleHome-0 C:\Users\jfcar\.gradle
+gradleHome-0 C:\Users\jfcar\AppData\Local\Temp\cursor-sandbox-cache\4e196acd611faceef85230a402c48dd3\gradle

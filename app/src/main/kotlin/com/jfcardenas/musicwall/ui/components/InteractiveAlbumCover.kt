@@ -26,7 +26,6 @@ fun InteractiveAlbumCover(
     cornerRadius: Dp = 10.dp,
     onShowDetail: () -> Unit,
     onDoubleTap: () -> Unit = {},
-    onTripleTap: (() -> Unit)? = null,
     onClick: (() -> Unit)? = null,
 ) {
     Box(
@@ -35,7 +34,6 @@ fun InteractiveAlbumCover(
             .coverMultiTapGestures(
                 onSingleTap = onClick,
                 onDoubleTap = onDoubleTap,
-                onTripleTap = onTripleTap,
                 onLongPress = onShowDetail,
             ),
     ) {
@@ -53,9 +51,8 @@ private const val MultiTapWindowMs = 320L
 private fun Modifier.coverMultiTapGestures(
     onSingleTap: (() -> Unit)?,
     onDoubleTap: () -> Unit,
-    onTripleTap: (() -> Unit)?,
     onLongPress: () -> Unit,
-): Modifier = pointerInput(onSingleTap, onDoubleTap, onTripleTap) {
+): Modifier = pointerInput(onSingleTap, onDoubleTap) {
     coroutineScope {
         var tapCount = 0
         var resetJob: Job? = null
@@ -67,10 +64,9 @@ private fun Modifier.coverMultiTapGestures(
                 resetJob?.cancel()
                 resetJob = launch {
                     delay(MultiTapWindowMs)
-                    when {
-                        tapCount >= 3 -> onTripleTap?.invoke()
-                        tapCount == 2 -> onDoubleTap()
-                        tapCount == 1 -> onSingleTap?.invoke()
+                    when (tapCount) {
+                        2 -> onDoubleTap()
+                        1 -> onSingleTap?.invoke()
                     }
                     tapCount = 0
                 }

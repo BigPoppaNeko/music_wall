@@ -1,0 +1,38 @@
+[
+    {
+        "merged": "com.jfcardenas.musicwall.app-staging-76:/xml_wallpaper.xml.flat",
+        "source": "com.jfcardenas.musicwall.app-main-77:/xml/wallpaper.xml"
+    },
+    {
+        "merged": "com.jfcardenas.musicwall.app-staging-76:/drawable_ic_launcher_foreground.xml.flat",
+        "source": "com.jfcardenas.musicwall.app-main-77:/drawable/ic_launcher_foreground.xml"
+    },
+    {
+        "merged": "com.jfcardenas.musicwall.app-staging-76:/xml_file_paths.xml.flat",
+        "source": "com.jfcardenas.musicwall.app-main-77:/xml/file_paths.xml"
+    },
+    {
+        "merged": "com.jfcardenas.musicwall.app-staging-76:/layout_activity_settings.xml.flat",
+        "source": "com.jfcardenas.musicwall.app-main-77:/layout/activity_settings.xml"
+    },
+    {
+        "merged": "com.jfcardenas.musicwall.app-staging-76:/drawable_ic_veto.xml.flat",
+        "source": "com.jfcardenas.musicwall.app-main-77:/drawable/ic_veto.xml"
+    },
+    {
+        "merged": "com.jfcardenas.musicwall.app-staging-76:/layout_activity_connect.xml.flat",
+        "source": "com.jfcardenas.musicwall.app-main-77:/layout/activity_connect.xml"
+    },
+    {
+        "merged": "com.jfcardenas.musicwall.app-staging-76:/mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "com.jfcardenas.musicwall.app-main-77:/mipmap-anydpi-v26/ic_launcher.xml"
+    },
+    {
+        "merged": "com.jfcardenas.musicwall.app-staging-76:/layout_dropdown_item.xml.flat",
+        "source": "com.jfcardenas.musicwall.app-main-77:/layout/dropdown_item.xml"
+    },
+    {
+        "merged": "com.jfcardenas.musicwall.app-staging-76:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "com.jfcardenas.musicwall.app-main-77:/mipmap-anydpi-v26/ic_launcher_round.xml"
+    }
+]

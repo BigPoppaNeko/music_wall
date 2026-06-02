@@ -1,0 +1,10 @@
+com.jfcardenas.musicwall.app-pngs-0 D:\Github\music_wall\app\build\generated\res\pngs\release
+com.jfcardenas.musicwall.app-resValues-1 D:\Github\music_wall\app\build\generated\res\resValues\release
+com.jfcardenas.musicwall.app-updated_navigation_xml-2 D:\Github\music_wall\app\build\generated\updated_navigation_xml\release
+com.jfcardenas.musicwall.app-packageReleaseResources-3 D:\Github\music_wall\app\build\intermediates\incremental\release\packageReleaseResources\merged.dir
+com.jfcardenas.musicwall.app-packageReleaseResources-4 D:\Github\music_wall\app\build\intermediates\incremental\release\packageReleaseResources\stripped.dir
+com.jfcardenas.musicwall.app-merged-not-compiled-resources-5 D:\Github\music_wall\app\build\intermediates\merged-not-compiled-resources\release
+com.jfcardenas.musicwall.app-release-6 D:\Github\music_wall\app\build\intermediates\merged_res\release\mergeReleaseResources
+com.jfcardenas.musicwall.app-main-7 D:\Github\music_wall\app\src\main\res
+com.jfcardenas.musicwall.app-release-8 D:\Github\music_wall\app\src\release\res
+gradleHome-0 C:\Users\jfcar\AppData\Local\Temp\cursor-sandbox-cache\4e196acd611faceef85230a402c48dd3\gradle

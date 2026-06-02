@@ -10,7 +10,7 @@ public final class BuildConfig {
   public static final int VERSION_CODE = 1;
   public static final String VERSION_NAME = "1.0";
   // Field from default config.
-  public static final String LASTFM_API_KEY = "df630f853e5b0a3c42f0e0c1e44991f8";
+  public static final String GOOGLE_WEB_CLIENT_ID = "";
   // Field from default config.
-  public static final String LASTFM_SHARED_SECRET = "09acff485d27b92648ac4cc6a994f32e";
+  public static final String LASTFM_API_KEY = "df630f853e5b0a3c42f0e0c1e44991f8";
 }

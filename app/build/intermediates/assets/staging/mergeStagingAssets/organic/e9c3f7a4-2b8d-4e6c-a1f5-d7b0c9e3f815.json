@@ -1,0 +1,29 @@
+{
+  "id": "e9c3f7a4-2b8d-4e6c-a1f5-d7b0c9e3f815",
+  "genre": "britrock",
+  "mood": "teenage_devotion",
+  "totalSlots": 15,
+  "slots": [
+    { "id": 1,  "x": 0.1338, "y": 0.1278, "width": 0.2157, "height": 0.1104, "rotation": 0.0, "lightingZone": [80, 50, 25] },
+    { "id": 2,  "x": 0.3921, "y": 0.1278, "width": 0.2157, "height": 0.1104, "rotation": 0.0, "lightingZone": [65, 41, 18] },
+    { "id": 3,  "x": 0.6505, "y": 0.1278, "width": 0.2157, "height": 0.1104, "rotation": 0.0, "lightingZone": [55, 35, 15] },
+    { "id": 4,  "x": 0.1338, "y": 0.2638, "width": 0.2157, "height": 0.1104, "rotation": 0.0, "lightingZone": [86, 54, 25] },
+    { "id": 5,  "x": 0.3921, "y": 0.2638, "width": 0.2157, "height": 0.1104, "rotation": 0.0, "lightingZone": [76, 48, 22] },
+    { "id": 6,  "x": 0.6505, "y": 0.2638, "width": 0.2157, "height": 0.1104, "rotation": 0.0, "lightingZone": [66, 42, 19] },
+    { "id": 7,  "x": 0.1338, "y": 0.3998, "width": 0.2157, "height": 0.1104, "rotation": 0.0, "lightingZone": [97, 62, 29] },
+    { "id": 8,  "x": 0.3921, "y": 0.3998, "width": 0.2157, "height": 0.1104, "rotation": 0.0, "lightingZone": [87, 56, 25] },
+    { "id": 9,  "x": 0.6505, "y": 0.3998, "width": 0.2157, "height": 0.1104, "rotation": 0.0, "lightingZone": [78, 49, 22] },
+    { "id": 10, "x": 0.1338, "y": 0.5358, "width": 0.2157, "height": 0.1104, "rotation": 0.0, "lightingZone": [109, 69, 32] },
+    { "id": 11, "x": 0.3921, "y": 0.5358, "width": 0.2157, "height": 0.1104, "rotation": 0.0, "lightingZone": [99, 63, 29] },
+    { "id": 12, "x": 0.6505, "y": 0.5358, "width": 0.2157, "height": 0.1104, "rotation": 0.0, "lightingZone": [89, 57, 26] },
+    { "id": 13, "x": 0.1338, "y": 0.6718, "width": 0.2157, "height": 0.1104, "rotation": 0.0, "lightingZone": [120, 76, 36] },
+    { "id": 14, "x": 0.3921, "y": 0.6718, "width": 0.2157, "height": 0.1104, "rotation": 0.0, "lightingZone": [110, 70, 33] },
+    { "id": 15, "x": 0.6505, "y": 0.6718, "width": 0.2157, "height": 0.1104, "rotation": 0.0, "lightingZone": [101, 64, 30] }
+  ],
+  "lightingMap": {
+    "type": "gradient",
+    "mainLightColor": "#C87010",
+    "ambientColor": "#120806",
+    "shadowDirection": "bottom-right"
+  }
+}

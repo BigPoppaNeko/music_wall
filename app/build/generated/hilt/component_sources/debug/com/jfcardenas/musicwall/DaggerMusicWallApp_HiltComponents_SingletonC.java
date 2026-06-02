@@ -17,28 +17,40 @@ import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.jfcardenas.musicwall.api.DeezerService;
 import com.jfcardenas.musicwall.api.DiscogsService;
 import com.jfcardenas.musicwall.api.LastFmService;
+import com.jfcardenas.musicwall.api.LrcLibService;
 import com.jfcardenas.musicwall.api.LyricsService;
 import com.jfcardenas.musicwall.api.SpotifyOEmbedService;
+import com.jfcardenas.musicwall.auth.GoogleAuthManager;
+import com.jfcardenas.musicwall.auth.UserSessionRepository;
 import com.jfcardenas.musicwall.data.ArtistImageResolver;
 import com.jfcardenas.musicwall.data.CoverFallbackRepository;
 import com.jfcardenas.musicwall.data.CoverUpdateBus;
 import com.jfcardenas.musicwall.data.LastFmRepository;
+import com.jfcardenas.musicwall.data.UserSettingsRepository;
 import com.jfcardenas.musicwall.data.local.db.MusicWallDatabase;
 import com.jfcardenas.musicwall.data.local.db.dao.AlbumDao;
 import com.jfcardenas.musicwall.data.local.db.dao.ArtistDao;
 import com.jfcardenas.musicwall.data.local.db.dao.FavoriteAlbumDao;
+import com.jfcardenas.musicwall.data.local.db.dao.LfMatchCacheDao;
+import com.jfcardenas.musicwall.data.local.db.dao.LocalScrobbleDao;
 import com.jfcardenas.musicwall.data.local.db.dao.MuralDao;
 import com.jfcardenas.musicwall.data.local.db.dao.TrackDao;
+import com.jfcardenas.musicwall.data.local.db.dao.VetoedAlbumDao;
 import com.jfcardenas.musicwall.di.DatabaseModule_ProvideAlbumDaoFactory;
 import com.jfcardenas.musicwall.di.DatabaseModule_ProvideArtistDaoFactory;
 import com.jfcardenas.musicwall.di.DatabaseModule_ProvideDatabaseFactory;
 import com.jfcardenas.musicwall.di.DatabaseModule_ProvideFavoriteAlbumDaoFactory;
+import com.jfcardenas.musicwall.di.DatabaseModule_ProvideLfMatchCacheDaoFactory;
+import com.jfcardenas.musicwall.di.DatabaseModule_ProvideLocalScrobbleDaoFactory;
 import com.jfcardenas.musicwall.di.DatabaseModule_ProvideMuralDaoFactory;
 import com.jfcardenas.musicwall.di.DatabaseModule_ProvideTrackDaoFactory;
+import com.jfcardenas.musicwall.di.DatabaseModule_ProvideVetoedAlbumDaoFactory;
+import com.jfcardenas.musicwall.di.HttpClientModule_ProvideOkHttpClientFactory;
 import com.jfcardenas.musicwall.di.NetworkModule_ProvideDeezerServiceFactory;
 import com.jfcardenas.musicwall.di.NetworkModule_ProvideDiscogsServiceFactory;
 import com.jfcardenas.musicwall.di.NetworkModule_ProvideImageLoaderFactory;
 import com.jfcardenas.musicwall.di.NetworkModule_ProvideLastFmServiceFactory;
+import com.jfcardenas.musicwall.di.NetworkModule_ProvideLrcLibServiceFactory;
 import com.jfcardenas.musicwall.di.NetworkModule_ProvideLyricsServiceFactory;
 import com.jfcardenas.musicwall.di.OrganicScenesModule_ProvideBanoBarLimaSceneFactory;
 import com.jfcardenas.musicwall.di.OrganicScenesModule_ProvideBritrockSceneFactory;
@@ -46,21 +58,32 @@ import com.jfcardenas.musicwall.di.OrganicScenesModule_ProvideWoodstockSceneFact
 import com.jfcardenas.musicwall.di.SpotifyModule_ProvideSpotifyOEmbedServiceFactory;
 import com.jfcardenas.musicwall.domain.usecase.GetMusicImagesUseCase;
 import com.jfcardenas.musicwall.features.connect.ConnectActivity;
-import com.jfcardenas.musicwall.features.connect.ConnectActivity_MembersInjector;
 import com.jfcardenas.musicwall.features.wallpaper.renderer.ManchesterWallRenderer;
 import com.jfcardenas.musicwall.features.wallpaper.renderer.MosaicBlendRenderer;
 import com.jfcardenas.musicwall.features.wallpaper.renderer.PsychedelicGridRenderer;
 import com.jfcardenas.musicwall.features.wallpaper.renderer.PuzzleRenderer;
 import com.jfcardenas.musicwall.features.wallpaper.renderer.WallpaperRendererFactory;
 import com.jfcardenas.musicwall.features.wallpaper.renderer.organic.OrganicRenderer;
+import com.jfcardenas.musicwall.scrobble.LastFmTrackResolver;
+import com.jfcardenas.musicwall.scrobble.NowPlayingBus;
+import com.jfcardenas.musicwall.scrobble.NowPlayingReader;
+import com.jfcardenas.musicwall.scrobble.ScrobbleEngine;
+import com.jfcardenas.musicwall.scrobble.ScrobbleRepository;
 import com.jfcardenas.musicwall.service.CollageWallpaper;
 import com.jfcardenas.musicwall.service.CollageWallpaper_MembersInjector;
+import com.jfcardenas.musicwall.service.NowPlayingListenerService;
+import com.jfcardenas.musicwall.service.NowPlayingListenerService_MembersInjector;
+import com.jfcardenas.musicwall.service.ScrobbleForegroundService;
+import com.jfcardenas.musicwall.service.ScrobbleForegroundService_MembersInjector;
 import com.jfcardenas.musicwall.settings.WallpaperSettingsActivity;
-import com.jfcardenas.musicwall.settings.WallpaperSettingsActivity_MembersInjector;
 import com.jfcardenas.musicwall.ui.viewmodel.ArtistasViewModel;
 import com.jfcardenas.musicwall.ui.viewmodel.ArtistasViewModel_HiltModules;
 import com.jfcardenas.musicwall.ui.viewmodel.ArtistasViewModel_HiltModules_BindsModule_Binds_LazyMapKey;
 import com.jfcardenas.musicwall.ui.viewmodel.ArtistasViewModel_HiltModules_KeyModule_Provide_LazyMapKey;
+import com.jfcardenas.musicwall.ui.viewmodel.CoverInteractionViewModel;
+import com.jfcardenas.musicwall.ui.viewmodel.CoverInteractionViewModel_HiltModules;
+import com.jfcardenas.musicwall.ui.viewmodel.CoverInteractionViewModel_HiltModules_BindsModule_Binds_LazyMapKey;
+import com.jfcardenas.musicwall.ui.viewmodel.CoverInteractionViewModel_HiltModules_KeyModule_Provide_LazyMapKey;
 import com.jfcardenas.musicwall.ui.viewmodel.ExploreViewModel;
 import com.jfcardenas.musicwall.ui.viewmodel.ExploreViewModel_HiltModules;
 import com.jfcardenas.musicwall.ui.viewmodel.ExploreViewModel_HiltModules_BindsModule_Binds_LazyMapKey;
@@ -81,26 +104,30 @@ import com.jfcardenas.musicwall.ui.viewmodel.LastFmSourceViewModel;
 import com.jfcardenas.musicwall.ui.viewmodel.LastFmSourceViewModel_HiltModules;
 import com.jfcardenas.musicwall.ui.viewmodel.LastFmSourceViewModel_HiltModules_BindsModule_Binds_LazyMapKey;
 import com.jfcardenas.musicwall.ui.viewmodel.LastFmSourceViewModel_HiltModules_KeyModule_Provide_LazyMapKey;
-import com.jfcardenas.musicwall.ui.viewmodel.MuralHistoryViewModel;
-import com.jfcardenas.musicwall.ui.viewmodel.MuralHistoryViewModel_HiltModules;
-import com.jfcardenas.musicwall.ui.viewmodel.MuralHistoryViewModel_HiltModules_BindsModule_Binds_LazyMapKey;
-import com.jfcardenas.musicwall.ui.viewmodel.MuralHistoryViewModel_HiltModules_KeyModule_Provide_LazyMapKey;
 import com.jfcardenas.musicwall.ui.viewmodel.NowPlayingDetailViewModel;
 import com.jfcardenas.musicwall.ui.viewmodel.NowPlayingDetailViewModel_HiltModules;
 import com.jfcardenas.musicwall.ui.viewmodel.NowPlayingDetailViewModel_HiltModules_BindsModule_Binds_LazyMapKey;
 import com.jfcardenas.musicwall.ui.viewmodel.NowPlayingDetailViewModel_HiltModules_KeyModule_Provide_LazyMapKey;
+import com.jfcardenas.musicwall.ui.viewmodel.OnboardingViewModel;
+import com.jfcardenas.musicwall.ui.viewmodel.OnboardingViewModel_HiltModules;
+import com.jfcardenas.musicwall.ui.viewmodel.OnboardingViewModel_HiltModules_BindsModule_Binds_LazyMapKey;
+import com.jfcardenas.musicwall.ui.viewmodel.OnboardingViewModel_HiltModules_KeyModule_Provide_LazyMapKey;
 import com.jfcardenas.musicwall.ui.viewmodel.PreviewViewModel;
 import com.jfcardenas.musicwall.ui.viewmodel.PreviewViewModel_HiltModules;
 import com.jfcardenas.musicwall.ui.viewmodel.PreviewViewModel_HiltModules_BindsModule_Binds_LazyMapKey;
 import com.jfcardenas.musicwall.ui.viewmodel.PreviewViewModel_HiltModules_KeyModule_Provide_LazyMapKey;
+import com.jfcardenas.musicwall.ui.viewmodel.SettingsViewModel;
+import com.jfcardenas.musicwall.ui.viewmodel.SettingsViewModel_HiltModules;
+import com.jfcardenas.musicwall.ui.viewmodel.SettingsViewModel_HiltModules_BindsModule_Binds_LazyMapKey;
+import com.jfcardenas.musicwall.ui.viewmodel.SettingsViewModel_HiltModules_KeyModule_Provide_LazyMapKey;
 import com.jfcardenas.musicwall.ui.viewmodel.SpotifySourceViewModel;
 import com.jfcardenas.musicwall.ui.viewmodel.SpotifySourceViewModel_HiltModules;
 import com.jfcardenas.musicwall.ui.viewmodel.SpotifySourceViewModel_HiltModules_BindsModule_Binds_LazyMapKey;
 import com.jfcardenas.musicwall.ui.viewmodel.SpotifySourceViewModel_HiltModules_KeyModule_Provide_LazyMapKey;
-import com.jfcardenas.musicwall.ui.viewmodel.StyleViewModel;
-import com.jfcardenas.musicwall.ui.viewmodel.StyleViewModel_HiltModules;
-import com.jfcardenas.musicwall.ui.viewmodel.StyleViewModel_HiltModules_BindsModule_Binds_LazyMapKey;
-import com.jfcardenas.musicwall.ui.viewmodel.StyleViewModel_HiltModules_KeyModule_Provide_LazyMapKey;
+import com.jfcardenas.musicwall.ui.viewmodel.WallSceneSetupViewModel;
+import com.jfcardenas.musicwall.ui.viewmodel.WallSceneSetupViewModel_HiltModules;
+import com.jfcardenas.musicwall.ui.viewmodel.WallSceneSetupViewModel_HiltModules_BindsModule_Binds_LazyMapKey;
+import com.jfcardenas.musicwall.ui.viewmodel.WallSceneSetupViewModel_HiltModules_KeyModule_Provide_LazyMapKey;
 import com.jfcardenas.musicwall.worker.WallpaperRefreshWorker;
 import com.jfcardenas.musicwall.worker.WallpaperRefreshWorker_AssistedFactory;
 import dagger.hilt.android.ActivityRetainedLifecycle;
@@ -129,6 +156,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.processing.Generated;
+import okhttp3.OkHttpClient;
 
 @DaggerGenerated
 @Generated(
@@ -452,23 +480,21 @@ public final class DaggerMusicWallApp_HiltComponents_SingletonC {
 
     }
 
-    GetMusicImagesUseCase getMusicImagesUseCase() {
-      return new GetMusicImagesUseCase(singletonCImpl.lastFmRepositoryProvider.get());
-    }
-
     Map keySetMapOfClassOfAndBooleanBuilder() {
-      MapBuilder mapBuilder = MapBuilder.<String, Boolean>newMapBuilder(11);
+      MapBuilder mapBuilder = MapBuilder.<String, Boolean>newMapBuilder(13);
       mapBuilder.put(ArtistasViewModel_HiltModules_KeyModule_Provide_LazyMapKey.lazyClassKeyName, ArtistasViewModel_HiltModules.KeyModule.provide());
+      mapBuilder.put(CoverInteractionViewModel_HiltModules_KeyModule_Provide_LazyMapKey.lazyClassKeyName, CoverInteractionViewModel_HiltModules.KeyModule.provide());
       mapBuilder.put(ExploreViewModel_HiltModules_KeyModule_Provide_LazyMapKey.lazyClassKeyName, ExploreViewModel_HiltModules.KeyModule.provide());
       mapBuilder.put(FavoritesViewModel_HiltModules_KeyModule_Provide_LazyMapKey.lazyClassKeyName, FavoritesViewModel_HiltModules.KeyModule.provide());
       mapBuilder.put(GeneratingViewModel_HiltModules_KeyModule_Provide_LazyMapKey.lazyClassKeyName, GeneratingViewModel_HiltModules.KeyModule.provide());
       mapBuilder.put(HomeViewModel_HiltModules_KeyModule_Provide_LazyMapKey.lazyClassKeyName, HomeViewModel_HiltModules.KeyModule.provide());
       mapBuilder.put(LastFmSourceViewModel_HiltModules_KeyModule_Provide_LazyMapKey.lazyClassKeyName, LastFmSourceViewModel_HiltModules.KeyModule.provide());
-      mapBuilder.put(MuralHistoryViewModel_HiltModules_KeyModule_Provide_LazyMapKey.lazyClassKeyName, MuralHistoryViewModel_HiltModules.KeyModule.provide());
       mapBuilder.put(NowPlayingDetailViewModel_HiltModules_KeyModule_Provide_LazyMapKey.lazyClassKeyName, NowPlayingDetailViewModel_HiltModules.KeyModule.provide());
+      mapBuilder.put(OnboardingViewModel_HiltModules_KeyModule_Provide_LazyMapKey.lazyClassKeyName, OnboardingViewModel_HiltModules.KeyModule.provide());
       mapBuilder.put(PreviewViewModel_HiltModules_KeyModule_Provide_LazyMapKey.lazyClassKeyName, PreviewViewModel_HiltModules.KeyModule.provide());
+      mapBuilder.put(SettingsViewModel_HiltModules_KeyModule_Provide_LazyMapKey.lazyClassKeyName, SettingsViewModel_HiltModules.KeyModule.provide());
       mapBuilder.put(SpotifySourceViewModel_HiltModules_KeyModule_Provide_LazyMapKey.lazyClassKeyName, SpotifySourceViewModel_HiltModules.KeyModule.provide());
-      mapBuilder.put(StyleViewModel_HiltModules_KeyModule_Provide_LazyMapKey.lazyClassKeyName, StyleViewModel_HiltModules.KeyModule.provide());
+      mapBuilder.put(WallSceneSetupViewModel_HiltModules_KeyModule_Provide_LazyMapKey.lazyClassKeyName, WallSceneSetupViewModel_HiltModules.KeyModule.provide());
       return mapBuilder.build();
     }
 
@@ -482,13 +508,11 @@ public final class DaggerMusicWallApp_HiltComponents_SingletonC {
 
     @Override
     public void injectConnectActivity(ConnectActivity connectActivity) {
-      injectConnectActivity2(connectActivity);
     }
 
     @Override
     public void injectWallpaperSettingsActivity(
         WallpaperSettingsActivity wallpaperSettingsActivity) {
-      injectWallpaperSettingsActivity2(wallpaperSettingsActivity);
     }
 
     @Override
@@ -515,21 +539,6 @@ public final class DaggerMusicWallApp_HiltComponents_SingletonC {
     public ViewComponentBuilder viewComponentBuilder() {
       return new ViewCBuilder(singletonCImpl, activityRetainedCImpl, activityCImpl);
     }
-
-    @CanIgnoreReturnValue
-    private ConnectActivity injectConnectActivity2(ConnectActivity instance) {
-      ConnectActivity_MembersInjector.injectLastFmService(instance, singletonCImpl.provideLastFmServiceProvider.get());
-      return instance;
-    }
-
-    @CanIgnoreReturnValue
-    private WallpaperSettingsActivity injectWallpaperSettingsActivity2(
-        WallpaperSettingsActivity instance2) {
-      WallpaperSettingsActivity_MembersInjector.injectGetMusicImages(instance2, getMusicImagesUseCase());
-      WallpaperSettingsActivity_MembersInjector.injectImageLoader(instance2, singletonCImpl.provideImageLoaderProvider.get());
-      WallpaperSettingsActivity_MembersInjector.injectRendererFactory(instance2, singletonCImpl.wallpaperRendererFactoryProvider.get());
-      return instance2;
-    }
   }
 
   private static final class ViewModelCImpl extends MusicWallApp_HiltComponents.ViewModelC {
@@ -543,6 +552,8 @@ public final class DaggerMusicWallApp_HiltComponents_SingletonC {
 
     Provider<ArtistasViewModel> artistasViewModelProvider;
 
+    Provider<CoverInteractionViewModel> coverInteractionViewModelProvider;
+
     Provider<ExploreViewModel> exploreViewModelProvider;
 
     Provider<FavoritesViewModel> favoritesViewModelProvider;
@@ -553,15 +564,17 @@ public final class DaggerMusicWallApp_HiltComponents_SingletonC {
 
     Provider<LastFmSourceViewModel> lastFmSourceViewModelProvider;
 
-    Provider<MuralHistoryViewModel> muralHistoryViewModelProvider;
-
     Provider<NowPlayingDetailViewModel> nowPlayingDetailViewModelProvider;
+
+    Provider<OnboardingViewModel> onboardingViewModelProvider;
 
     Provider<PreviewViewModel> previewViewModelProvider;
 
+    Provider<SettingsViewModel> settingsViewModelProvider;
+
     Provider<SpotifySourceViewModel> spotifySourceViewModelProvider;
 
-    Provider<StyleViewModel> styleViewModelProvider;
+    Provider<WallSceneSetupViewModel> wallSceneSetupViewModelProvider;
 
     ViewModelCImpl(SingletonCImpl singletonCImpl, ActivityRetainedCImpl activityRetainedCImpl,
         SavedStateHandle savedStateHandleParam, ViewModelLifecycle viewModelLifecycleParam) {
@@ -577,18 +590,20 @@ public final class DaggerMusicWallApp_HiltComponents_SingletonC {
     }
 
     Map hiltViewModelMapMapOfClassOfAndProviderOfViewModelBuilder() {
-      MapBuilder mapBuilder = MapBuilder.<String, javax.inject.Provider<ViewModel>>newMapBuilder(11);
+      MapBuilder mapBuilder = MapBuilder.<String, javax.inject.Provider<ViewModel>>newMapBuilder(13);
       mapBuilder.put(ArtistasViewModel_HiltModules_BindsModule_Binds_LazyMapKey.lazyClassKeyName, ((Provider) (artistasViewModelProvider)));
+      mapBuilder.put(CoverInteractionViewModel_HiltModules_BindsModule_Binds_LazyMapKey.lazyClassKeyName, ((Provider) (coverInteractionViewModelProvider)));
       mapBuilder.put(ExploreViewModel_HiltModules_BindsModule_Binds_LazyMapKey.lazyClassKeyName, ((Provider) (exploreViewModelProvider)));
       mapBuilder.put(FavoritesViewModel_HiltModules_BindsModule_Binds_LazyMapKey.lazyClassKeyName, ((Provider) (favoritesViewModelProvider)));
       mapBuilder.put(GeneratingViewModel_HiltModules_BindsModule_Binds_LazyMapKey.lazyClassKeyName, ((Provider) (generatingViewModelProvider)));
       mapBuilder.put(HomeViewModel_HiltModules_BindsModule_Binds_LazyMapKey.lazyClassKeyName, ((Provider) (homeViewModelProvider)));
       mapBuilder.put(LastFmSourceViewModel_HiltModules_BindsModule_Binds_LazyMapKey.lazyClassKeyName, ((Provider) (lastFmSourceViewModelProvider)));
-      mapBuilder.put(MuralHistoryViewModel_HiltModules_BindsModule_Binds_LazyMapKey.lazyClassKeyName, ((Provider) (muralHistoryViewModelProvider)));
       mapBuilder.put(NowPlayingDetailViewModel_HiltModules_BindsModule_Binds_LazyMapKey.lazyClassKeyName, ((Provider) (nowPlayingDetailViewModelProvider)));
+      mapBuilder.put(OnboardingViewModel_HiltModules_BindsModule_Binds_LazyMapKey.lazyClassKeyName, ((Provider) (onboardingViewModelProvider)));
       mapBuilder.put(PreviewViewModel_HiltModules_BindsModule_Binds_LazyMapKey.lazyClassKeyName, ((Provider) (previewViewModelProvider)));
+      mapBuilder.put(SettingsViewModel_HiltModules_BindsModule_Binds_LazyMapKey.lazyClassKeyName, ((Provider) (settingsViewModelProvider)));
       mapBuilder.put(SpotifySourceViewModel_HiltModules_BindsModule_Binds_LazyMapKey.lazyClassKeyName, ((Provider) (spotifySourceViewModelProvider)));
-      mapBuilder.put(StyleViewModel_HiltModules_BindsModule_Binds_LazyMapKey.lazyClassKeyName, ((Provider) (styleViewModelProvider)));
+      mapBuilder.put(WallSceneSetupViewModel_HiltModules_BindsModule_Binds_LazyMapKey.lazyClassKeyName, ((Provider) (wallSceneSetupViewModelProvider)));
       return mapBuilder.build();
     }
 
@@ -596,16 +611,18 @@ public final class DaggerMusicWallApp_HiltComponents_SingletonC {
     private void initialize(final SavedStateHandle savedStateHandleParam,
         final ViewModelLifecycle viewModelLifecycleParam) {
       this.artistasViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 0);
-      this.exploreViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 1);
-      this.favoritesViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 2);
-      this.generatingViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 3);
-      this.homeViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 4);
-      this.lastFmSourceViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 5);
-      this.muralHistoryViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 6);
+      this.coverInteractionViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 1);
+      this.exploreViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 2);
+      this.favoritesViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 3);
+      this.generatingViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 4);
+      this.homeViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 5);
+      this.lastFmSourceViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 6);
       this.nowPlayingDetailViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 7);
-      this.previewViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 8);
-      this.spotifySourceViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 9);
-      this.styleViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 10);
+      this.onboardingViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 8);
+      this.previewViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 9);
+      this.settingsViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 10);
+      this.spotifySourceViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 11);
+      this.wallSceneSetupViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 12);
     }
 
     @Override
@@ -642,35 +659,41 @@ public final class DaggerMusicWallApp_HiltComponents_SingletonC {
           case 0: // com.jfcardenas.musicwall.ui.viewmodel.ArtistasViewModel
           return (T) new ArtistasViewModel(singletonCImpl.provideLastFmServiceProvider.get(), singletonCImpl.provideDeezerServiceProvider.get(), singletonCImpl.coverFallbackRepositoryProvider.get(), ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
 
-          case 1: // com.jfcardenas.musicwall.ui.viewmodel.ExploreViewModel
-          return (T) new ExploreViewModel(singletonCImpl.provideLastFmServiceProvider.get());
+          case 1: // com.jfcardenas.musicwall.ui.viewmodel.CoverInteractionViewModel
+          return (T) new CoverInteractionViewModel(singletonCImpl.provideLastFmServiceProvider.get(), singletonCImpl.favoriteAlbumDao());
 
-          case 2: // com.jfcardenas.musicwall.ui.viewmodel.FavoritesViewModel
+          case 2: // com.jfcardenas.musicwall.ui.viewmodel.ExploreViewModel
+          return (T) new ExploreViewModel(singletonCImpl.provideLastFmServiceProvider.get(), singletonCImpl.userSettingsRepositoryProvider.get());
+
+          case 3: // com.jfcardenas.musicwall.ui.viewmodel.FavoritesViewModel
           return (T) new FavoritesViewModel(singletonCImpl.favoriteAlbumDao());
 
-          case 3: // com.jfcardenas.musicwall.ui.viewmodel.GeneratingViewModel
+          case 4: // com.jfcardenas.musicwall.ui.viewmodel.GeneratingViewModel
           return (T) new GeneratingViewModel(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule), viewModelCImpl.getMusicImagesUseCase(), singletonCImpl.wallpaperRendererFactoryProvider.get(), singletonCImpl.provideImageLoaderProvider.get(), viewModelCImpl.savedStateHandle);
 
-          case 4: // com.jfcardenas.musicwall.ui.viewmodel.HomeViewModel
-          return (T) new HomeViewModel(singletonCImpl.provideLastFmServiceProvider.get(), singletonCImpl.albumDao(), singletonCImpl.coverFallbackRepositoryProvider.get(), singletonCImpl.coverUpdateBusProvider.get(), ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
+          case 5: // com.jfcardenas.musicwall.ui.viewmodel.HomeViewModel
+          return (T) new HomeViewModel(singletonCImpl.provideLastFmServiceProvider.get(), singletonCImpl.albumDao(), singletonCImpl.favoriteAlbumDao(), singletonCImpl.vetoedAlbumDao(), singletonCImpl.coverFallbackRepositoryProvider.get(), singletonCImpl.coverUpdateBusProvider.get(), singletonCImpl.userSessionRepositoryProvider.get(), singletonCImpl.scrobbleRepositoryProvider.get(), singletonCImpl.nowPlayingBusProvider.get(), viewModelCImpl.getMusicImagesUseCase(), ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
 
-          case 5: // com.jfcardenas.musicwall.ui.viewmodel.LastFmSourceViewModel
-          return (T) new LastFmSourceViewModel(singletonCImpl.provideLastFmServiceProvider.get(), ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
-
-          case 6: // com.jfcardenas.musicwall.ui.viewmodel.MuralHistoryViewModel
-          return (T) new MuralHistoryViewModel(singletonCImpl.muralDao());
+          case 6: // com.jfcardenas.musicwall.ui.viewmodel.LastFmSourceViewModel
+          return (T) new LastFmSourceViewModel(singletonCImpl.provideLastFmServiceProvider.get(), singletonCImpl.userSettingsRepositoryProvider.get());
 
           case 7: // com.jfcardenas.musicwall.ui.viewmodel.NowPlayingDetailViewModel
-          return (T) new NowPlayingDetailViewModel(singletonCImpl.provideLastFmServiceProvider.get(), singletonCImpl.provideLyricsServiceProvider.get(), singletonCImpl.provideDiscogsServiceProvider.get(), singletonCImpl.coverFallbackRepositoryProvider.get(), singletonCImpl.favoriteAlbumDao());
+          return (T) new NowPlayingDetailViewModel(singletonCImpl.provideLastFmServiceProvider.get(), singletonCImpl.provideLyricsServiceProvider.get(), singletonCImpl.provideLrcLibServiceProvider.get(), singletonCImpl.provideDiscogsServiceProvider.get(), singletonCImpl.coverFallbackRepositoryProvider.get(), singletonCImpl.favoriteAlbumDao());
 
-          case 8: // com.jfcardenas.musicwall.ui.viewmodel.PreviewViewModel
+          case 8: // com.jfcardenas.musicwall.ui.viewmodel.OnboardingViewModel
+          return (T) new OnboardingViewModel(singletonCImpl.userSessionRepositoryProvider.get());
+
+          case 9: // com.jfcardenas.musicwall.ui.viewmodel.PreviewViewModel
           return (T) new PreviewViewModel(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule), singletonCImpl.muralDao(), viewModelCImpl.savedStateHandle);
 
-          case 9: // com.jfcardenas.musicwall.ui.viewmodel.SpotifySourceViewModel
+          case 10: // com.jfcardenas.musicwall.ui.viewmodel.SettingsViewModel
+          return (T) new SettingsViewModel(singletonCImpl.userSettingsRepositoryProvider.get());
+
+          case 11: // com.jfcardenas.musicwall.ui.viewmodel.SpotifySourceViewModel
           return (T) new SpotifySourceViewModel(singletonCImpl.provideSpotifyOEmbedServiceProvider.get());
 
-          case 10: // com.jfcardenas.musicwall.ui.viewmodel.StyleViewModel
-          return (T) new StyleViewModel(singletonCImpl.provideLastFmServiceProvider.get(), ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
+          case 12: // com.jfcardenas.musicwall.ui.viewmodel.WallSceneSetupViewModel
+          return (T) new WallSceneSetupViewModel(singletonCImpl.favoriteAlbumDao(), singletonCImpl.provideLastFmServiceProvider.get(), ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
 
           default: throw new AssertionError(id);
         }
@@ -755,12 +778,41 @@ public final class DaggerMusicWallApp_HiltComponents_SingletonC {
       injectCollageWallpaper2(collageWallpaper);
     }
 
+    @Override
+    public void injectNowPlayingListenerService(
+        NowPlayingListenerService nowPlayingListenerService) {
+      injectNowPlayingListenerService2(nowPlayingListenerService);
+    }
+
+    @Override
+    public void injectScrobbleForegroundService(
+        ScrobbleForegroundService scrobbleForegroundService) {
+      injectScrobbleForegroundService2(scrobbleForegroundService);
+    }
+
     @CanIgnoreReturnValue
     private CollageWallpaper injectCollageWallpaper2(CollageWallpaper instance) {
       CollageWallpaper_MembersInjector.injectGetMusicImages(instance, getMusicImagesUseCase());
       CollageWallpaper_MembersInjector.injectRendererFactory(instance, singletonCImpl.wallpaperRendererFactoryProvider.get());
       CollageWallpaper_MembersInjector.injectImageLoader(instance, singletonCImpl.provideImageLoaderProvider.get());
       return instance;
+    }
+
+    @CanIgnoreReturnValue
+    private NowPlayingListenerService injectNowPlayingListenerService2(
+        NowPlayingListenerService instance2) {
+      NowPlayingListenerService_MembersInjector.injectNowPlayingBus(instance2, singletonCImpl.nowPlayingBusProvider.get());
+      return instance2;
+    }
+
+    @CanIgnoreReturnValue
+    private ScrobbleForegroundService injectScrobbleForegroundService2(
+        ScrobbleForegroundService instance3) {
+      ScrobbleForegroundService_MembersInjector.injectNowPlayingReader(instance3, singletonCImpl.nowPlayingReaderProvider.get());
+      ScrobbleForegroundService_MembersInjector.injectScrobbleEngine(instance3, singletonCImpl.scrobbleEngineProvider.get());
+      ScrobbleForegroundService_MembersInjector.injectUserSession(instance3, singletonCImpl.userSessionRepositoryProvider.get());
+      ScrobbleForegroundService_MembersInjector.injectNowPlayingBus(instance3, singletonCImpl.nowPlayingBusProvider.get());
+      return instance3;
     }
   }
 
@@ -771,15 +823,27 @@ public final class DaggerMusicWallApp_HiltComponents_SingletonC {
 
     Provider<WallpaperRefreshWorker_AssistedFactory> wallpaperRefreshWorker_AssistedFactoryProvider;
 
+    Provider<UserSessionRepository> userSessionRepositoryProvider;
+
+    Provider<GoogleAuthManager> googleAuthManagerProvider;
+
+    Provider<OkHttpClient> provideOkHttpClientProvider;
+
     Provider<LastFmService> provideLastFmServiceProvider;
 
+    Provider<DeezerService> provideDeezerServiceProvider;
+
     Provider<MusicWallDatabase> provideDatabaseProvider;
+
+    Provider<CoverUpdateBus> coverUpdateBusProvider;
+
+    Provider<CoverFallbackRepository> coverFallbackRepositoryProvider;
+
+    Provider<UserSettingsRepository> userSettingsRepositoryProvider;
 
     Provider<ArtistImageResolver> artistImageResolverProvider;
 
     Provider<LastFmRepository> lastFmRepositoryProvider;
-
-    Provider<ImageLoader> provideImageLoaderProvider;
 
     Provider<MosaicBlendRenderer> mosaicBlendRendererProvider;
 
@@ -797,21 +861,30 @@ public final class DaggerMusicWallApp_HiltComponents_SingletonC {
 
     Provider<WallpaperRendererFactory> wallpaperRendererFactoryProvider;
 
-    Provider<DeezerService> provideDeezerServiceProvider;
+    Provider<ImageLoader> provideImageLoaderProvider;
 
-    Provider<CoverUpdateBus> coverUpdateBusProvider;
+    Provider<LastFmTrackResolver> lastFmTrackResolverProvider;
 
-    Provider<CoverFallbackRepository> coverFallbackRepositoryProvider;
+    Provider<ScrobbleRepository> scrobbleRepositoryProvider;
+
+    Provider<NowPlayingBus> nowPlayingBusProvider;
 
     Provider<LyricsService> provideLyricsServiceProvider;
+
+    Provider<LrcLibService> provideLrcLibServiceProvider;
 
     Provider<DiscogsService> provideDiscogsServiceProvider;
 
     Provider<SpotifyOEmbedService> provideSpotifyOEmbedServiceProvider;
 
+    Provider<NowPlayingReader> nowPlayingReaderProvider;
+
+    Provider<ScrobbleEngine> scrobbleEngineProvider;
+
     SingletonCImpl(ApplicationContextModule applicationContextModuleParam) {
       this.applicationContextModule = applicationContextModuleParam;
       initialize(applicationContextModuleParam);
+      initialize2(applicationContextModuleParam);
 
     }
 
@@ -828,6 +901,10 @@ public final class DaggerMusicWallApp_HiltComponents_SingletonC {
       return DatabaseModule_ProvideAlbumDaoFactory.provideAlbumDao(provideDatabaseProvider.get());
     }
 
+    FavoriteAlbumDao favoriteAlbumDao() {
+      return DatabaseModule_ProvideFavoriteAlbumDaoFactory.provideFavoriteAlbumDao(provideDatabaseProvider.get());
+    }
+
     ArtistDao artistDao() {
       return DatabaseModule_ProvideArtistDaoFactory.provideArtistDao(provideDatabaseProvider.get());
     }
@@ -836,8 +913,16 @@ public final class DaggerMusicWallApp_HiltComponents_SingletonC {
       return DatabaseModule_ProvideTrackDaoFactory.provideTrackDao(provideDatabaseProvider.get());
     }
 
-    FavoriteAlbumDao favoriteAlbumDao() {
-      return DatabaseModule_ProvideFavoriteAlbumDaoFactory.provideFavoriteAlbumDao(provideDatabaseProvider.get());
+    VetoedAlbumDao vetoedAlbumDao() {
+      return DatabaseModule_ProvideVetoedAlbumDaoFactory.provideVetoedAlbumDao(provideDatabaseProvider.get());
+    }
+
+    LocalScrobbleDao localScrobbleDao() {
+      return DatabaseModule_ProvideLocalScrobbleDaoFactory.provideLocalScrobbleDao(provideDatabaseProvider.get());
+    }
+
+    LfMatchCacheDao lfMatchCacheDao() {
+      return DatabaseModule_ProvideLfMatchCacheDaoFactory.provideLfMatchCacheDao(provideDatabaseProvider.get());
     }
 
     MuralDao muralDao() {
@@ -847,30 +932,54 @@ public final class DaggerMusicWallApp_HiltComponents_SingletonC {
     @SuppressWarnings("unchecked")
     private void initialize(final ApplicationContextModule applicationContextModuleParam) {
       this.wallpaperRefreshWorker_AssistedFactoryProvider = SingleCheck.provider(new SwitchingProvider<WallpaperRefreshWorker_AssistedFactory>(singletonCImpl, 0));
-      this.provideLastFmServiceProvider = DoubleCheck.provider(new SwitchingProvider<LastFmService>(singletonCImpl, 1));
-      this.provideDatabaseProvider = DoubleCheck.provider(new SwitchingProvider<MusicWallDatabase>(singletonCImpl, 3));
-      this.artistImageResolverProvider = DoubleCheck.provider(new SwitchingProvider<ArtistImageResolver>(singletonCImpl, 4));
-      this.lastFmRepositoryProvider = DoubleCheck.provider(new SwitchingProvider<LastFmRepository>(singletonCImpl, 2));
-      this.provideImageLoaderProvider = DoubleCheck.provider(new SwitchingProvider<ImageLoader>(singletonCImpl, 5));
-      this.mosaicBlendRendererProvider = DoubleCheck.provider(new SwitchingProvider<MosaicBlendRenderer>(singletonCImpl, 7));
-      this.puzzleRendererProvider = DoubleCheck.provider(new SwitchingProvider<PuzzleRenderer>(singletonCImpl, 8));
-      this.psychedelicGridRendererProvider = DoubleCheck.provider(new SwitchingProvider<PsychedelicGridRenderer>(singletonCImpl, 9));
-      this.manchesterWallRendererProvider = DoubleCheck.provider(new SwitchingProvider<ManchesterWallRenderer>(singletonCImpl, 10));
-      this.provideBritrockSceneProvider = DoubleCheck.provider(new SwitchingProvider<OrganicRenderer>(singletonCImpl, 11));
-      this.provideBanoBarLimaSceneProvider = DoubleCheck.provider(new SwitchingProvider<OrganicRenderer>(singletonCImpl, 12));
-      this.provideWoodstockSceneProvider = DoubleCheck.provider(new SwitchingProvider<OrganicRenderer>(singletonCImpl, 13));
-      this.wallpaperRendererFactoryProvider = DoubleCheck.provider(new SwitchingProvider<WallpaperRendererFactory>(singletonCImpl, 6));
-      this.provideDeezerServiceProvider = DoubleCheck.provider(new SwitchingProvider<DeezerService>(singletonCImpl, 14));
-      this.coverUpdateBusProvider = DoubleCheck.provider(new SwitchingProvider<CoverUpdateBus>(singletonCImpl, 16));
-      this.coverFallbackRepositoryProvider = DoubleCheck.provider(new SwitchingProvider<CoverFallbackRepository>(singletonCImpl, 15));
-      this.provideLyricsServiceProvider = DoubleCheck.provider(new SwitchingProvider<LyricsService>(singletonCImpl, 17));
-      this.provideDiscogsServiceProvider = DoubleCheck.provider(new SwitchingProvider<DiscogsService>(singletonCImpl, 18));
-      this.provideSpotifyOEmbedServiceProvider = DoubleCheck.provider(new SwitchingProvider<SpotifyOEmbedService>(singletonCImpl, 19));
+      this.userSessionRepositoryProvider = DoubleCheck.provider(new SwitchingProvider<UserSessionRepository>(singletonCImpl, 1));
+      this.googleAuthManagerProvider = DoubleCheck.provider(new SwitchingProvider<GoogleAuthManager>(singletonCImpl, 2));
+      this.provideOkHttpClientProvider = DoubleCheck.provider(new SwitchingProvider<OkHttpClient>(singletonCImpl, 4));
+      this.provideLastFmServiceProvider = DoubleCheck.provider(new SwitchingProvider<LastFmService>(singletonCImpl, 3));
+      this.provideDeezerServiceProvider = DoubleCheck.provider(new SwitchingProvider<DeezerService>(singletonCImpl, 5));
+      this.provideDatabaseProvider = DoubleCheck.provider(new SwitchingProvider<MusicWallDatabase>(singletonCImpl, 7));
+      this.coverUpdateBusProvider = DoubleCheck.provider(new SwitchingProvider<CoverUpdateBus>(singletonCImpl, 8));
+      this.coverFallbackRepositoryProvider = DoubleCheck.provider(new SwitchingProvider<CoverFallbackRepository>(singletonCImpl, 6));
+      this.userSettingsRepositoryProvider = DoubleCheck.provider(new SwitchingProvider<UserSettingsRepository>(singletonCImpl, 9));
+      this.artistImageResolverProvider = DoubleCheck.provider(new SwitchingProvider<ArtistImageResolver>(singletonCImpl, 11));
+      this.lastFmRepositoryProvider = DoubleCheck.provider(new SwitchingProvider<LastFmRepository>(singletonCImpl, 10));
+      this.mosaicBlendRendererProvider = DoubleCheck.provider(new SwitchingProvider<MosaicBlendRenderer>(singletonCImpl, 13));
+      this.puzzleRendererProvider = DoubleCheck.provider(new SwitchingProvider<PuzzleRenderer>(singletonCImpl, 14));
+      this.psychedelicGridRendererProvider = DoubleCheck.provider(new SwitchingProvider<PsychedelicGridRenderer>(singletonCImpl, 15));
+      this.manchesterWallRendererProvider = DoubleCheck.provider(new SwitchingProvider<ManchesterWallRenderer>(singletonCImpl, 16));
+      this.provideBritrockSceneProvider = DoubleCheck.provider(new SwitchingProvider<OrganicRenderer>(singletonCImpl, 17));
+      this.provideBanoBarLimaSceneProvider = DoubleCheck.provider(new SwitchingProvider<OrganicRenderer>(singletonCImpl, 18));
+      this.provideWoodstockSceneProvider = DoubleCheck.provider(new SwitchingProvider<OrganicRenderer>(singletonCImpl, 19));
+      this.wallpaperRendererFactoryProvider = DoubleCheck.provider(new SwitchingProvider<WallpaperRendererFactory>(singletonCImpl, 12));
+      this.provideImageLoaderProvider = DoubleCheck.provider(new SwitchingProvider<ImageLoader>(singletonCImpl, 20));
+      this.lastFmTrackResolverProvider = DoubleCheck.provider(new SwitchingProvider<LastFmTrackResolver>(singletonCImpl, 22));
+      this.scrobbleRepositoryProvider = DoubleCheck.provider(new SwitchingProvider<ScrobbleRepository>(singletonCImpl, 21));
+      this.nowPlayingBusProvider = DoubleCheck.provider(new SwitchingProvider<NowPlayingBus>(singletonCImpl, 23));
+      this.provideLyricsServiceProvider = DoubleCheck.provider(new SwitchingProvider<LyricsService>(singletonCImpl, 24));
+    }
+
+    @SuppressWarnings("unchecked")
+    private void initialize2(final ApplicationContextModule applicationContextModuleParam) {
+      this.provideLrcLibServiceProvider = DoubleCheck.provider(new SwitchingProvider<LrcLibService>(singletonCImpl, 25));
+      this.provideDiscogsServiceProvider = DoubleCheck.provider(new SwitchingProvider<DiscogsService>(singletonCImpl, 26));
+      this.provideSpotifyOEmbedServiceProvider = DoubleCheck.provider(new SwitchingProvider<SpotifyOEmbedService>(singletonCImpl, 27));
+      this.nowPlayingReaderProvider = DoubleCheck.provider(new SwitchingProvider<NowPlayingReader>(singletonCImpl, 28));
+      this.scrobbleEngineProvider = DoubleCheck.provider(new SwitchingProvider<ScrobbleEngine>(singletonCImpl, 29));
     }
 
     @Override
     public void injectMusicWallApp(MusicWallApp musicWallApp) {
       injectMusicWallApp2(musicWallApp);
+    }
+
+    @Override
+    public UserSessionRepository userSessionRepository() {
+      return userSessionRepositoryProvider.get();
+    }
+
+    @Override
+    public GoogleAuthManager googleAuthManager() {
+      return googleAuthManagerProvider.get();
     }
 
     @Override
@@ -916,62 +1025,92 @@ public final class DaggerMusicWallApp_HiltComponents_SingletonC {
             }
           };
 
-          case 1: // com.jfcardenas.musicwall.api.LastFmService
-          return (T) NetworkModule_ProvideLastFmServiceFactory.provideLastFmService();
+          case 1: // com.jfcardenas.musicwall.auth.UserSessionRepository
+          return (T) new UserSessionRepository(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
 
-          case 2: // com.jfcardenas.musicwall.data.LastFmRepository
-          return (T) new LastFmRepository(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule), singletonCImpl.provideLastFmServiceProvider.get(), singletonCImpl.albumDao(), singletonCImpl.artistDao(), singletonCImpl.trackDao(), singletonCImpl.artistImageResolverProvider.get());
+          case 2: // com.jfcardenas.musicwall.auth.GoogleAuthManager
+          return (T) new GoogleAuthManager(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule), singletonCImpl.userSessionRepositoryProvider.get());
 
-          case 3: // com.jfcardenas.musicwall.data.local.db.MusicWallDatabase
-          return (T) DatabaseModule_ProvideDatabaseFactory.provideDatabase(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
+          case 3: // com.jfcardenas.musicwall.api.LastFmService
+          return (T) NetworkModule_ProvideLastFmServiceFactory.provideLastFmService(singletonCImpl.provideOkHttpClientProvider.get());
 
-          case 4: // com.jfcardenas.musicwall.data.ArtistImageResolver
-          return (T) new ArtistImageResolver();
+          case 4: // okhttp3.OkHttpClient
+          return (T) HttpClientModule_ProvideOkHttpClientFactory.provideOkHttpClient();
 
-          case 5: // coil.ImageLoader
-          return (T) NetworkModule_ProvideImageLoaderFactory.provideImageLoader(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
+          case 5: // com.jfcardenas.musicwall.api.DeezerService
+          return (T) NetworkModule_ProvideDeezerServiceFactory.provideDeezerService(singletonCImpl.provideOkHttpClientProvider.get());
 
-          case 6: // com.jfcardenas.musicwall.features.wallpaper.renderer.WallpaperRendererFactory
-          return (T) new WallpaperRendererFactory(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule), singletonCImpl.mosaicBlendRendererProvider.get(), singletonCImpl.puzzleRendererProvider.get(), singletonCImpl.psychedelicGridRendererProvider.get(), singletonCImpl.manchesterWallRendererProvider.get(), singletonCImpl.provideBritrockSceneProvider.get(), singletonCImpl.provideBanoBarLimaSceneProvider.get(), singletonCImpl.provideWoodstockSceneProvider.get());
-
-          case 7: // com.jfcardenas.musicwall.features.wallpaper.renderer.MosaicBlendRenderer
-          return (T) new MosaicBlendRenderer();
-
-          case 8: // com.jfcardenas.musicwall.features.wallpaper.renderer.PuzzleRenderer
-          return (T) new PuzzleRenderer();
-
-          case 9: // com.jfcardenas.musicwall.features.wallpaper.renderer.PsychedelicGridRenderer
-          return (T) new PsychedelicGridRenderer();
-
-          case 10: // com.jfcardenas.musicwall.features.wallpaper.renderer.ManchesterWallRenderer
-          return (T) new ManchesterWallRenderer();
-
-          case 11: // @javax.inject.Named("scene_britrock") com.jfcardenas.musicwall.features.wallpaper.renderer.organic.OrganicRenderer
-          return (T) OrganicScenesModule_ProvideBritrockSceneFactory.provideBritrockScene(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
-
-          case 12: // @javax.inject.Named("scene_bano_bar_lima") com.jfcardenas.musicwall.features.wallpaper.renderer.organic.OrganicRenderer
-          return (T) OrganicScenesModule_ProvideBanoBarLimaSceneFactory.provideBanoBarLimaScene(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
-
-          case 13: // @javax.inject.Named("scene_woodstock") com.jfcardenas.musicwall.features.wallpaper.renderer.organic.OrganicRenderer
-          return (T) OrganicScenesModule_ProvideWoodstockSceneFactory.provideWoodstockScene(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
-
-          case 14: // com.jfcardenas.musicwall.api.DeezerService
-          return (T) NetworkModule_ProvideDeezerServiceFactory.provideDeezerService();
-
-          case 15: // com.jfcardenas.musicwall.data.CoverFallbackRepository
+          case 6: // com.jfcardenas.musicwall.data.CoverFallbackRepository
           return (T) new CoverFallbackRepository(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule), singletonCImpl.provideDeezerServiceProvider.get(), singletonCImpl.albumDao(), singletonCImpl.coverUpdateBusProvider.get());
 
-          case 16: // com.jfcardenas.musicwall.data.CoverUpdateBus
+          case 7: // com.jfcardenas.musicwall.data.local.db.MusicWallDatabase
+          return (T) DatabaseModule_ProvideDatabaseFactory.provideDatabase(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
+
+          case 8: // com.jfcardenas.musicwall.data.CoverUpdateBus
           return (T) new CoverUpdateBus();
 
-          case 17: // com.jfcardenas.musicwall.api.LyricsService
-          return (T) NetworkModule_ProvideLyricsServiceFactory.provideLyricsService();
+          case 9: // com.jfcardenas.musicwall.data.UserSettingsRepository
+          return (T) new UserSettingsRepository(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
 
-          case 18: // com.jfcardenas.musicwall.api.DiscogsService
-          return (T) NetworkModule_ProvideDiscogsServiceFactory.provideDiscogsService();
+          case 10: // com.jfcardenas.musicwall.data.LastFmRepository
+          return (T) new LastFmRepository(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule), singletonCImpl.provideLastFmServiceProvider.get(), singletonCImpl.albumDao(), singletonCImpl.artistDao(), singletonCImpl.trackDao(), singletonCImpl.artistImageResolverProvider.get());
 
-          case 19: // com.jfcardenas.musicwall.api.SpotifyOEmbedService
-          return (T) SpotifyModule_ProvideSpotifyOEmbedServiceFactory.provideSpotifyOEmbedService();
+          case 11: // com.jfcardenas.musicwall.data.ArtistImageResolver
+          return (T) new ArtistImageResolver(singletonCImpl.provideOkHttpClientProvider.get());
+
+          case 12: // com.jfcardenas.musicwall.features.wallpaper.renderer.WallpaperRendererFactory
+          return (T) new WallpaperRendererFactory(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule), singletonCImpl.mosaicBlendRendererProvider.get(), singletonCImpl.puzzleRendererProvider.get(), singletonCImpl.psychedelicGridRendererProvider.get(), singletonCImpl.manchesterWallRendererProvider.get(), singletonCImpl.provideBritrockSceneProvider.get(), singletonCImpl.provideBanoBarLimaSceneProvider.get(), singletonCImpl.provideWoodstockSceneProvider.get());
+
+          case 13: // com.jfcardenas.musicwall.features.wallpaper.renderer.MosaicBlendRenderer
+          return (T) new MosaicBlendRenderer();
+
+          case 14: // com.jfcardenas.musicwall.features.wallpaper.renderer.PuzzleRenderer
+          return (T) new PuzzleRenderer();
+
+          case 15: // com.jfcardenas.musicwall.features.wallpaper.renderer.PsychedelicGridRenderer
+          return (T) new PsychedelicGridRenderer();
+
+          case 16: // com.jfcardenas.musicwall.features.wallpaper.renderer.ManchesterWallRenderer
+          return (T) new ManchesterWallRenderer();
+
+          case 17: // @javax.inject.Named("scene_britrock") com.jfcardenas.musicwall.features.wallpaper.renderer.organic.OrganicRenderer
+          return (T) OrganicScenesModule_ProvideBritrockSceneFactory.provideBritrockScene(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
+
+          case 18: // @javax.inject.Named("scene_bano_bar_lima") com.jfcardenas.musicwall.features.wallpaper.renderer.organic.OrganicRenderer
+          return (T) OrganicScenesModule_ProvideBanoBarLimaSceneFactory.provideBanoBarLimaScene(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
+
+          case 19: // @javax.inject.Named("scene_woodstock") com.jfcardenas.musicwall.features.wallpaper.renderer.organic.OrganicRenderer
+          return (T) OrganicScenesModule_ProvideWoodstockSceneFactory.provideWoodstockScene(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
+
+          case 20: // coil.ImageLoader
+          return (T) NetworkModule_ProvideImageLoaderFactory.provideImageLoader(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
+
+          case 21: // com.jfcardenas.musicwall.scrobble.ScrobbleRepository
+          return (T) new ScrobbleRepository(singletonCImpl.localScrobbleDao(), singletonCImpl.lastFmTrackResolverProvider.get());
+
+          case 22: // com.jfcardenas.musicwall.scrobble.LastFmTrackResolver
+          return (T) new LastFmTrackResolver(singletonCImpl.provideLastFmServiceProvider.get(), singletonCImpl.lfMatchCacheDao());
+
+          case 23: // com.jfcardenas.musicwall.scrobble.NowPlayingBus
+          return (T) new NowPlayingBus();
+
+          case 24: // com.jfcardenas.musicwall.api.LyricsService
+          return (T) NetworkModule_ProvideLyricsServiceFactory.provideLyricsService(singletonCImpl.provideOkHttpClientProvider.get());
+
+          case 25: // com.jfcardenas.musicwall.api.LrcLibService
+          return (T) NetworkModule_ProvideLrcLibServiceFactory.provideLrcLibService(singletonCImpl.provideOkHttpClientProvider.get());
+
+          case 26: // com.jfcardenas.musicwall.api.DiscogsService
+          return (T) NetworkModule_ProvideDiscogsServiceFactory.provideDiscogsService(singletonCImpl.provideOkHttpClientProvider.get());
+
+          case 27: // com.jfcardenas.musicwall.api.SpotifyOEmbedService
+          return (T) SpotifyModule_ProvideSpotifyOEmbedServiceFactory.provideSpotifyOEmbedService(singletonCImpl.provideOkHttpClientProvider.get());
+
+          case 28: // com.jfcardenas.musicwall.scrobble.NowPlayingReader
+          return (T) new NowPlayingReader(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
+
+          case 29: // com.jfcardenas.musicwall.scrobble.ScrobbleEngine
+          return (T) new ScrobbleEngine(singletonCImpl.scrobbleRepositoryProvider.get());
 
           default: throw new AssertionError(id);
         }

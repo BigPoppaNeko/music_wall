@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#191414">
+
+    <!-- Toolbar -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/app_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#1E1E1E"
+        app:liftOnScroll="true">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:title="Configuración"
+            app:titleTextColor="#FFFFFF"
+            app:navigationIconTint="#FFFFFF" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Scrollable content -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <!-- ══ SECCIÓN: CUENTA ══════════════════════════════════ -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:text="CUENTA"
+                android:textColor="#D51007"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.12" />
+
+            <!-- Username input -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/til_username"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Usuario de Last.fm"
+                app:boxBackgroundColor="#2A2A2A"
+                app:boxStrokeColor="#D51007"
+                app:boxStrokeWidth="1.5dp"
+                app:hintTextColor="#AAAAAA"
+                app:endIconMode="clear_text"
+                app:endIconTint="#888888">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_username"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textNoSuggestions"
+                    android:imeOptions="actionDone"
+                    android:singleLine="true"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginBottom="6dp"
+                android:text="Introduce tu nombre de usuario de Last.fm"
+                android:textColor="#888888"
+                android:textSize="12sp" />
+
+            <!-- Cambiar cuenta -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_change_account"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="-8dp"
+                android:layout_marginBottom="24dp"
+                android:text="Cambiar cuenta Last.fm →"
+                android:textColor="#D51007"
+                android:textSize="13sp" />
+
+            <!-- ══ SECCIÓN: WALLPAPER ════════════════════════════════ -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:text="WALLPAPER"
+                android:textColor="#D51007"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.12" />
+
+            <!-- Tipo de imágenes -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="Tipo de imágenes"
+                android:textColor="#CCCCCC"
+                android:textSize="13sp" />
+
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/btn_group_image_kind"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:singleSelection="true"
+                app:selectionRequired="true">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_kind_albums"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="48dp"
+                    android:text="Álbumes"
+                    android:textColor="#FFFFFF"
+                    app:strokeColor="#555555" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_kind_artists"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="48dp"
+                    android:text="Artistas"
+                    android:textColor="#FFFFFF"
+                    app:strokeColor="#555555" />
+
+            </com.google.android.material.button.MaterialButtonToggleGroup>
+
+            <!-- Período -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:text="Período de tiempo"
+                android:textColor="#CCCCCC"
+                android:textSize="13sp" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/til_period"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:boxBackgroundColor="#2A2A2A"
+                app:boxStrokeColor="#555555"
+                app:hintTextColor="#888888">
+
+                <AutoCompleteTextView
+                    android:id="@+id/acv_period"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="none"
+                    android:textColor="#FFFFFF"
+                    android:textSize="15sp"
+                    android:paddingTop="14dp"
+                    android:paddingBottom="14dp"
+                    android:dropDownVerticalOffset="4dp" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Número de imágenes -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:text="Número de imágenes"
+                android:textColor="#CCCCCC"
+                android:textSize="13sp" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/til_limit"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="32dp"
+                app:boxBackgroundColor="#2A2A2A"
+                app:boxStrokeColor="#555555"
+                app:hintTextColor="#888888">
+
+                <AutoCompleteTextView
+                    android:id="@+id/acv_limit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="none"
+                    android:textColor="#FFFFFF"
+                    android:textSize="15sp"
+                    android:paddingTop="14dp"
+                    android:paddingBottom="14dp"
+                    android:dropDownVerticalOffset="4dp" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- ══ BOTÓN GENERAR ══════════════════════════════════════ -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_generate"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="GENERAR WALLPAPER"
+                android:textColor="#FFFFFF"
+                android:textSize="15sp"
+                android:letterSpacing="0.06"
+                android:backgroundTint="#D51007" />
+
+            <!-- Mensaje de estado -->
+            <TextView
+                android:id="@+id/tv_status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:gravity="center"
+                android:textSize="14sp"
+                android:visibility="gone" />
+
+            <!-- Botón aplicar wallpaper (visible tras generar) -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_apply_wallpaper"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="8dp"
+                android:text="APLICAR COMO FONDO DE PANTALLA"
+                android:textColor="#FFFFFF"
+                android:strokeColor="#FFFFFF"
+                android:visibility="gone" />
+
+            <!-- Preview del wallpaper generado -->
+            <ImageView
+                android:id="@+id/iv_preview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:adjustViewBounds="true"
+                android:scaleType="fitCenter"
+                android:visibility="gone" />
+
+            <!-- Etiqueta de ítems utilizados -->
+            <TextView
+                android:id="@+id/tv_used_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="8dp"
+                android:textColor="#D51007"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.12"
+                android:visibility="gone" />
+
+            <!-- Chips de álbumes/artistas utilizados -->
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chip_group_used_items"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                app:chipSpacingHorizontal="6dp"
+                app:chipSpacingVertical="4dp"
+                android:visibility="gone" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

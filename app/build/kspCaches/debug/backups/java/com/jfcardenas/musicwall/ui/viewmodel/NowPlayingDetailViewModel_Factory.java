@@ -2,6 +2,7 @@ package com.jfcardenas.musicwall.ui.viewmodel;
 
 import com.jfcardenas.musicwall.api.DiscogsService;
 import com.jfcardenas.musicwall.api.LastFmService;
+import com.jfcardenas.musicwall.api.LrcLibService;
 import com.jfcardenas.musicwall.api.LyricsService;
 import com.jfcardenas.musicwall.data.CoverFallbackRepository;
 import com.jfcardenas.musicwall.data.local.db.dao.FavoriteAlbumDao;
@@ -33,6 +34,8 @@ public final class NowPlayingDetailViewModel_Factory implements Factory<NowPlayi
 
   private final Provider<LyricsService> lyricsServiceProvider;
 
+  private final Provider<LrcLibService> lrcLibServiceProvider;
+
   private final Provider<DiscogsService> discogsServiceProvider;
 
   private final Provider<CoverFallbackRepository> coverFallbackRepoProvider;
@@ -40,12 +43,13 @@ public final class NowPlayingDetailViewModel_Factory implements Factory<NowPlayi
   private final Provider<FavoriteAlbumDao> favoriteDaoProvider;
 
   private NowPlayingDetailViewModel_Factory(Provider<LastFmService> lastFmServiceProvider,
-      Provider<LyricsService> lyricsServiceProvider,
+      Provider<LyricsService> lyricsServiceProvider, Provider<LrcLibService> lrcLibServiceProvider,
       Provider<DiscogsService> discogsServiceProvider,
       Provider<CoverFallbackRepository> coverFallbackRepoProvider,
       Provider<FavoriteAlbumDao> favoriteDaoProvider) {
     this.lastFmServiceProvider = lastFmServiceProvider;
     this.lyricsServiceProvider = lyricsServiceProvider;
+    this.lrcLibServiceProvider = lrcLibServiceProvider;
     this.discogsServiceProvider = discogsServiceProvider;
     this.coverFallbackRepoProvider = coverFallbackRepoProvider;
     this.favoriteDaoProvider = favoriteDaoProvider;
@@ -53,20 +57,21 @@ public final class NowPlayingDetailViewModel_Factory implements Factory<NowPlayi
 
   @Override
   public NowPlayingDetailViewModel get() {
-    return newInstance(lastFmServiceProvider.get(), lyricsServiceProvider.get(), discogsServiceProvider.get(), coverFallbackRepoProvider.get(), favoriteDaoProvider.get());
+    return newInstance(lastFmServiceProvider.get(), lyricsServiceProvider.get(), lrcLibServiceProvider.get(), discogsServiceProvider.get(), coverFallbackRepoProvider.get(), favoriteDaoProvider.get());
   }
 
   public static NowPlayingDetailViewModel_Factory create(
       Provider<LastFmService> lastFmServiceProvider, Provider<LyricsService> lyricsServiceProvider,
+      Provider<LrcLibService> lrcLibServiceProvider,
       Provider<DiscogsService> discogsServiceProvider,
       Provider<CoverFallbackRepository> coverFallbackRepoProvider,
       Provider<FavoriteAlbumDao> favoriteDaoProvider) {
-    return new NowPlayingDetailViewModel_Factory(lastFmServiceProvider, lyricsServiceProvider, discogsServiceProvider, coverFallbackRepoProvider, favoriteDaoProvider);
+    return new NowPlayingDetailViewModel_Factory(lastFmServiceProvider, lyricsServiceProvider, lrcLibServiceProvider, discogsServiceProvider, coverFallbackRepoProvider, favoriteDaoProvider);
   }
 
   public static NowPlayingDetailViewModel newInstance(LastFmService lastFmService,
-      LyricsService lyricsService, DiscogsService discogsService,
+      LyricsService lyricsService, LrcLibService lrcLibService, DiscogsService discogsService,
       CoverFallbackRepository coverFallbackRepo, FavoriteAlbumDao favoriteDao) {
-    return new NowPlayingDetailViewModel(lastFmService, lyricsService, discogsService, coverFallbackRepo, favoriteDao);
+    return new NowPlayingDetailViewModel(lastFmService, lyricsService, lrcLibService, discogsService, coverFallbackRepo, favoriteDao);
   }
 }

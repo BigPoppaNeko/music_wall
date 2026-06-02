@@ -2,6 +2,7 @@ package com.jfcardenas.musicwall.ui.navigation
 
 import android.net.Uri
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
@@ -28,7 +29,6 @@ import com.jfcardenas.musicwall.ui.components.MuralesGridIcon
 import com.jfcardenas.musicwall.ui.components.SampleBackground
 import com.jfcardenas.musicwall.ui.screens.*
 import com.jfcardenas.musicwall.ui.theme.*
-import com.jfcardenas.musicwall.ui.viewmodel.ArtistasViewModel
 import com.jfcardenas.musicwall.ui.viewmodel.CoverInteractionViewModel
 import com.jfcardenas.musicwall.ui.viewmodel.HomeViewModel
 import com.jfcardenas.musicwall.ui.viewmodel.SettingsViewModel
@@ -37,7 +37,7 @@ private data class TabItem(val route: String, val label: String, val icon: Image
 
 private val TABS = listOf(
     TabItem("inicio",     "Inicio",     Icons.Filled.Home),
-    TabItem("biblioteca", "Biblioteca", Icons.Filled.Person),
+    TabItem("biblioteca", "ADN",       Icons.Filled.Person),
     TabItem("murales",    "Murales",    MuralesGridIcon),
     TabItem("cuenta",     "Perfil",     Icons.Filled.Settings),
 )
@@ -53,8 +53,21 @@ fun MainNav(initialRoute: String? = null) {
     val coverVm: CoverInteractionViewModel = hiltViewModel(viewModelStoreOwner = activity)
     val homeVm: HomeViewModel = hiltViewModel(viewModelStoreOwner = activity)
     val settingsVm: SettingsViewModel = hiltViewModel(viewModelStoreOwner = activity)
-    val artistsVm: ArtistasViewModel = hiltViewModel(viewModelStoreOwner = activity)
     val snackbarHostState = remember { SnackbarHostState() }
+
+    val baseRoute = currentRoute?.substringBefore("/")?.substringBefore("?")
+
+    BackHandler(enabled = coverVm.tracksOverlay != null) {
+        coverVm.closeTracksOverlay()
+    }
+
+    BackHandler(
+        enabled = coverVm.tracksOverlay == null &&
+            baseRoute != null &&
+            baseRoute !in TAB_ROUTES,
+    ) {
+        nav.popBackStack()
+    }
 
     LaunchedEffect(initialRoute) {
         initialRoute?.let { route ->
@@ -153,19 +166,7 @@ fun MainNav(initialRoute: String? = null) {
             }
 
             composable("biblioteca") {
-                ProfileScreen(
-                    vm = homeVm,
-                    artistsVm = artistsVm,
-                    coverVm = coverVm,
-                    onGoToFavoritas = { nav.navigate("favoritas") },
-                    onGoToCuenta = {
-                        nav.navigate("cuenta") {
-                            popUpTo("inicio") { saveState = true }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-                    },
-                )
+                MusicalDnaScreen()
             }
 
             composable("cuenta") {
@@ -314,10 +315,8 @@ fun MainNav(initialRoute: String? = null) {
             AlbumTracksOverlay(
                 detail = detail,
                 isFavorite = coverVm.isFavorite(detail.cover.key),
-                showVeto = coverVm.tracksOverlayShowVeto,
                 onDismiss = { coverVm.closeTracksOverlay() },
                 onToggleFavorite = { coverVm.toggleFavoriteFromOverlay() },
-                onVeto = { coverVm.vetoFromTracksOverlay() },
             )
         }
     }

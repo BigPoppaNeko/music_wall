@@ -28,7 +28,6 @@ import com.jfcardenas.musicwall.data.local.db.dao.FavoriteAlbumDao
 import com.jfcardenas.musicwall.data.local.db.dao.VetoedAlbumDao
 import com.jfcardenas.musicwall.data.local.db.entity.AlbumEntity
 import com.jfcardenas.musicwall.data.local.db.entity.FavoriteAlbum
-import com.jfcardenas.musicwall.data.local.db.entity.VetoedAlbum
 import com.jfcardenas.musicwall.auth.UserSessionRepository
 import com.jfcardenas.musicwall.service.CollageWallpaper
 import com.jfcardenas.musicwall.scrobble.LocalScrobbleMapper
@@ -102,7 +101,6 @@ class HomeViewModel @Inject constructor(
         val genreRecommendations: Map<String, List<CoverItem>> = emptyMap(),
         val loadingGenre: String? = null,
         val lastSavedFavoriteKey: String? = null,
-        val songDurationMs: Long = 0L,
         val error: String? = null,
         val currentTrackCoverUrl: String? = null,
         val coverSearchState: CoverSearchState = CoverSearchState.Idle,
@@ -297,7 +295,6 @@ class HomeViewModel @Inject constructor(
                     val vsPool = buildVsPool(vsFromDb, archiveAlbums + weekAlbums, visibleKeys, insightGenres, similarCovers)
                     val vsA = vsPool.getOrNull(0)
                     val vsB = vsPool.getOrNull(1)
-                    val songDurationMs = track?.let { fetchDurationMs(it.artist.name, it.name) } ?: 0L
                     val artistNames = topArtists.map { it.name }
                     val vetoedKeys = vetoedAlbumDao.getAllIds().toSet()
                     val previousRecKeys = uiState.recommendationCovers.map { it.key }
@@ -343,7 +340,6 @@ class HomeViewModel @Inject constructor(
                         vsWinStreaks         = uiState.vsWinStreaks,
                         lastVsWinnerKey      = uiState.lastVsWinnerKey,
                         genreRecommendations = uiState.genreRecommendations,
-                        songDurationMs       = songDurationMs,
                         isLoading            = false,
                         currentTrackCoverUrl = coverUrl,
                         coverSearchState     = CoverSearchState.Idle,
@@ -618,21 +614,6 @@ class HomeViewModel @Inject constructor(
         uiState = uiState.copy(
             recommendationCovers = uiState.recommendationCovers.filter { it.key != coverKey },
         )
-    }
-
-    /** Triple toque o botón vetar: excluye la portada y renueva todo el carrusel. */
-    fun vetoAndRefreshRecommendations(vetoed: CoverItem) {
-        viewModelScope.launch {
-            vetoedAlbumDao.insert(
-                VetoedAlbum(
-                    id = vetoed.key,
-                    albumName = vetoed.albumName,
-                    artistName = vetoed.artistName,
-                ),
-            )
-            markRecommendationsSeen(uiState.recommendationCovers.map { it.key } + vetoed.key)
-            reloadRecommendationCovers()
-        }
     }
 
     /** Sustituye todas las portadas de Te puede gustar por otras no vistas. */
@@ -953,15 +934,6 @@ class HomeViewModel @Inject constructor(
             uiState = uiState.copy(
                 coverOverrides = uiState.coverOverrides + (update.key to update.url)
             )
-        }
-    }
-
-    private suspend fun fetchDurationMs(artist: String, track: String): Long {
-        return try {
-            lastFmService.getTrackInfo(artist = artist, track = track)
-                .track?.duration?.toLongOrNull() ?: 0L
-        } catch (_: Exception) {
-            0L
         }
     }
 

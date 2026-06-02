@@ -1,6 +1,7 @@
 package com.jfcardenas.musicwall.ui.viewmodel;
 
 import com.jfcardenas.musicwall.api.LastFmService;
+import com.jfcardenas.musicwall.data.UserSettingsRepository;
 import dagger.internal.DaggerGenerated;
 import dagger.internal.Factory;
 import dagger.internal.Provider;
@@ -27,20 +28,26 @@ import javax.annotation.processing.Generated;
 public final class ExploreViewModel_Factory implements Factory<ExploreViewModel> {
   private final Provider<LastFmService> lastFmServiceProvider;
 
-  private ExploreViewModel_Factory(Provider<LastFmService> lastFmServiceProvider) {
+  private final Provider<UserSettingsRepository> settingsProvider;
+
+  private ExploreViewModel_Factory(Provider<LastFmService> lastFmServiceProvider,
+      Provider<UserSettingsRepository> settingsProvider) {
     this.lastFmServiceProvider = lastFmServiceProvider;
+    this.settingsProvider = settingsProvider;
   }
 
   @Override
   public ExploreViewModel get() {
-    return newInstance(lastFmServiceProvider.get());
+    return newInstance(lastFmServiceProvider.get(), settingsProvider.get());
   }
 
-  public static ExploreViewModel_Factory create(Provider<LastFmService> lastFmServiceProvider) {
-    return new ExploreViewModel_Factory(lastFmServiceProvider);
+  public static ExploreViewModel_Factory create(Provider<LastFmService> lastFmServiceProvider,
+      Provider<UserSettingsRepository> settingsProvider) {
+    return new ExploreViewModel_Factory(lastFmServiceProvider, settingsProvider);
   }
 
-  public static ExploreViewModel newInstance(LastFmService lastFmService) {
-    return new ExploreViewModel(lastFmService);
+  public static ExploreViewModel newInstance(LastFmService lastFmService,
+      UserSettingsRepository settings) {
+    return new ExploreViewModel(lastFmService, settings);
   }
 }

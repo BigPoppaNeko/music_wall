@@ -9,7 +9,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -20,14 +19,12 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.jfcardenas.musicwall.R
 import com.jfcardenas.musicwall.api.formatTotalDuration
 import com.jfcardenas.musicwall.ui.theme.*
 import com.jfcardenas.musicwall.ui.viewmodel.AlbumDetailState
@@ -39,10 +36,8 @@ private val CoverImageShape = RoundedCornerShape(14.dp)
 fun AlbumTracksOverlay(
     detail: AlbumDetailState,
     isFavorite: Boolean,
-    showVeto: Boolean,
     onDismiss: () -> Unit,
     onToggleFavorite: () -> Unit,
-    onVeto: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val totalSeconds = detail.tracks.sumOf { it.durationSeconds }
@@ -255,31 +250,6 @@ fun AlbumTracksOverlay(
                 }
             }
 
-            if (showVeto) {
-                item { Spacer(Modifier.height(8.dp)) }
-                item {
-                    Row(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(20.dp))
-                            .clickable(onClick = onVeto)
-                            .padding(horizontal = 12.dp, vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_veto),
-                            contentDescription = "Vetar portada",
-                            tint = TextMuted,
-                            modifier = Modifier.size(18.dp),
-                        )
-                        Text(
-                            text = "Ver menos así",
-                            fontSize = 11.sp,
-                            color = TextMuted,
-                        )
-                    }
-                }
-            }
 
             item { Spacer(Modifier.height(4.dp)) }
         }

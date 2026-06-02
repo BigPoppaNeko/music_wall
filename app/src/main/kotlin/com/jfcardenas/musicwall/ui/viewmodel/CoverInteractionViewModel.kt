@@ -55,11 +55,8 @@ class CoverInteractionViewModel @Inject constructor(
     var tracksOverlay by mutableStateOf<AlbumDetailState?>(null)
         private set
 
-    private var tracksOverlayVetoHandler: ((CoverItem) -> Unit)? = null
     private var tracksOverlayFavoritedHandler: ((CoverItem) -> Unit)? = null
     private var overlayLoadGeneration = 0
-    var tracksOverlayShowVeto by mutableStateOf(false)
-        private set
 
     var snackbarMessage by mutableStateOf<String?>(null)
         private set
@@ -107,13 +104,9 @@ class CoverInteractionViewModel @Inject constructor(
 
     fun openCoverOverlay(
         cover: CoverItem,
-        showVeto: Boolean = false,
-        onVeto: ((CoverItem) -> Unit)? = null,
         onFavorited: ((CoverItem) -> Unit)? = null,
     ) {
         val generation = ++overlayLoadGeneration
-        tracksOverlayShowVeto = showVeto
-        tracksOverlayVetoHandler = onVeto
         tracksOverlayFavoritedHandler = onFavorited
         loadAlbumDetail(cover, generation) { state ->
             if (generation == overlayLoadGeneration) {
@@ -122,22 +115,10 @@ class CoverInteractionViewModel @Inject constructor(
         }
     }
 
-    fun openTracksOverlay(cover: CoverItem, onVeto: (CoverItem) -> Unit) {
-        openCoverOverlay(cover, showVeto = true, onVeto = onVeto)
-    }
-
     fun closeTracksOverlay() {
         overlayLoadGeneration++
         tracksOverlay = null
-        tracksOverlayVetoHandler = null
         tracksOverlayFavoritedHandler = null
-        tracksOverlayShowVeto = false
-    }
-
-    fun vetoFromTracksOverlay() {
-        val cover = tracksOverlay?.cover ?: return
-        tracksOverlayVetoHandler?.invoke(cover)
-        closeTracksOverlay()
     }
 
     fun toggleFavoriteFromOverlay() {

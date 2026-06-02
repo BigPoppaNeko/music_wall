@@ -1,9 +1,11 @@
 package com.jfcardenas.musicwall.ui.navigation
 
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -48,6 +50,15 @@ fun MusicWallNav(onOnboardingComplete: () -> Unit = {}) {
     val finishOnboarding: () -> Unit = {
         onboardingVm.completeOnboarding()
         onOnboardingComplete()
+    }
+
+    val backStack by nav.currentBackStackEntryAsState()
+    val onboardingRoute = backStack?.destination?.route
+
+    BackHandler(
+        enabled = onboardingRoute != null && onboardingRoute != Route.SPLASH,
+    ) {
+        nav.popBackStack()
     }
 
     NavHost(

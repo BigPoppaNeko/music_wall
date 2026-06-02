@@ -1,5 +1,6 @@
 package com.jfcardenas.musicwall.ui.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -33,7 +34,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import coil.compose.AsyncImage
-import kotlinx.coroutines.delay
 import com.jfcardenas.musicwall.api.Album
 import com.jfcardenas.musicwall.api.RecentTrack
 import com.jfcardenas.musicwall.api.browseableGenreTags
@@ -48,7 +48,7 @@ import com.jfcardenas.musicwall.ui.viewmodel.CoverItem
 import com.jfcardenas.musicwall.ui.viewmodel.HomeViewModel
 import com.jfcardenas.musicwall.ui.viewmodel.relativeTime
 
-private const val DiscoveryGestureHint = "Doble toque actualizar · triple vetar · mantén portada y canciones"
+private const val DiscoveryGestureHint = "Doble toque actualizar · mantén portada y canciones"
 private const val GenreGestureHint = "Toque ampliar · doble toque otro género · mantén portada y canciones"
 private const val CoverGestureHint = "Mantén portada y canciones"
 
@@ -118,16 +118,14 @@ fun HomeScreen(
         }
     }
 
-    val openCoverDetail: (CoverItem, Boolean) -> Unit = { cover, showVeto ->
+    BackHandler(enabled = genrePreviewCover != null) {
+        genrePreviewCover = null
+    }
+
+    val openCoverDetail: (CoverItem) -> Unit = { cover ->
         genrePreviewCover = null
         coverVm.openCoverOverlay(
             cover = cover,
-            showVeto = showVeto,
-            onVeto = if (showVeto) {
-                { vetoed -> vm.vetoAndRefreshRecommendations(vetoed) }
-            } else {
-                null
-            },
             onFavorited = { favorited -> vm.removeFromDiscoveryFeeds(favorited.key) },
         )
     }
@@ -178,11 +176,6 @@ fun HomeScreen(
                             )
                         }
                     }
-                    val timerMs = (state.songDurationMs / 3L).takeIf { it > 15_000L } ?: 70_000L
-                    SkullTimer(
-                        durationMs = timerMs,
-                        onRefresh  = { vm.refresh() },
-                    )
                 }
             }
 
@@ -207,16 +200,16 @@ fun HomeScreen(
                                     albumName = albumName,
                                     artistName = t.artist.name,
                                 ),
-                                false,
                             )
                         }
                     },
-                    onShowDetailCover = { openCoverDetail(it, false) },
+                    onShowDetailCover = { openCoverDetail(it) },
                     onClick = {
                         state.currentTrack?.let { t ->
                             onNowPlayingClick(t.artist.name, t.name, t.album.name)
                         }
                     },
+                    onRefreshNowPlaying = { vm.refresh() },
                 )
             }
 
@@ -227,8 +220,7 @@ fun HomeScreen(
                         favoriteKeys     = favoriteKeys,
                         isRefreshing     = state.isRefreshingRecommendations,
                         onRefreshCovers  = { vm.reloadRecommendationCovers() },
-                        onShowDetail     = { openCoverDetail(it, true) },
-                        onVetoCover      = { vm.vetoAndRefreshRecommendations(it) },
+                        onShowDetail     = { openCoverDetail(it) },
                     )
                 }
             }
@@ -239,7 +231,7 @@ fun HomeScreen(
                     coverB           = state.vsCoverB,
                     favoriteKeys     = favoriteKeys,
                     onPick           = { vm.chooseVsWinner(it) },
-                    onShowDetail     = { openCoverDetail(it, false) },
+                    onShowDetail     = { openCoverDetail(it) },
                     streaks          = state.vsWinStreaks,
                     winnerKey        = state.lastVsWinnerKey,
                 )
@@ -254,7 +246,7 @@ fun HomeScreen(
                         favoriteKeys = favoriteKeys,
                         onShuffleGenre = shuffleGenre,
                         onPreviewCover = { genrePreviewCover = it },
-                        onShowDetail = { openCoverDetail(it, false) },
+                        onShowDetail = { openCoverDetail(it) },
                     )
                 }
             }
@@ -265,7 +257,7 @@ fun HomeScreen(
                         covers = state.favoriteCovers,
                         favoriteKeys = favoriteKeys,
                         onOpenAll = onGoToFavoritas,
-                        onShowDetail = { openCoverDetail(it, false) },
+                        onShowDetail = { openCoverDetail(it) },
                     )
                 }
             }
@@ -290,7 +282,6 @@ private fun RecommendationsCard(
     isRefreshing: Boolean,
     onRefreshCovers: () -> Unit,
     onShowDetail: (CoverItem) -> Unit,
-    onVetoCover: (CoverItem) -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Row(
@@ -334,7 +325,6 @@ private fun RecommendationsCard(
                         modifier             = Modifier.size(100.dp),
                         onShowDetail         = { onShowDetail(coverItem) },
                         onDoubleTap          = onRefreshCovers,
-                        onTripleTap          = { onVetoCover(coverItem) },
                     )
                     Spacer(Modifier.height(5.dp))
                     Text(
@@ -372,6 +362,7 @@ private fun NowPlayingCard(
     onShowDetail: () -> Unit,
     onShowDetailCover: (CoverItem) -> Unit,
     onClick: () -> Unit,
+    onRefreshNowPlaying: () -> Unit,
 ) {
     Box(
         modifier = Modifier
@@ -440,6 +431,7 @@ private fun NowPlayingCard(
                         onSearchCover    = onSearchCover,
                         onShowDetail     = onShowDetail,
                         onShowDetailCover = onShowDetailCover,
+                        onRefreshNowPlaying = onRefreshNowPlaying,
                     )
                 }
                 else -> {
@@ -465,6 +457,7 @@ private fun TrackContent(
     onSearchCover: () -> Unit,
     onShowDetail: () -> Unit,
     onShowDetailCover: (CoverItem) -> Unit,
+    onRefreshNowPlaying: () -> Unit,
 ) {
     val albumName = track.album.name.takeIf { it.isNotBlank() } ?: track.name
     val coverKey = "${track.artist.name}::${albumName}".lowercase()
@@ -478,6 +471,7 @@ private fun TrackContent(
                     modifier           = Modifier.size(80.dp),
                     cornerRadius       = 10.dp,
                     onShowDetail       = onShowDetail,
+                    onDoubleTap        = if (isNowPlaying) onRefreshNowPlaying else {},
                 )
             } else {
                 LayeredAlbumCover(
@@ -565,7 +559,7 @@ private fun TrackContent(
         )
     } else {
         Text(
-            text = "Escuchando ahora ♪",
+            text = "Escuchando ahora · doble toque en portada para actualizar",
             fontSize = 12.sp,
             color = Color(0xFF1DB954),
         )
@@ -887,39 +881,3 @@ private fun FavoriteCoversStrip(
     }
 }
 
-// ── Skull refresh timer ────────────────────────────────────────────────────────
-
-@Composable
-private fun SkullTimer(
-    durationMs: Long,
-    onRefresh: () -> Unit,
-) {
-    var key      by remember { mutableStateOf(0) }
-    val progress = remember { Animatable(1f) }
-    var scream   by remember { mutableStateOf(false) }
-
-    LaunchedEffect(key) {
-        progress.snapTo(1f); scream = false
-        progress.animateTo(0f, tween(durationMs.toInt(), easing = LinearEasing))
-        scream = true; delay(360L); onRefresh(); scream = false; key++
-    }
-
-    val scale by animateFloatAsState(
-        targetValue   = if (scream) 1.45f else 1f,
-        animationSpec = spring(dampingRatio = 0.22f, stiffness = 550f),
-        label         = "lml_scale",
-    )
-
-    Text(
-        text     = "🥁↻🥁",
-        fontSize = 16.sp,
-        modifier = Modifier
-            .graphicsLayer {
-                scaleX = scale
-                scaleY = scale
-                alpha  = 0.35f + 0.65f * progress.value
-            }
-            .clickable { onRefresh(); key++ }
-            .padding(horizontal = 4.dp, vertical = 2.dp),
-    )
-}
